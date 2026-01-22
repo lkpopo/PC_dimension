@@ -55,11 +55,11 @@ class OSGEarthApp : public QWidget {
 
   void applyFullLayout(int w, int h);
   void onReShow();
-  void resetForNewProject();
+  void resetScene();
  signals:
   void projectSavedSuccess();
 
- private slots:
+ public slots:
   void onSlotLoadLas(const QString& filePath);
   void onSlotLasEle();
   void onSlotTif(const QString& filePath);
@@ -69,11 +69,6 @@ class OSGEarthApp : public QWidget {
   void onSlotClose();
   void onSavePro();
   void onLoadScene();
-
-  //void onSlotLasPos();
-  //void onSlotShpPos();
-  //void onSlotElePos();
-  //void onSlotTifPos();
 
  private:
   void initEnvironment();    // 路径与环境配置

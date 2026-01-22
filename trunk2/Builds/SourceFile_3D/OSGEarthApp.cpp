@@ -548,7 +548,7 @@ void OSGEarthApp::onLoadScene() {
   } else if (suffix == "tif") {
     onSlotTif(filePath);
     //} else {
-    onSlotElevation(filePath);
+    //onSlotElevation(filePath);
     //}
   } else if (suffix == "shp") {
     onSlotShp(filePath);
@@ -640,7 +640,7 @@ void OSGEarthApp::onReShow() {
   }
 }
 
-void OSGEarthApp::resetForNewProject() {
+void OSGEarthApp::resetScene() {
   m_currentData.clear();
   if (ui.leProjectName) ui.leProjectName->clear();
 
@@ -654,7 +654,6 @@ void OSGEarthApp::resetForNewProject() {
     map->getLayers(layers);
 
     for (auto& layer : layers) {
-      // cout << layer->getName() << endl;
       if (layer->getName() == "readymap_elevation" ||
           layer->getName() == "GlobeImage")
         continue;
@@ -710,6 +709,12 @@ void OSGEarthApp::applyFullLayout(int w, int h) {
 
   // 5. 布局：项目名称输入框 (leProjectName)
   if (ui.leProjectName) {
+    ui.leProjectName->setPlaceholderText(
+        QStringLiteral("请输入新建的项目名称..."));
+    QPalette pal = ui.leProjectName->palette();
+    pal.setColor(QPalette::PlaceholderText,
+                 QColor(150, 150, 150));  // 设置你想要的灰色
+    ui.leProjectName->setPalette(pal);
     ui.leProjectName->setGeometry(btnX, currentY, btnW, btnH);
     currentY += (btnH + spacing);
   }
@@ -825,6 +830,7 @@ void OSGEarthApp::onSavePro() {
 
 void OSGEarthApp::onSlotClose() {
   this->hide();
+  resetScene();
 
   // 建议同时停止 OSG 的定时器，节省不显示的性能开销
   if (m_frameTimer) {

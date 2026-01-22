@@ -29,7 +29,7 @@ Space_3D::~Space_3D() {
 }
 
 void Space_3D::handleCreateProject() {
-  m_earthWindow->resetForNewProject();
+  m_earthWindow->resetScene();
   m_earthWindow->onReShow();
   m_earthWindow->activateWindow();  // 确保窗口在最前面
 }
@@ -157,41 +157,42 @@ void Space_3D::onDeleteProject(QString pName) {
 }
 
 void Space_3D::onLoadProject(QString pName) {
-  cout << "Loading Project: " << pName.toStdString() << endl;
-
-  // 1. 从数据库查询该项目所有的文件路径
+  // 1. 获取数据库中的路径
   QSqlQuery query;
   query.prepare("SELECT file_path FROM t_project_assets WHERE p_name = ?");
   query.addBindValue(pName);
 
-  if (!query.exec()) return;
-
-  QStringList filesToLoad;
-  while (query.next()) {
-    filesToLoad << query.value(0).toString();
-  }
-
-  if (filesToLoad.isEmpty()) {
-    QMessageBox::warning(this, QStringLiteral("提示"),
-                         QStringLiteral("该项目没有任何关联文件。"));
+  if (!query.exec()) {
+    QMessageBox::warning(this, "Error", "Failed to query project assets.");
     return;
   }
 
-  // 2. 调用你的 OSG 加载逻辑
-  // 假设你有一个全局的加载函数或者你可以访问 OSGEarthApp 的实例
-  for (const QString& path : filesToLoad) {
-    // 这里根据后缀名调用你之前的加载代码
-    if (path.endsWith(".las", Qt::CaseInsensitive)) {
-      // 加载点云...
-      // m_osgApp->addPointCloud(path);
-    } else if (path.endsWith(".tif", Qt::CaseInsensitive) ||
-               path.endsWith(".img", Qt::CaseInsensitive)) {
-      // 加载影像...
-      // m_osgApp->addImageLayer(path);
-    }
-  }
+  // 2. 准备加载，先把当前的 OSGEarthApp 窗口切出来
+  // 假设 m_osgApp 是你保存在 Space_3D 里的 OSGEarthApp 实例指针
+  if (!m_earthWindow) return;
 
-  QMessageBox::information(
-      this, QStringLiteral("加载成功"),
-      QStringLiteral("已成功加载项目 [%1] 的所有图层。").arg(pName));
+  // 这里的逻辑：显示 OSG 窗口，并可以设置项目名称到它的输入框
+  m_earthWindow->onReShow();
+
+  // 3. 循环加载文件
+  int loadCount = 0;
+  while (query.next()) {
+    QString path = query.value(0).toString();
+    QFileInfo info(path);
+    QString suffix = info.suffix().toLower();
+
+    // 根据后缀分发给 OSGEarthApp 的对应函数
+    if (suffix == "las") {
+      m_earthWindow->onSlotLoadLas(path);
+    } else if (suffix == "tif" || suffix == "img") {
+      // 注意：这里可能需要区分是 Elevation 还是 Imagery
+      // 简单处理可以先默认作为影像加载，或者根据你数据库的设计增加类型字段
+      m_earthWindow->onSlotTif(path);
+    } else if (suffix == "shp") {
+      m_earthWindow->onSlotShp(path);
+    } else if (suffix == "obj") {
+      m_earthWindow->onSlotLoadObj(path);
+    }
+    loadCount++;
+  }
 }
