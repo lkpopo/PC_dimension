@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_edit_hotpoint_group_setClass</class>
+ <widget class="QWidget" name="project_edit_hotpoint_group_setClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>255</width>
+    <height>1062</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_edit_hotpoint_group_set</string>
+  </property>
+  <widget class="QLabel" name="label_fov_cut">
+   <property name="geometry">
+    <rect>
+     <x>105</x>
+     <y>240</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(20, 20, 20,0);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>60.0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_close">
+   <property name="geometry">
+    <rect>
+     <x>205</x>
+     <y>4</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>230</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_style">
+   <property name="geometry">
+    <rect>
+     <x>209</x>
+     <y>536</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_search">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>530</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);
+border: 1px solid rgb(40, 40, 40);
+border-radius:5px;
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="placeholderText">
+    <string>搜索热点</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>260</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>最近</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_done">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>1010</y>
+     <width>231</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>完成设置</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_filter">
+   <property name="geometry">
+    <rect>
+     <x>186</x>
+     <y>536</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>600</y>
+     <width>251</width>
+     <height>381</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(40, 40, 40,0);
+border:0px;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_iconCount">
+   <property name="geometry">
+    <rect>
+     <x>95</x>
+     <y>570</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(108, 108, 108);font: 8pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>(0)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>260</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>最远</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>440</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>分组热点</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>180</y>
+     <width>230</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bottom_bg">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>430</y>
+     <width>231</width>
+     <height>561</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>5</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 16pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>分组设置</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_hpList">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>570</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>热点列表</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>分组视角</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>530</y>
+     <width>55</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>230</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>250</width>
+     <height>1051</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>分组名称</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_groupName">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>90</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);
+border: 1px solid rgb(40, 40, 40);
+border-radius:5px;
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="placeholderText">
+    <string>请输入分组名称</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>480</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox
+{background-color: rgb(52, 52, 52);
+color: rgb(255, 255, 255);
+font: 12pt &quot;微软雅黑&quot;;
+border-width:0;
+border-style:outset;
+}
+QComboBox::item:hover{background-color:rgb(52, 52, 52);};
+QComboBox::item:selected{background-color:rgb(52, 52, 52);};</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_groupShow">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>201</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>在场景中显示该分组</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_SeeAngle">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>270</y>
+     <width>210</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_blGroupAngle">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>230</y>
+     <width>201</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>自定义分组视角</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_blSeeAngleZoom">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>380</y>
+     <width>201</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>分组视角缩放</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>530</y>
+     <width>211</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;微软雅黑&quot;;
+color: rgb(255, 85, 0);</string>
+   </property>
+   <property name="text">
+    <string>注：系统将自动添加所有热点至该分组，后
+续新增热点也会自动归入</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_del">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>533</y>
+     <width>24</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>label_bg</zorder>
+  <zorder>label_frontCover_2</zorder>
+  <zorder>label_bottom_bg</zorder>
+  <zorder>label_fov_cut</zorder>
+  <zorder>label_frontCover_3</zorder>
+  <zorder>label_6</zorder>
+  <zorder>pushButton_done</zorder>
+  <zorder>label_8</zorder>
+  <zorder>label_9</zorder>
+  <zorder>label_frontCover_4</zorder>
+  <zorder>checkBox_hpList</zorder>
+  <zorder>label_5</zorder>
+  <zorder>label_3</zorder>
+  <zorder>label_title_2</zorder>
+  <zorder>pushButton_close</zorder>
+  <zorder>lineEdit_groupName</zorder>
+  <zorder>comboBox</zorder>
+  <zorder>checkBox_groupShow</zorder>
+  <zorder>label_SeeAngle</zorder>
+  <zorder>checkBox_blGroupAngle</zorder>
+  <zorder>checkBox_blSeeAngleZoom</zorder>
+  <zorder>listWidget</zorder>
+  <zorder>label</zorder>
+  <zorder>pushButton_filter</zorder>
+  <zorder>pushButton_style</zorder>
+  <zorder>label_iconCount</zorder>
+  <zorder>label_10</zorder>
+  <zorder>lineEdit_search</zorder>
+  <zorder>pushButton_del</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

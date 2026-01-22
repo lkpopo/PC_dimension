@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_edit_hotpoint_levelClass</class>
+ <widget class="QWidget" name="project_edit_hotpoint_levelClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>246</width>
+    <height>782</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_edit_hotpoint_level</string>
+  </property>
+  <widget class="CustomListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>5</x>
+     <y>90</y>
+     <width>251</width>
+     <height>691</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);
+border:0px;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_style">
+   <property name="geometry">
+    <rect>
+     <x>218</x>
+     <y>105</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>96</y>
+     <width>51</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>250</width>
+     <height>801</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_add">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>56</y>
+     <width>231</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>添加层级</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_exit">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>16</y>
+     <width>18</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_hp">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255,0);
+color: rgb(255, 255, 255);
+font: 14pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>热点</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>231</width>
+     <height>46</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_levelCount">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>13</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255,0);
+color:rgb(140, 140, 140);
+font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>层级 0</string>
+   </property>
+  </widget>
+  <zorder>pushButton_style</zorder>
+  <zorder>label</zorder>
+  <zorder>label_bg</zorder>
+  <zorder>pushButton_add</zorder>
+  <zorder>listWidget</zorder>
+  <zorder>label_bg_2</zorder>
+  <zorder>label_levelCount</zorder>
+  <zorder>label_hp</zorder>
+  <zorder>pushButton_exit</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>CustomListWidget</class>
+   <extends>QListWidget</extends>
+   <header>CustomListWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

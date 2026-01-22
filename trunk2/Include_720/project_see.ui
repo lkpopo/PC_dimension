@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_seeClass</class>
+ <widget class="QWidget" name="project_seeClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1928</width>
+    <height>1058</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>720全景图片浏览器</string>
+  </property>
+  <widget class="QOpenGLWidget" name="openGLWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>1040</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_close">
+   <property name="geometry">
+    <rect>
+     <x>1850</x>
+     <y>20</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_full">
+   <property name="geometry">
+    <rect>
+     <x>1850</x>
+     <y>80</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_selPic">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>950</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>场景选择</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_info">
+   <property name="geometry">
+    <rect>
+     <x>1840</x>
+     <y>960</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>简介</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>840</y>
+     <width>400</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(60, 60, 60, 0);
+border:0px;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_pic_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>840</y>
+     <width>1920</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(60, 60, 60, 150);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget_group">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>410</y>
+     <width>110</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255,0);
+border:0px;</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_autoRotate">
+   <property name="geometry">
+    <rect>
+     <x>1810</x>
+     <y>1020</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+font: 12pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>自动旋转</string>
+   </property>
+  </widget>
+  <zorder>openGLWidget</zorder>
+  <zorder>pushButton_close</zorder>
+  <zorder>pushButton_full</zorder>
+  <zorder>pushButton_selPic</zorder>
+  <zorder>pushButton_info</zorder>
+  <zorder>label_pic_bg</zorder>
+  <zorder>listWidget</zorder>
+  <zorder>listWidget_group</zorder>
+  <zorder>checkBox_autoRotate</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

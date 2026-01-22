@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_see_itemClass</class>
+ <widget class="QWidget" name="project_see_itemClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>80</width>
+    <height>80</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_see_item</string>
+  </property>
+  <widget class="QPushButton" name="pushButton_pic">
+   <property name="geometry">
+    <rect>
+     <x>3</x>
+     <y>3</y>
+     <width>74</width>
+     <height>74</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-radius: 5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>3</x>
+     <y>3</y>
+     <width>74</width>
+     <height>74</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border-radius:5px;
+background-color: rgb(144, 144, 144);
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_baseName">
+   <property name="geometry">
+    <rect>
+     <x>3</x>
+     <y>53</y>
+     <width>74</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(80, 80, 80, 0);
+border: 0px;
+</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="MarqueeLabel" name="label_baseName">
+   <property name="geometry">
+    <rect>
+     <x>3</x>
+     <y>53</y>
+     <width>74</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(80, 80, 80, 200);
+font: 9pt &quot;微软雅黑&quot;;
+color: rgb(255, 255, 255);
+border: 0px;
+text-align: center;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <zorder>label_bg</zorder>
+  <zorder>pushButton_pic</zorder>
+  <zorder>label_baseName</zorder>
+  <zorder>pushButton_baseName</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MarqueeLabel</class>
+   <extends>QLabel</extends>
+   <header>MarqueeLabel.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

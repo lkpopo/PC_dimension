@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_edit_hotpoint_level_set_itemClass</class>
+ <widget class="QWidget" name="project_edit_hotpoint_level_set_itemClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>230</width>
+    <height>36</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_edit_hotpoint_level_set_item</string>
+  </property>
+  <widget class="QPushButton" name="pushButton_changPic">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>0</y>
+     <width>51</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(52, 52, 52,0);
+border:0px;
+color: rgb(140, 140, 140);</string>
+   </property>
+   <property name="text">
+    <string>场景切换</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>9</y>
+     <width>21</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255,0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_icon">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>8</y>
+     <width>20</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(52, 52, 52,0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_title">
+   <property name="geometry">
+    <rect>
+     <x>55</x>
+     <y>0</y>
+     <width>111</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(52, 52, 52,0);
+color: rgb(255, 255, 255);
+text-align: left;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

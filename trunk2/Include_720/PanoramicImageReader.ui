@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PanoramicImageReaderClass</class>
+ <widget class="QWidget" name="PanoramicImageReaderClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1924</width>
+    <height>1040</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>720全景图片浏览器</string>
+  </property>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>1040</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(40, 40,40);
+border-width: 1px;
+border-style: solid;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_new">
+   <property name="geometry">
+    <rect>
+     <x>1530</x>
+     <y>20</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(250, 100, 0);
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>新建作品</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget_project">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>70</y>
+     <width>1920</width>
+     <height>1011</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_pidel">
+   <property name="geometry">
+    <rect>
+     <x>1670</x>
+     <y>20</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string>批量删除</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_sort">
+   <property name="geometry">
+    <rect>
+     <x>1800</x>
+     <y>20</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(85, 170, 127);</string>
+   </property>
+   <property name="text">
+    <string>分类排序</string>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../Resource/PanoramicImageReader.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_edit_group_itemClass</class>
+ <widget class="QWidget" name="project_edit_group_itemClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>90</width>
+    <height>36</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_edit_group_item</string>
+  </property>
+  <widget class="QPushButton" name="pushButton_HPGroup">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>90</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(250, 255, 255);
+background-color: rgb(250, 100, 0);
+border-radius:5px;
+border: 0px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

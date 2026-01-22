@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_edit_hotpoint_group_ResetGroupStyleClass</class>
+ <widget class="QWidget" name="project_edit_hotpoint_group_ResetGroupStyleClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>250</width>
+    <height>810</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_edit_hotpoint_group_ResetGroupStyle</string>
+  </property>
+  <widget class="QPushButton" name="pushButton_done">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>760</y>
+     <width>231</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>完成</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_hp">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255,0);
+color: rgb(255, 255, 255);
+font: 14pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>样式设置</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>250</width>
+     <height>801</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>70</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>默认背景颜色</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_unsel_bg_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>150</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>默认字体颜色</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_unsel_text_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_sel_bg_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>270</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_5">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>230</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>选中背景颜色</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_sel_text_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>350</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_6">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>310</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>选中字体颜色</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>230</width>
+     <height>401</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>label_bg</zorder>
+  <zorder>label_frontCover_2</zorder>
+  <zorder>pushButton_sel_bg_color</zorder>
+  <zorder>pushButton_done</zorder>
+  <zorder>pushButton_sel_text_color</zorder>
+  <zorder>pushButton_unsel_text_color</zorder>
+  <zorder>pushButton_unsel_bg_color</zorder>
+  <zorder>label_hp</zorder>
+  <zorder>label_title_4</zorder>
+  <zorder>label_title_5</zorder>
+  <zorder>label_title_6</zorder>
+  <zorder>label_title_3</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

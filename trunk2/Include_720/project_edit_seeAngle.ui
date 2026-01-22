@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_edit_seeAngleClass</class>
+ <widget class="QWidget" name="project_edit_seeAngleClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>246</width>
+    <height>860</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_edit_seeAngle</string>
+  </property>
+  <widget class="QLabel" name="label_frontCover_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>460</y>
+     <width>231</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>240</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>视角（FOV）初始值</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>470</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>视角限制</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>246</width>
+     <height>871</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>当前初始视角</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_SeeAngle">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>210</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>230</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>230</y>
+     <width>231</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_CtoOtherPic">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>160</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>把初始视角应用于...</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_FtoOtherPic">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>300</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>把视角（FOV）应用于...</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_StoOtherPic">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>700</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>把视角限制应用于...</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_AlltoOtherPic">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>770</y>
+     <width>231</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>把全部视角设置应用于...</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_FtoOtherPic_2">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>410</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(52, 52, 52);
+color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>把缩放范围应用于...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>350</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>场景缩放范围</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_done">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>810</y>
+     <width>231</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);</string>
+   </property>
+   <property name="text">
+    <string>保存设置</string>
+   </property>
+  </widget>
+  <zorder>label_bg</zorder>
+  <zorder>label_frontCover_5</zorder>
+  <zorder>label_frontCover</zorder>
+  <zorder>label_frontCover_4</zorder>
+  <zorder>label_title</zorder>
+  <zorder>label_title_2</zorder>
+  <zorder>label_title_3</zorder>
+  <zorder>label_SeeAngle</zorder>
+  <zorder>pushButton_CtoOtherPic</zorder>
+  <zorder>pushButton_FtoOtherPic</zorder>
+  <zorder>pushButton_StoOtherPic</zorder>
+  <zorder>pushButton_AlltoOtherPic</zorder>
+  <zorder>pushButton_FtoOtherPic_2</zorder>
+  <zorder>label_title_4</zorder>
+  <zorder>pushButton_done</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

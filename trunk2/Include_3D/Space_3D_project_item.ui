@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Space_3D_project_itemClass</class>
+ <widget class="QWidget" name="Space_3D_project_itemClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>100</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_item</string>
+  </property>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>910</x>
+     <y>60</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;微软雅黑&quot;;
+background-color: rgba(255, 255, 255, 0);
+color: rgb(0, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string>最后修改：</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_lastChange">
+   <property name="geometry">
+    <rect>
+     <x>1000</x>
+     <y>60</y>
+     <width>221</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;微软雅黑&quot;;
+background-color: rgba(255, 255, 255, 0);
+color: rgb(0, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_sel">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>30</y>
+     <width>36</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255, 0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_projectName">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>30</y>
+     <width>441</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;微软雅黑&quot;;
+background-color: rgba(255, 255, 255, 0);
+color: rgb(0, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnEditPro">
+   <property name="geometry">
+    <rect>
+     <x>1750</x>
+     <y>30</y>
+     <width>50</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: rgb(0, 85, 255);
+    background-color: rgba(255, 255, 255, 0);
+    border: 0px;
+    font: 12pt;
+}
+QPushButton::hover {
+    color: rgb(0, 120, 255);
+}</string>
+   </property>
+   <property name="text">
+    <string>编辑</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnDelPro">
+   <property name="geometry">
+    <rect>
+     <x>1800</x>
+     <y>30</y>
+     <width>50</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: rgb(255, 0, 0);
+    background-color: rgba(255, 255, 255, 0);
+    border: 0px;
+    font: 12pt ;
+}
+QPushButton::hover {
+    color: rgb(255, 50, 50);
+}</string>
+   </property>
+   <property name="text">
+    <string>删除</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="lbl_createTime">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>60</y>
+     <width>171</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;微软雅黑&quot;;
+background-color: rgba(255, 255, 255, 0);
+color: rgb(0, 0, 0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>640</x>
+     <y>60</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 12pt &quot;微软雅黑&quot;;
+color: rgb(0, 0, 0);
+background-color: rgba(255, 255, 255, 0);</string>
+   </property>
+   <property name="text">
+    <string>创建时间：</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_frontCover">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>20</y>
+     <width>64</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnViewPro">
+   <property name="geometry">
+    <rect>
+     <x>1700</x>
+     <y>30</y>
+     <width>50</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    color: rgb(0, 85, 255);
+    background-color: rgba(255, 255, 255, 0);
+    border: 0px;
+    font: 12pt;
+}
+QPushButton::hover {
+    color: rgb(0, 120, 255);
+}</string>
+   </property>
+   <property name="text">
+    <string>浏览</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>100</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border:0px;background-color: rgb(250, 250, 250);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>pushButton_bg</zorder>
+  <zorder>label_3</zorder>
+  <zorder>lbl_lastChange</zorder>
+  <zorder>checkBox_sel</zorder>
+  <zorder>lbl_projectName</zorder>
+  <zorder>btnEditPro</zorder>
+  <zorder>btnDelPro</zorder>
+  <zorder>lbl_createTime</zorder>
+  <zorder>label_5</zorder>
+  <zorder>pushButton_frontCover</zorder>
+  <zorder>btnViewPro</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,22 @@
+# 1. 忽略根目录下的所有文件和文件夹
+/*
+
+# 2. 允许追踪 .gitignore 文件本身
+!.gitignore
+
+# 3. 逐级放行路径
+# 先放行 trunk2 目录（但不追踪其下所有内容）
+!trunk2/
+trunk2/*
+
+# 4. 放行 trunk2 下的两个直接子目录
+!trunk2/Include_3D/
+!trunk2/Include_720/
+
+# 5. 继续深入：放行 trunk2/Builds 目录
+!trunk2/Builds/
+trunk2/Builds/*
+
+# 6. 放行 Builds 下的两个目标子目录
+!trunk2/Builds/SourceFile_3D/
+!trunk2/Builds/SourceFile_720/

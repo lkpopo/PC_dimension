@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_new_todoClass</class>
+ <widget class="QWidget" name="project_new_todoClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1040</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_new_todo</string>
+  </property>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>1040</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-color: rgb(26, 26,26);
+border-width: 1px;
+border-style: solid;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>830</x>
+     <y>320</y>
+     <width>360</width>
+     <height>400</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string/>
+   </property>
+   <widget class="QLabel" name="label_cg">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>50</y>
+      <width>141</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(170, 255, 0);
+border-image: url(:/PanoramicImageReader/create.png);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_renew">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>320</y>
+      <width>111</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(40, 40, 40, 40);
+color: rgb(40, 104, 243);
+border:0px;</string>
+    </property>
+    <property name="text">
+     <string>继续创建新作品</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_edit">
+    <property name="geometry">
+     <rect>
+      <x>145</x>
+      <y>220</y>
+      <width>75</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgba(40, 104, 255, 243);</string>
+    </property>
+    <property name="text">
+     <string>编辑作品</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_see">
+    <property name="geometry">
+     <rect>
+      <x>145</x>
+      <y>270</y>
+      <width>75</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(40, 40, 40, 40);
+color: rgb(40, 104, 243);
+border:0px;</string>
+    </property>
+    <property name="text">
+     <string>查看作品</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>115</x>
+      <y>150</y>
+      <width>141</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+font: 14pt &quot;微软雅黑&quot;;</string>
+    </property>
+    <property name="text">
+     <string>创建成功</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_center">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>360</width>
+      <height>400</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(40, 40, 40);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <zorder>label_center</zorder>
+   <zorder>label_cg</zorder>
+   <zorder>pushButton_renew</zorder>
+   <zorder>pushButton_edit</zorder>
+   <zorder>pushButton_see</zorder>
+   <zorder>label_2</zorder>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../Resource/PanoramicImageReader.qrc"/>
+ </resources>
+ <connections/>
+</ui>

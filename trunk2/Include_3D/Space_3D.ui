@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Space_3DClass</class>
+ <widget class="QWidget" name="Space_3DClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1924</width>
+    <height>1040</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Space_3D</string>
+  </property>
+  <widget class="QPushButton" name="btnBatchDelete">
+   <property name="geometry">
+    <rect>
+     <x>1670</x>
+     <y>20</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton#btnBatchDelete {
+    border-radius: 5px;
+    background-color: rgb(210, 110, 25);
+    color: rgb(255, 255, 255);
+}
+QPushButton#btnBatchDelete:hover {
+    background-color: rgb(245, 110, 25);
+}</string>
+   </property>
+   <property name="text">
+    <string>批量删除</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnSortCategory">
+   <property name="geometry">
+    <rect>
+     <x>1800</x>
+     <y>20</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton#btnSortCategory {
+    border-radius: 5px;
+    background-color: rgb(100, 200, 100);
+    color: rgb(255, 210, 255);
+}
+QPushButton#btnSortCategory:hover {
+    background-color: rgb(85, 235, 85);
+}</string>
+   </property>
+   <property name="text">
+    <string>分类排序</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>1040</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);
+border-color: rgb(40, 40,40);
+border-width: 1px;
+border-style: solid;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnNewProject">
+   <property name="geometry">
+    <rect>
+     <x>1530</x>
+     <y>20</y>
+     <width>111</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton#btnNewProject {
+    border-radius: 5px;
+    background-color: rgb(40, 110, 250);
+    color: rgb(255, 255, 255);
+}
+QPushButton#btnNewProject:hover {
+    background-color: rgb(0, 85, 255);
+}</string>
+   </property>
+   <property name="text">
+    <string>新建作品</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="projectList">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>70</y>
+     <width>1920</width>
+     <height>1011</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);</string>
+   </property>
+  </widget>
+  <zorder>label_bg</zorder>
+  <zorder>projectList</zorder>
+  <zorder>btnSortCategory</zorder>
+  <zorder>btnBatchDelete</zorder>
+  <zorder>btnNewProject</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
