@@ -585,7 +585,6 @@ void OSGEarthApp::onReShow() {
 }
 
 void OSGEarthApp::resetScene() {
-  
   if (ui.leProjectName) ui.leProjectName->clear();
 
   if (m_dataGroup.valid()) {
@@ -691,12 +690,11 @@ void OSGEarthApp::applyFullLayout(int w, int h) {
 }
 
 void OSGEarthApp::onSavePro() {
-  // 1. 获取名称
+  // 1. 获取名称和时间
   QString pName = ui.leProjectName->text().trimmed();
   QString currentTime =
       QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
-  // 如果用户没输入，以时间作为名称
   if (pName.isEmpty()) {
     pName = QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss");
     ui.leProjectName->setText(pName);
@@ -705,54 +703,76 @@ void OSGEarthApp::onSavePro() {
   QSqlDatabase db = QSqlDatabase::database();
   QSqlQuery query(db);
 
-  // if ()
+  // --- 核心逻辑：区分模式 ---
+  bool isNewProject = true;
 
-  // 2. 查重逻辑
-  query.prepare("SELECT p_name FROM t_project WHERE p_name = ?");
-  query.addBindValue(pName);
-
-  if (query.exec() && query.next()) {
-    // 发现同名，打印到终端并弹窗
-    cout << "Save Failed: Project name [" << pName.toLocal8Bit().constData()
-         << "] already exists." << endl;
-    QMessageBox::warning(
-        this, QStringLiteral("名称冲突"),
-        QStringLiteral("项目 [%1] 已存在，请修改项目名称后再保存。")
-            .arg(pName));
-    return;
+  // 如果当前已经是编辑模式，且输入框名字没改，说明是覆盖保存
+  if (m_isEditMode && pName == m_currentData.projectName) {
+    isNewProject = false;
   }
 
-  // 3. 开始保存
-  if (!db.transaction()) {
-    cout << "Database Transaction Error!" << endl;
-    return;
+  // 2. 只有“新建”或者“改名”时才查重
+  if (isNewProject) {
+    query.prepare("SELECT p_name FROM t_project WHERE p_name = ?");
+    query.addBindValue(pName);
+    if (query.exec() && query.next()) {
+      QMessageBox::warning(
+          this, QStringLiteral("名称冲突"),
+          QStringLiteral("项目 [%1] 已存在，请修改项目名称后再保存。")
+              .arg(pName));
+      return;
+    }
   }
 
-  // A. 插入项目主表
-  query.prepare(
-      "INSERT INTO t_project (p_name, create_time, modify_time) VALUES (?, ?, "
-      "?)");
-  query.addBindValue(pName);
-  query.addBindValue(currentTime);
-  query.addBindValue(currentTime);
+  // 3. 开始数据库事务
+  if (!db.transaction()) return;
 
-  if (!query.exec()) {
-    // 使用 lastError().text() 打印具体错误到 cout
-    cout << "Insert Project Error: "
-         << query.lastError().text().toLocal8Bit().constData() << endl;
-    db.rollback();
-    return;
+  if (isNewProject) {
+    // A1. 新建项目：插入主表
+    query.prepare(
+        "INSERT INTO t_project (p_name, create_time, modify_time) VALUES (?, "
+        "?, ?)");
+    query.addBindValue(pName);
+    query.addBindValue(currentTime);
+    query.addBindValue(currentTime);
+    if (!query.exec()) {
+      cout << "Insert Main Error: " << query.lastError().text().toStdString()
+           << endl;
+      db.rollback();
+      return;
+    }
+  } else {
+    // A2. 编辑项目：仅更新主表的修改时间
+    query.prepare("UPDATE t_project SET modify_time = ? WHERE p_name = ?");
+    query.addBindValue(currentTime);
+    query.addBindValue(pName);
+    if (!query.exec()) {
+      db.rollback();
+      return;
+    }
+
+    // B1. 编辑模式下，先清空旧资产记录 (关键步骤)
+    query.prepare("DELETE FROM t_project_assets WHERE p_name = ?");
+    query.addBindValue(pName);
+    if (!query.exec()) {
+      db.rollback();
+      return;
+    }
   }
 
-  // B. 插入资源路径表
+  // B2. 统一插入资源路径 (从映射表 m_pathNodeMap 获取最新的文件列表)
   query.prepare(
       "INSERT INTO t_project_assets (p_name, file_path) VALUES (?, ?)");
-  for (const QString& path : m_currentData.allFiles) {
+
+  // 注意：这里建议使用 m_pathNodeMap.keys()，因为这是当前场景中真实存在的文件
+  QMapIterator<QString, osg::ref_ptr<osg::Object>> it(m_pathNodeMap);
+  while (it.hasNext()) {
+    it.next();
     query.addBindValue(pName);
-    query.addBindValue(path);
+    query.addBindValue(it.key());  // 文件绝对路径
     if (!query.exec()) {
-      cout << "Insert Assets Error: "
-           << query.lastError().text().toLocal8Bit().constData() << endl;
+      cout << "Insert Assets Error: " << query.lastError().text().toStdString()
+           << endl;
       db.rollback();
       return;
     }
@@ -760,12 +780,12 @@ void OSGEarthApp::onSavePro() {
 
   // 4. 提交
   if (db.commit()) {
-    m_currentData.projectName = pName;
+    m_currentProjectName = pName;
+    m_isEditMode = true;  // 保存后进入编辑状态
     emit projectSavedSuccess();
     QMessageBox::information(this, QStringLiteral("成功"),
                              QStringLiteral("项目保存成功！"));
   } else {
-    cout << "Commit failed!" << endl;
     db.rollback();
   }
 }
@@ -867,7 +887,7 @@ void OSGEarthApp::addFileToTree(QString filePath) {
   connect(widget, &SceneItemWidget::signalLocate, this,
           &OSGEarthApp::onSlotLocateFile);
 
-   //连接删除信号 (需要 Lambda 捕获当前 item 指针)
+  // 连接删除信号 (需要 Lambda 捕获当前 item 指针)
   connect(widget, &SceneItemWidget::signalDelete, this,
           &OSGEarthApp::onSlotDeleteFile);
 
@@ -952,7 +972,8 @@ void OSGEarthApp::registerLoadedObject(const QString& filePath,
     m_currentData.allFiles.append(filePath);
   }
 
-  ui.lblText->setText(QStringLiteral("加载成功: %1").arg(QFileInfo(filePath).suffix().toLower()));
+  ui.lblText->setText(QStringLiteral("加载成功: %1")
+                          .arg(QFileInfo(filePath).suffix().toLower()));
 }
 
 void OSGEarthApp::onSlotDeleteFile(QString path) {
@@ -1010,8 +1031,7 @@ void OSGEarthApp::resetSceneUI() {
   m_pathItemMap.clear();
 
   for (int i = 0; i < ui.treeSceneManager->topLevelItemCount(); ++i) {
-      QTreeWidgetItem* root = ui.treeSceneManager->topLevelItem(i);
-      qDeleteAll(root->takeChildren());
+    QTreeWidgetItem* root = ui.treeSceneManager->topLevelItem(i);
+    qDeleteAll(root->takeChildren());
   }
-  
 }
