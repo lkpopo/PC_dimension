@@ -547,10 +547,10 @@ void project_new::processInsertPicItem()
 	QString front_cover = newPath;
 	QString projectName = ui.textEdit_tilte->toPlainText();
 	QString start_angle = "0.0;0.0;0.0";
-	QString fov = "30.0";
+	QString fov = "60.0";
 	QString zoom = "1.0";
 	QString zoom_range = "0.5;3.0";
-	QString h_range = "-360.0;360.0";
+	QString h_range = "-180.0;180.0";
 	QString v_range = "-90.0;90.0";
 
 	QString compass_s_angle = "0.0";

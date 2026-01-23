@@ -58,6 +58,13 @@ public slots:
 	void slotSetFirstAngle();
 	void slotSetSeeAngle(QString);
 	void slotSetFirstAngle_FrontCover();
+	void slotSetSelPicFirstAngle(std::vector<QString>&);//设置选择的场景的第一视角
+	void slotSetSelPicFOV(std::vector<QString>&, float, float, float);//设置选择的场景的FOV
+	void slotSetSelPicHV(std::vector<QString>&, int, int, int, int);//设置选择的场景的H/V
+	void slotSetSelPicCompass(std::vector<QString>&, float, QString, QString);//设置选择的场景的指北针
+
+	void slotSetPicCompassPic(QString);
+	void slotSetPicCompassPos(QString);
 	void slotSetGroupAngle();
 	void slotSetCompassN();
 
@@ -81,6 +88,8 @@ public slots:
 	void slotSetTitleTextColor(QColor);
 	void slotSetTitleTextSize(int);
 	void slotSetCutZoom(float);
+	void slotHAngle(int);
+	void slotVAngle(int);
 	void slotReloadLevel();
 	void slotReloadGroup(QString);
 	void slotAddGroupItemStyle(GroupItemStyle);
@@ -100,6 +109,7 @@ public slots:
 signals:
 	void sig_updateSeeAngle(float);
 	void sig_Pixmap(QPixmap&);
+	void sig_Angle(float);
 	void sig_update();
 	void sig_Close();
 	void sig_edit_GroupSeeAngleZoom(GroupSeeAngleZoom);
@@ -126,9 +136,13 @@ private:
 	project_edit_mask* m_mask;
 	project_edit_hotpoint* m_hotpoint;
 	project_edit_delPics* m_delPics;
+
 	QVector3D m_rotation = QVector3D(-9999,-9999,-9999);
-	float m_CAngle = -9999.0;
 	float m_zoom = -9999.0;
+
+	float m_CAngle = -9999.0;
+
+	
 	std::vector<Hotspot> m_vecCurPicHp;
 	int m_curInsertNum;
 	

@@ -130,7 +130,7 @@ background-color: #3278FF;
    <property name="geometry">
     <rect>
      <x>1310</x>
-     <y>180</y>
+     <y>130</y>
      <width>231</width>
      <height>40</height>
     </rect>
@@ -169,7 +169,7 @@ QPushButton:pressed {
    <property name="geometry">
     <rect>
      <x>1310</x>
-     <y>100</y>
+     <y>70</y>
      <width>231</width>
      <height>41</height>
     </rect>
@@ -195,7 +195,13 @@ QLineEdit:focus {
     border: 2px solid #0055ff;
     background-color: #FDFDFD;
 }
-</string>
+
+/* 3. 【新增】只读状态（编辑模式）下的样式 */
+QLineEdit[readOnly=&quot;true&quot;] {
+    background-color: #EEEEEE; /* 灰色背景 */
+    color: #888888;            /* 灰色文字 */
+    border: 1px solid #DDDDDD; /* 变淡的边框 */
+}</string>
    </property>
    <property name="text">
     <string/>
@@ -205,9 +211,9 @@ QLineEdit:focus {
    <property name="geometry">
     <rect>
      <x>1310</x>
-     <y>270</y>
+     <y>790</y>
      <width>231</width>
-     <height>111</height>
+     <height>16</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -217,6 +223,51 @@ QLineEdit:focus {
     <string>支持模型格式：las,tif,obj,dem,shp</string>
    </property>
   </widget>
+  <widget class="QTreeWidget" name="treeSceneManager">
+   <property name="geometry">
+    <rect>
+     <x>1290</x>
+     <y>200</y>
+     <width>256</width>
+     <height>481</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTreeWidget {
+    background-color: rgba(255, 255, 255, 10);
+    border: 1px solid rgba(255, 255, 255, 50);
+    border-radius: 4px;
+color: white;
+padding: 5px;
+}
+
+/* 一级分类节点（根节点）样式 */
+QTreeWidget::item:branch:has-children {
+    /* 这里可以设置箭头图标 */
+}
+
+/* 场景文件行样式 */
+QTreeWidget::item {
+    padding: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+QTreeWidget::item:hover {
+    background-color: rgba(0, 85, 255, 0.2);
+}</string>
+   </property>
+   <property name="columnCount">
+    <number>1</number>
+   </property>
+   <attribute name="headerVisible">
+    <bool>false</bool>
+   </attribute>
+   <column>
+    <property name="text">
+     <string notr="true">1</string>
+    </property>
+   </column>
+  </widget>
   <zorder>lblBackground</zorder>
   <zorder>lblBtnbackground</zorder>
   <zorder>btn_Close</zorder>
@@ -225,6 +276,7 @@ QLineEdit:focus {
   <zorder>btnLoadScene</zorder>
   <zorder>leProjectName</zorder>
   <zorder>lblText</zorder>
+  <zorder>treeSceneManager</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

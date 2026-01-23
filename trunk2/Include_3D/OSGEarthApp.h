@@ -19,6 +19,7 @@
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 #include <osgEarth/ImageLayer>
+#include <osgEarth/ModelLayer>
 #include <osgEarth/MapNode>
 #include <osgEarth/ShaderUtils>
 #include <osgEarth/VirtualProgram>
@@ -56,16 +57,21 @@ class OSGEarthApp : public QWidget {
   void applyFullLayout(int w, int h);
   void onReShow();
   void resetScene();
+  void setEditMode(bool edit, QString pName);
+  bool getEarthInitStatus() const { return m_earth_init; }
+  void addFileToTree(QString filePath);
+  void registerLoadedObject(const QString& filePath, osg::Object* obj);
+
  signals:
   void projectSavedSuccess();
 
  public slots:
-  void onSlotLoadLas(const QString& filePath);
+  osg::Object* onSlotLoadLas(const QString& filePath);
   void onSlotLasEle();
-  void onSlotTif(const QString& filePath);
-  void onSlotElevation(const QString& filePath);
-  void onSlotShp(const QString& filePath);
-  void onSlotLoadObj(const QString& filePath);
+  osg::Object* onSlotTif(const QString& filePath);
+  osg::Object* onSlotElevation(const QString& filePath);
+  osg::Object* onSlotShp(const QString& filePath);
+  osg::Object* onSlotLoadObj(const QString& filePath);
   void onSlotClose();
   void onSavePro();
   void onLoadScene();
@@ -76,6 +82,11 @@ class OSGEarthApp : public QWidget {
   void initUIConnections();  // 信号与槽绑定
   void startAsyncLoad();     // 异步读取地球模型
   void flyToNode(osg::Node* node);
+  void flyToImageCenter(const QString& filePath);
+  void initSceneManagerTree();
+  void onSlotLocateFile(QString path);
+  void onSlotDeleteFile(QString path);
+  void resetSceneUI();
 
  private:
   Ui::OSGEarthAppClass ui;
@@ -83,6 +94,9 @@ class OSGEarthApp : public QWidget {
   QButtonGroup* m_cameraGroup = nullptr;
   QWidget* m_glWidget;
   QString m_lastOpenPath;
+  QMap<QString, QTreeWidgetItem*> m_categoryNodes;
+  QMap<QString, osg::ref_ptr<osg::Object>> m_pathNodeMap;
+  QMap<QString, QTreeWidgetItem*> m_pathItemMap;
 
   // 业务数据
   ProjectMemoryData m_currentData;
@@ -90,6 +104,8 @@ class OSGEarthApp : public QWidget {
   std::string m_elePath;
   double m_lon = 0.0;
   double m_lat = 0.0;
+  bool m_isEditMode = false;
+  bool m_earth_init = false;
 
   // OSG
   osg::ref_ptr<osgViewer::Viewer> m_viewer;

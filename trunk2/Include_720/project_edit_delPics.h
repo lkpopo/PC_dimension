@@ -20,7 +20,11 @@ signals:
 	void sig_delList(std::vector<QString>);
 	void sig_selList(std::vector<QString>, std::vector<QString>);
 	void sig_Msg(QString);
-
+	void sig_sel_setFirstAnglePic(std::vector<QString>&);
+	void sig_sel_setFOVPic(std::vector<QString>&);
+	void sig_sel_setHVPic(std::vector<QString>&);
+	void sig_sel_setAllPic(std::vector<QString>&);
+	void sig_sel_setCompassPic(std::vector<QString>&);
 public slots:
 	void slotClose();
 	void slotSelStatus(int);

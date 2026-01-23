@@ -1,5 +1,6 @@
 ﻿#include "OSGEarthApp.h"
 
+#include "SceneItemWidget.h"
 #include "utils.h"
 
 OSGEarthApp::OSGEarthApp(QWidget* parent) : QWidget(parent) {
@@ -10,10 +11,11 @@ OSGEarthApp::OSGEarthApp(QWidget* parent) : QWidget(parent) {
   setAttribute(Qt::WA_DeleteOnClose);
   setWindowTitle("osgEarth Eigen APP");
 
-  initEnvironment();    // 1. 环境准备
-  initOSGViewer();      // 2. 配置相机和渲染窗口
-  initUIConnections();  // 3. 绑定按钮逻辑
-  startAsyncLoad();     // 4. 异步加载地球模型
+  initEnvironment();       // 1. 环境准备
+  initOSGViewer();         // 2. 配置相机和渲染窗口
+  initUIConnections();     // 3. 绑定按钮逻辑
+  startAsyncLoad();        // 4. 异步加载地球模型
+  initSceneManagerTree();  // 初始化场景管理树
 }
 
 OSGEarthApp::~OSGEarthApp() {
@@ -65,7 +67,7 @@ void OSGEarthApp::startAsyncLoad() {
             if (m_mapNode.valid()) {
               m_geoSRS = m_mapNode->getMapSRS()->getGeographicSRS();
             }
-            qDebug() << "Earth Node Loaded in Main Thread";
+            m_earth_init = true;
           }
         },
         Qt::QueuedConnection);
@@ -150,43 +152,9 @@ void OSGEarthApp::initUIConnections() {
   m_frameTimer->start(5);
 }
 
-void OSGEarthApp::flyToNode(osg::Node* node) {
-  if (!node || !m_mapNode || !m_earthManipulator) return;
-
-  // 1. 获取节点的包围球（包含中心点 center 和半径 radius）
-  osg::BoundingSphere bs = node->getBound();
-
-  // 如果包围球无效（比如节点还没完全加载），可以尝试强制更新
-  if (!bs.valid()) {
-    node->dirtyBound();
-    bs = node->getBound();
-  }
-
-  if (bs.valid()) {
-    // 2. 将世界坐标 (ECEF) 转换为地理坐标 (经纬度)
-    osgEarth::GeoPoint geo;
-    geo.fromWorld(m_geoSRS, bs.center());
-
-    // 3. 计算观察范围 (Range)
-    // 通常设为半径的 2 到 3 倍，这样能看清全貌又不会太远
-    double range = bs.radius() * 2.5;
-    if (range < 500.0) range = 500.0;  // 防止半径太小时镜头贴太近
-
-    // 4. 创建视角对象
-    // 参数依次为：名称、经度、纬度、高度(相对海拔)、航向角(0为北)、俯仰角(-90为垂直向下)、距离
-    osgEarth::Viewpoint vp("Point Cloud Target", geo.x(), geo.y(), 2000, 0.0,
-                           -90.0, range);
-    m_lon = geo.x();
-    m_lat = geo.y();
-
-    // 5. 使用操作器执行平滑飞行（第二个参数是动画持续时间，单位：秒）
-    m_earthManipulator->setViewpoint(vp, 2.0);
-  }
-}
-
 /*-------------------加载场景-------------------*/
 
-void OSGEarthApp::onSlotLoadLas(const QString& filePath) {
+osg::Object* OSGEarthApp::onSlotLoadLas(const QString& filePath) {
   QFileInfo lasInfo(filePath);
   QString tilesBaseDir =
       QApplication::applicationDirPath() + "/tiles/" + lasInfo.baseName() + "/";
@@ -204,7 +172,7 @@ void OSGEarthApp::onSlotLoadLas(const QString& filePath) {
     if (loadedIndex.valid()) {
       m_dataGroup->addChild(loadedIndex.get());
       this->flyToNode(loadedIndex.get());
-      return;
+      return loadedIndex.get();
     }
   }
 
@@ -217,6 +185,7 @@ void OSGEarthApp::onSlotLoadLas(const QString& filePath) {
     m_dataGroup->addChild(resultNode);
     this->flyToNode(resultNode);
   }
+  return resultNode;
 }
 
 void OSGEarthApp::onSlotLasEle() {
@@ -336,66 +305,35 @@ void OSGEarthApp::onSlotLasEle() {
       << std::endl;
 }
 
-void OSGEarthApp::onSlotTif(const QString& filePath) {
-  QByteArray by = filePath.toLocal8Bit();
-  m_tifPath = by.constData();
-  QFileInfo fileinfo = QFileInfo(filePath);
-  // 文件名
-  QString file_name = fileinfo.fileName();
-  QByteArray by2 = file_name.toLocal8Bit();
-std:
-  string tif_name = by2.constData();
+osg::Object* OSGEarthApp::onSlotTif(const QString& filePath) {
+  // 1. 构建 GDAL 图层配置
+  std::string tifName =
+      QFileInfo(filePath).fileName().toLocal8Bit().constData();
+  std::string tifUrl = filePath.toLocal8Bit().constData();
 
-  osgEarth::Config terrainConfig;
-  // 初始化terrainConfig
-  terrainConfig.key() = "image";
-  terrainConfig.add("name", tif_name);
-  terrainConfig.add("driver", "gdal");
-  terrainConfig.add("url", m_tifPath);
-  terrainConfig.add("hastransparency", true);
-  terrainConfig.add("transparent", true);
-  terrainConfig.add("visible", true);
-  terrainConfig.add("format", "png");
-  terrainConfig.add("transparent_color", "0 0 0 0");
-  // 初始化TileSourceOptions
-  osgEarth::TileSourceOptions tileSourceOpt;
-  tileSourceOpt.merge(terrainConfig);
-  tileSourceOpt.setDriver("gdal");
-  osg::ref_ptr<osgEarth::TileSource> pTileSource =
-      osgEarth::TileSourceFactory::create(tileSourceOpt);
+  // 2. 扁平化构建 Config (参考你成功的案例)
+  osgEarth::Config layerConf;
+  layerConf.key() = "image";
+  layerConf.add("name", tifName);
+  layerConf.add("driver", "gdal");
+  layerConf.add("url", tifUrl);
+  layerConf.add("fadeInDuration", "0");
+  layerConf.add("min_level", "0");
+  layerConf.add("max_data_level", "25");
 
-  osgEarth::ImageLayerOptions layerOpt(terrainConfig);
+  // 2. 创建 ImageLayer
+  osgEarth::ImageLayerOptions layerOpt(layerConf);
+  osg::ref_ptr<osgEarth::ImageLayer> layer = new osgEarth::ImageLayer(layerOpt);
 
-  if (m_layer != NULL) {
-    m_mapNode->getMap()->removeImageLayer(m_layer);
-  }
-  m_layer = new osgEarth::ImageLayer(layerOpt, pTileSource);
-  osg::ref_ptr<osgEarth::Map> map = m_mapNode->getMap();
-  map->addImageLayer(m_layer);
+  if (!layer.valid()) return nullptr;
 
-  // 定位
-  // tif文件读取
-  GDALAllRegister();                                  // 注册所有的驱动
-  CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");  // 以防中文名不能正常读取
-  GDALDataset* poDataset =
-      (GDALDataset*)GDALOpen(m_tifPath.c_str(), GA_ReadOnly);  // GDAL数据集
-  if (poDataset == NULL) return;
-  // 获取图像的尺寸
-  int nImgSizeX = poDataset->GetRasterXSize();
-  int nImgSizeY = poDataset->GetRasterYSize();
-  double trans[6];
-  CPLErr err = poDataset->GetGeoTransform(trans);
-  delete poDataset;
-  // 中心点
-  double centlon = trans[0] + trans[1] * nImgSizeX / 2.0;
-  double centlat = trans[3] + trans[5] * nImgSizeY / 2.0;
+  m_mapNode->getMap()->addImageLayer(layer);
 
-  m_earthManipulator->setViewpoint(
-      osgEarth::Viewpoint(u8"影像", centlon, centlat, 3000, 0.0, -90.0, 0.0),
-      1.0);
+  flyToImageCenter(filePath);
+  return layer;
 }
 
-void OSGEarthApp::onSlotElevation(const QString& filePath) {
+osg::Object* OSGEarthApp::onSlotElevation(const QString& filePath) {
   QByteArray by = filePath.toLocal8Bit();
   m_elePath = by.constData();
 
@@ -431,31 +369,11 @@ std:
   osg::ref_ptr<osgEarth::Map> map = m_mapNode->getMap();
   map->addLayer(m_eleLayer);
 
-  // 定位
-  // 获取坐标变换系数
-  // tif文件读取
-  GDALAllRegister();                                  // 注册所有的驱动
-  CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");  // 以防中文名不能正常读取
-  GDALDataset* poDataset =
-      (GDALDataset*)GDALOpen(m_elePath.c_str(), GA_ReadOnly);  // GDAL数据集
-  if (poDataset == NULL) return;
-  // 获取图像的尺寸
-  int nImgSizeX = poDataset->GetRasterXSize();
-  int nImgSizeY = poDataset->GetRasterYSize();
-  double trans[6];
-  CPLErr err = poDataset->GetGeoTransform(trans);
-  delete poDataset;
-
-  // 中心点
-  double centlon = trans[0] + trans[1] * nImgSizeX / 2.0;
-  double centlat = trans[3] + trans[5] * nImgSizeY / 2.0;
-
-  m_earthManipulator->setViewpoint(
-      osgEarth::Viewpoint(u8"高程", centlon, centlat, 3000, 0.0, -90.0, 0.0),
-      1.0);
+  flyToImageCenter(filePath);
+  return m_eleLayer;
 }
 
-void OSGEarthApp::onSlotShp(const QString& filePath) {
+osg::Object* OSGEarthApp::onSlotShp(const QString& filePath) {
   osgEarth::Drivers::OGRFeatureOptions featureData;
   featureData.url() = filePath.toStdString();
 
@@ -475,7 +393,7 @@ void OSGEarthApp::onSlotShp(const QString& filePath) {
       featureSourceLayer->getFeatureSource();
   if (!features) {
     printf("无法打开该矢量文件！");
-    return;
+    return nullptr;
   }
 
   // 设置样式
@@ -515,53 +433,46 @@ void OSGEarthApp::onSlotShp(const QString& filePath) {
   osg::ref_ptr<osgEarth::Features::FeatureModelLayer> fml =
       new osgEarth::Features::FeatureModelLayer(fmlOpt);
   map->addLayer(fml);
+
+  return m_mapNode->getLayerNode(fml);
 }
 
-void OSGEarthApp::onSlotLoadObj(const QString& filePath) {}
+osg::Object* OSGEarthApp::onSlotLoadObj(const QString& filePath) {
+  return nullptr;
+}
 
 void OSGEarthApp::onLoadScene() {
-  // 1. 弹出文件对话框，支持多种格式过滤
-  QString filter =
-      "All Supported Files (*.las *.tif *.img *.shp *.obj);;"
-      "Point Cloud (*.las);;"
-      "Imagery/Elevation (*.tif);;"
-      "Vector (*.shp);;"
-      "Model (*.obj)";
-
+  // 1. 弹出文件对话框 (保持原样)
+  QString filter = "All Supported Files (*.las *.tif *.img *.shp *.obj);;...";
   QString filePath = QFileDialog::getOpenFileName(
-      this, QStringLiteral("选择要加载的文件"),
-      m_lastOpenPath,  // 记录上次打开的路径，提升体验
-      filter);
-
+      this, QStringLiteral("选择要加载的文件"), m_lastOpenPath, filter);
   if (filePath.isEmpty()) return;
+
+  // 防止重复加载
+  if (m_pathNodeMap.contains(filePath)) {
+    ui.lblText->setText(QStringLiteral("该文件已加载"));
+    return;
+  }
 
   // 更新最后一次打开的路径
   m_lastOpenPath = QFileInfo(filePath).absolutePath();
-
-  // 2. 获取后缀名并判断类型
   QFileInfo fileInfo(filePath);
   QString suffix = fileInfo.suffix().toLower();
 
-  // 3. 分流处理
+  // 2. 分流处理，并接收返回的 Node
+  osg::ref_ptr<osg::Object> loadedNode = nullptr;
+
   if (suffix == "las") {
-    onSlotLoadLas(filePath);
+    loadedNode = onSlotLoadLas(filePath);  // 修改这些函数，让它们返回 node
   } else if (suffix == "tif") {
-    onSlotTif(filePath);
-    //} else {
-    //onSlotElevation(filePath);
-    //}
+    loadedNode = onSlotTif(filePath);
   } else if (suffix == "shp") {
-    onSlotShp(filePath);
+    loadedNode = onSlotShp(filePath);
   } else if (suffix == "obj") {
-    onSlotLoadObj(filePath);
+    loadedNode = onSlotLoadObj(filePath);
   }
 
-  // 4. 重要：将加载成功的文件路径加入待保存列表
-  if (!m_currentData.allFiles.contains(filePath)) {
-    m_currentData.allFiles.append(filePath);
-    cout << "Added to project list: " << filePath.toLocal8Bit().constData()
-         << endl;
-  }
+  registerLoadedObject(filePath, loadedNode.get());
 }
 
 /*
@@ -632,6 +543,39 @@ void OSGEarthApp::onSlotShpPos() {}
  */
 
 /*-------------------辅助函数-------------------*/
+void OSGEarthApp::flyToNode(osg::Node* node) {
+  if (!node || !m_mapNode || !m_earthManipulator) return;
+
+  // 1. 获取节点的包围球（包含中心点 center 和半径 radius）
+  osg::BoundingSphere bs = node->getBound();
+
+  // 如果包围球无效（比如节点还没完全加载），可以尝试强制更新
+  if (!bs.valid()) {
+    node->dirtyBound();
+    bs = node->getBound();
+  }
+
+  if (bs.valid()) {
+    // 2. 将世界坐标 (ECEF) 转换为地理坐标 (经纬度)
+    osgEarth::GeoPoint geo;
+    geo.fromWorld(m_geoSRS, bs.center());
+
+    // 3. 计算观察范围 (Range)
+    // 通常设为半径的 2 到 3 倍，这样能看清全貌又不会太远
+    double range = bs.radius() * 2.5;
+    if (range < 500.0) range = 500.0;  // 防止半径太小时镜头贴太近
+
+    // 4. 创建视角对象
+    // 参数依次为：名称、经度、纬度、高度(相对海拔)、航向角(0为北)、俯仰角(-90为垂直向下)、距离
+    osgEarth::Viewpoint vp("Point Cloud Target", geo.x(), geo.y(), 2000, 0.0,
+                           -90.0, range);
+    m_lon = geo.x();
+    m_lat = geo.y();
+
+    // 5. 使用操作器执行平滑飞行（第二个参数是动画持续时间，单位：秒）
+    m_earthManipulator->setViewpoint(vp, 2.0);
+  }
+}
 
 void OSGEarthApp::onReShow() {
   this->show();
@@ -641,7 +585,7 @@ void OSGEarthApp::onReShow() {
 }
 
 void OSGEarthApp::resetScene() {
-  m_currentData.clear();
+  
   if (ui.leProjectName) ui.leProjectName->clear();
 
   if (m_dataGroup.valid()) {
@@ -667,86 +611,82 @@ void OSGEarthApp::applyFullLayout(int w, int h) {
   // 1. 调整主窗口几何尺寸
   this->setGeometry(0, 0, w, h);
 
-  // 2. 调整全局背景（如有）
+  // 2. 调整全局背景
   if (ui.lblBackground) {
     ui.lblBackground->setGeometry(0, 0, w, h);
     ui.lblBackground->lower();
   }
 
-  // --- 核心参数定义 ---
-  int rightPanelWidth = 320;  // 右侧面板宽度（略微加宽以适应输入框）
-  int btnW = 260;             // 按钮和输入框宽度
-  int btnH = 35;              // 按钮和输入框高度
-  int sideMargin = (rightPanelWidth - btnW) / 2;  // 侧向居中间距
-  int btnX = w - rightPanelWidth + sideMargin;    // 右侧组件的 X 坐标
-  int currentY = 100;                             // 起始 Y 坐标
-  int spacing = 15;                               // 组件垂直间距
+  // --- 核心布局参数 ---
+  int rightPanelWidth = 320;  // 右侧面板总宽
+  int btnW = 280;    // 内部组件宽度（稍微加宽点，更美观）
+  int btnH = 35;     // 按钮高度
+  int spacing = 15;  // 组件间的垂直间距
+  int sideMargin = (rightPanelWidth - btnW) / 2;
+  int panelX = w - rightPanelWidth;
+  int compX = panelX + sideMargin;  // 组件起始 X
+  int currentY = 50;                // 起始顶部间距
 
   // 3. 渲染区域 (左侧 OSG Widget)
-  // 预留右侧空间给面板，四周留 20px 边距
   if (ui.widgetOSG) {
-    int osgW = w - rightPanelWidth - 40;
+    int osgW = w - rightPanelWidth - 30;  // 留 30px 间隙
     int osgH = h - 40;
-    ui.widgetOSG->setGeometry(20, 20, osgW, osgH);
+    ui.widgetOSG->setGeometry(15, 20, osgW, osgH);
 
-    // 同步更新 OSG 相机参数（防止拉伸）
+    // 同步更新相机
     if (osgH > 0 && m_camera.valid()) {
       double aspect = static_cast<double>(osgW) / static_cast<double>(osgH);
       m_camera->setProjectionMatrixAsPerspective(45.0f, aspect, 1.0f, 10000.0f);
       m_camera->setViewport(0, 0, osgW, osgH);
-
       auto gw = dynamic_cast<osgQt::GraphicsWindowQt*>(
           m_camera->getGraphicsContext());
       if (gw) gw->getEventQueue()->windowResize(0, 0, osgW, osgH);
     }
   }
 
-  // 4. 右侧面板背景 Label
+  // 4. 右侧面板背景
   if (ui.lblBtnbackground) {
-    ui.lblBtnbackground->setGeometry(w - rightPanelWidth, 0, rightPanelWidth,
-                                     h);
+    ui.lblBtnbackground->setGeometry(panelX, 0, rightPanelWidth, h);
   }
 
-  // 5. 布局：项目名称输入框 (leProjectName)
+  // 5. [顶部] 项目名称输入框
   if (ui.leProjectName) {
-    ui.leProjectName->setPlaceholderText(
-        QStringLiteral("请输入新建的项目名称..."));
-    QPalette pal = ui.leProjectName->palette();
-    pal.setColor(QPalette::PlaceholderText,
-                 QColor(150, 150, 150));  // 设置你想要的灰色
-    ui.leProjectName->setPalette(pal);
-    ui.leProjectName->setGeometry(btnX, currentY, btnW, btnH);
+    ui.leProjectName->setGeometry(compX, currentY, btnW, btnH);
     currentY += (btnH + spacing);
   }
 
-  // 6. 布局：加载场景按钮 (btnLoadScene)
+  // 6. [顶部] 加载场景按钮
   if (ui.btnLoadScene) {
-    ui.btnLoadScene->setGeometry(btnX, currentY, btnW, btnH);
-    // 这里可以给 btnLoadScene 设置样式
+    ui.btnLoadScene->setGeometry(compX, currentY, btnW, btnH);
+    currentY += (btnH + spacing);
   }
 
-  // 7. 布局：提示文本 (lblText) - 位于中间或特定间距
-  currentY += 60;  // 额外空出一段距离
+  // --- 计算底部区域高度，以便给 Tree 留出空间 ---
+  int bottomAreaHeight = 120;  // 给 lblText 和 btnSavePro 预留的总高度
+  int treeY = currentY;
+  int treeH = h - treeY - bottomAreaHeight - 20;  // 20 为底部留白
+
+  // 7. [中间核心] 文件树控件 (treeSceneManager)
+  if (ui.treeSceneManager) {
+    ui.treeSceneManager->setGeometry(compX, treeY, btnW, treeH);
+  }
+
+  // 8. [底部] 提示文本 (lblText)
+  int lblTextY = treeY + treeH + 10;
   if (ui.lblText) {
-    ui.lblText->setGeometry(btnX, currentY, btnW,
-                            60);  // 高度可以略大，支持多行
+    ui.lblText->setGeometry(compX, lblTextY, btnW, 40);
+    ui.lblText->setAlignment(Qt::AlignCenter);
   }
 
-  // 8. 布局：保存按钮 (btnSavePro) - 靠底部
+  // 9. [底部] 保存按钮 (btnSavePro)
   if (ui.btnSavePro) {
-    // 固定在距离底部 60px 的位置
-    ui.btnSavePro->setGeometry(btnX, h - 60 - btnH, btnW, btnH);
+    ui.btnSavePro->setGeometry(compX, h - 30 - btnH, btnW, btnH);
   }
 
-  // 9. 右上角关闭按钮 (btn_Close)
+  // 10. 右上角关闭按钮 (不变)
   if (ui.btn_Close) {
-    ui.btn_Close->setGeometry(w - 40 - 10, 10, 40, 40);
-    ui.btn_Close->raise();  // 确保在最顶层
-    QString iconPath = QString("%1/Resource/common/close.png")
-                           .arg(QApplication::applicationDirPath());
-    ui.btn_Close->setStyleSheet(
-        QString("QPushButton{border-image:url(%1); border:none;}")
-            .arg(iconPath));
+    ui.btn_Close->setGeometry(w - 45, 10, 35, 35);
+    ui.btn_Close->raise();
   }
 }
 
@@ -764,6 +704,8 @@ void OSGEarthApp::onSavePro() {
 
   QSqlDatabase db = QSqlDatabase::database();
   QSqlQuery query(db);
+
+  // if ()
 
   // 2. 查重逻辑
   query.prepare("SELECT p_name FROM t_project WHERE p_name = ?");
@@ -830,10 +772,246 @@ void OSGEarthApp::onSavePro() {
 
 void OSGEarthApp::onSlotClose() {
   this->hide();
+
+  // 清空场景管理器资源
+  resetSceneUI();
+
+  // 清空渲染的模型
   resetScene();
 
-  // 建议同时停止 OSG 的定时器，节省不显示的性能开销
+  // 停止 OSG 的定时器，节省不显示的性能开销
   if (m_frameTimer) {
     m_frameTimer->stop();
   }
+}
+
+void OSGEarthApp::setEditMode(bool edit, QString pName) {
+  m_isEditMode = edit;
+  ui.leProjectName->setText(pName);
+
+  if (m_isEditMode) {
+    // 编辑模式：锁定输入框，不允许改名
+    ui.leProjectName->setReadOnly(true);
+    ui.lblText->setText(
+        QStringLiteral("当前状态：正在编辑项目 [%1]").arg(pName));
+  } else {
+    // 新建模式：恢复可写
+    ui.leProjectName->setReadOnly(false);
+    ui.lblText->setText(QStringLiteral("支持模型格式：las,tif,obj,dem,shp"));
+    ui.leProjectName->clear();
+  }
+}
+
+void OSGEarthApp::initSceneManagerTree() {
+  QStringList categories = {
+      QStringLiteral("点云数据 (LAS)"), QStringLiteral("三维模型 (OBJ)"),
+      QStringLiteral("影像/地形 (TIF)"), QStringLiteral("矢量数据 (SHP)")};
+
+  ui.treeSceneManager->header()->setStretchLastSection(true);
+  ui.treeSceneManager->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  ui.treeSceneManager->setIndentation(5);
+
+  for (const QString& cat : categories) {
+    QTreeWidgetItem* root = new QTreeWidgetItem(ui.treeSceneManager);
+    root->setText(0, cat);
+    root->setSizeHint(0, QSize(280, 35));
+    root->setExpanded(true);  // 默认展开
+
+    QFont font = root->font(0);
+    font.setBold(true);
+    root->setFont(0, font);
+
+    // 用 key 记录方便查找
+    if (cat.contains("LAS"))
+      m_categoryNodes["las"] = root;
+    else if (cat.contains("OBJ"))
+      m_categoryNodes["obj"] = root;
+    else if (cat.contains("TIF"))
+      m_categoryNodes["tif"] = root;
+    else if (cat.contains("SHP"))
+      m_categoryNodes["shp"] = root;
+  }
+}
+
+void OSGEarthApp::addFileToTree(QString filePath) {
+  QFileInfo info(filePath);
+  QString suffix = info.suffix().toLower();
+  QString fileName = info.fileName();
+
+  // 1. 找到对应的根节点 (假设你已在 initTree 中初始化了 m_categoryNodes)
+  QTreeWidgetItem* parentNode = nullptr;
+  if (suffix == "las")
+    parentNode = m_categoryNodes["las"];
+  else if (suffix == "obj")
+    parentNode = m_categoryNodes["obj"];
+  else if (suffix == "tif" || suffix == "img")
+    parentNode = m_categoryNodes["tif"];
+  else if (suffix == "shp")
+    parentNode = m_categoryNodes["shp"];
+
+  if (!parentNode) return;
+
+  // 2. 创建树子节点
+  QTreeWidgetItem* item = new QTreeWidgetItem(parentNode);
+
+  // --- 关键步骤：设置尺寸 ---
+  int itemW = ui.treeSceneManager->viewport()->width();
+  int itemH = 40;
+  item->setSizeHint(0, QSize(itemW, itemH));
+  item->setData(0, Qt::UserRole, filePath);
+
+  // 3. 创建自定义 Widget
+  SceneItemWidget* widget =
+      new SceneItemWidget(fileName, filePath, ui.treeSceneManager);
+
+  connect(widget, &SceneItemWidget::signalLocate, this,
+          &OSGEarthApp::onSlotLocateFile);
+
+   //连接删除信号 (需要 Lambda 捕获当前 item 指针)
+  connect(widget, &SceneItemWidget::signalDelete, this,
+          &OSGEarthApp::onSlotDeleteFile);
+
+  // 设置 Widget 的固定高度，防止被 Tree 压缩
+  widget->setFixedHeight(itemH);
+  widget->setFixedWidth(itemW);
+
+  // 4. 将 Widget 插入树节点
+  ui.treeSceneManager->setItemWidget(item, 0, widget);
+  m_pathItemMap[filePath] = item;
+
+  // 5. 确保父节点展开，否则看不见子项
+  parentNode->setExpanded(true);
+}
+
+void OSGEarthApp::onSlotLocateFile(QString path) {
+  if (!m_pathNodeMap.contains(path)) return;
+
+  osg::Object* obj = m_pathNodeMap[path].get();
+
+  // ---------- 情况 1：影像图层 ----------
+  if (auto* layer = dynamic_cast<osgEarth::ImageLayer*>(obj)) {
+    flyToImageCenter(path);
+  }
+  // ---------- 情况 2：模型 / 点云 ----------
+  auto* node = dynamic_cast<osg::Node*>(obj);
+  flyToNode(node);
+}
+
+void OSGEarthApp::flyToImageCenter(const QString& filePath) {
+  // 1. 编码转换：处理中文路径的关键
+  QByteArray localPath = filePath.toLocal8Bit();
+  const char* c_path = localPath.constData();
+
+  // 2. 确保驱动已注册
+  GDALAllRegister();
+  CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
+
+  // 3. 打开数据集
+  GDALDataset* poDataset = (GDALDataset*)GDALOpen(c_path, GA_ReadOnly);
+  if (!poDataset) {
+    cout << "Failed to open image for flight: " << c_path << endl;
+    return;
+  }
+
+  // 4. 读取元数据并计算中心点
+  int nImgSizeX = poDataset->GetRasterXSize();
+  int nImgSizeY = poDataset->GetRasterYSize();
+  double trans[6];
+
+  if (poDataset->GetGeoTransform(trans) == CE_None) {
+    // 计算影像中心坐标 (地理坐标或投影坐标)
+    double centlon = trans[0] + trans[1] * nImgSizeX / 2.0;
+    double centlat = trans[3] + trans[5] * nImgSizeY / 2.0;
+
+    //(名称, 经度, 纬度, 海拔, 偏航, 俯仰, 距离)
+    m_earthManipulator->setViewpoint(
+        osgEarth::Viewpoint(u8"影像定位", centlon, centlat, 0.0, 0.0, -90.0,
+                            1000.0),
+        1.0);
+  }
+
+  // 6. 关闭数据集
+  GDALClose(poDataset);
+}
+
+void OSGEarthApp::registerLoadedObject(const QString& filePath,
+                                       osg::Object* obj) {
+  if (!obj) {
+    ui.lblText->setText(QStringLiteral("加载失败，请检查文件格式"));
+    return;
+  }
+
+  // 1. 建立映射
+  m_pathNodeMap[filePath] = obj;
+
+  // 2. 添加到 UI 树 (创建 SceneItemWidget)
+  addFileToTree(filePath);
+
+  // 3. 记录到当前项目的文件列表（防止重复）
+  if (!m_currentData.allFiles.contains(filePath)) {
+    m_currentData.allFiles.append(filePath);
+  }
+
+  ui.lblText->setText(QStringLiteral("加载成功: %1").arg(QFileInfo(filePath).suffix().toLower()));
+}
+
+void OSGEarthApp::onSlotDeleteFile(QString path) {
+  // 1. 检查文件是否在映射表中
+  if (!m_pathNodeMap.contains(path)) return;
+
+  // 获取对应的 OSG 对象
+  osg::ref_ptr<osg::Object> obj = m_pathNodeMap[path];
+
+  // 情况 A: 影像图层 (TIF/IMG)
+  if (auto* layer = dynamic_cast<osgEarth::ImageLayer*>(obj.get())) {
+    if (m_mapNode.valid() && m_mapNode->getMap()) {
+      m_mapNode->getMap()->removeImageLayer(layer);
+    }
+  }
+  // 情况 B: 矢量图层 (SHP)
+  else if (auto* modelLayer = dynamic_cast<osgEarth::ModelLayer*>(obj.get())) {
+    if (m_mapNode.valid() && m_mapNode->getMap()) {
+      m_mapNode->getMap()->removeModelLayer(modelLayer);
+    }
+  }
+  // 情况 C: 普通模型节点 (OBJ/LAS)
+  else if (auto* node = dynamic_cast<osg::Node*>(obj.get())) {
+    if (m_root.valid()) {
+      m_dataGroup->removeChild(node);
+    }
+  }
+
+  // 3. 从映射表中删除（这一步会减少 osg::ref_ptr 的引用计数，真正释放内存）
+  m_pathNodeMap.remove(path);
+
+  // 4. 从 QTreeWidget 中删除对应的项
+  if (m_pathItemMap.contains(path)) {
+    QTreeWidgetItem* item = m_pathItemMap.take(path);
+    if (item && item->parent()) {
+      item->parent()->removeChild(item);
+      delete item;
+    }
+  }
+
+  // 5. 维护项目变量 (如果有记录当前项目所有文件的列表)
+  m_currentData.allFiles.removeAll(path);
+
+  // 6. 状态提示
+  ui.lblText->setText(
+      QStringLiteral("已移除资源：%1").arg(QFileInfo(path).fileName()));
+
+  // 7. 强制刷新一次界面（可选）
+  // m_viewer->frame();
+}
+
+void OSGEarthApp::resetSceneUI() {
+  m_currentData.clear();
+  m_pathNodeMap.clear();
+  m_pathItemMap.clear();
+
+  for (int i = 0; i < ui.treeSceneManager->topLevelItemCount(); ++i) {
+      QTreeWidgetItem* root = ui.treeSceneManager->topLevelItem(i);
+      qDeleteAll(root->takeChildren());
+  }
+  
 }

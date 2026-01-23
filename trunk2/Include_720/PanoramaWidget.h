@@ -620,6 +620,17 @@ public:
     {
         m_rotation.setX(x);
         m_rotation.setY(y);
+        update();
+    }
+    void setRotateX(float x)
+    {
+        m_rotation.setX(x);
+        update();
+    }
+    void setRotateY(float y)
+    {
+        m_rotation.setY(y);
+        update();
     }
     //²ã´Î
     void setIconShowZooms(std::map<QString, std::vector<HotspotLevelShow>>& mapVecIconID_Zoom)
@@ -740,7 +751,7 @@ public:
             }      
         }
     }
-
+ 
     float getCompassN() { return m_compassN; };
     QString getCompass_picPath() { return m_compassN_picpath; };
     QString getCompass_location() { return m_compassN_location; };

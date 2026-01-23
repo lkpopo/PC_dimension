@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>246</width>
+    <width>250</width>
     <height>860</height>
    </rect>
   </property>
@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>400</y>
      <width>231</width>
-     <height>291</height>
+     <height>341</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -33,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>240</y>
+     <y>210</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -49,7 +49,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>470</y>
+     <y>400</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -115,7 +115,7 @@
      <x>10</x>
      <y>0</y>
      <width>230</width>
-     <height>221</height>
+     <height>201</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -129,9 +129,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>230</y>
+     <y>210</y>
      <width>231</width>
-     <height>221</height>
+     <height>181</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -151,31 +151,33 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
    </property>
    <property name="text">
     <string>把初始视角应用于...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_FtoOtherPic">
+  <widget class="QPushButton" name="pushButton_FovOtherPic">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>300</y>
+     <x>50</x>
+     <y>350</y>
      <width>151</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
    </property>
    <property name="text">
     <string>把视角（FOV）应用于...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_StoOtherPic">
+  <widget class="QPushButton" name="pushButton_HVOtherPic">
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -185,8 +187,9 @@ color: rgb(255, 255, 255);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
    </property>
    <property name="text">
     <string>把视角限制应用于...</string>
@@ -196,41 +199,332 @@ color: rgb(255, 255, 255);</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>770</y>
+     <y>750</y>
      <width>231</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
    </property>
    <property name="text">
     <string>把全部视角设置应用于...</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_FtoOtherPic_2">
+  <widget class="QLabel" name="label_fov_max">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>410</y>
-     <width>151</width>
+     <x>200</x>
+     <y>290</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>180</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>310</y>
+     <width>31</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
    </property>
    <property name="text">
-    <string>把缩放范围应用于...</string>
+    <string>最远</string>
+   </property>
+  </widget>
+  <widget class="MultiPosSlider_FOV" name="horizontalSlide_FOV">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>250</y>
+     <width>211</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_fov_cut">
+   <property name="geometry">
+    <rect>
+     <x>102</x>
+     <y>290</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(20, 20, 20,0);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>60.0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>310</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>最近</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_fov_min">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>290</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>0.1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>310</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>初始</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>520</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>最右</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_H_min">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>500</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>-360</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_H_max">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>500</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>360</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>520</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>最左</string>
+   </property>
+  </widget>
+  <widget class="MultiPosSlider_H" name="horizontalSlide_H">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>460</y>
+     <width>211</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_12">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>650</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>最高</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_V_min">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>630</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>-180</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_V_max">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>630</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>180</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_13">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>650</y>
+     <width>31</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>最低</string>
+   </property>
+  </widget>
+  <widget class="MultiPosSlider_V" name="horizontalSlide_V">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>590</y>
+     <width>211</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
    </property>
   </widget>
   <widget class="QLabel" name="label_title_4">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>350</y>
+     <y>430</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -239,24 +533,23 @@ color: rgb(255, 255, 255);</string>
     <string notr="true">color: rgb(255, 255, 255);</string>
    </property>
    <property name="text">
-    <string>场景缩放范围</string>
+    <string>水平视角限制</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_done">
+  <widget class="QLabel" name="label_title_5">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>810</y>
-     <width>231</width>
-     <height>30</height>
+     <x>20</x>
+     <y>550</y>
+     <width>121</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 85, 255);</string>
+    <string notr="true">color: rgb(255, 255, 255);</string>
    </property>
    <property name="text">
-    <string>保存设置</string>
+    <string>垂直视角限制</string>
    </property>
   </widget>
   <zorder>label_bg</zorder>
@@ -268,14 +561,47 @@ background-color: rgb(0, 85, 255);</string>
   <zorder>label_title_3</zorder>
   <zorder>label_SeeAngle</zorder>
   <zorder>pushButton_CtoOtherPic</zorder>
-  <zorder>pushButton_FtoOtherPic</zorder>
-  <zorder>pushButton_StoOtherPic</zorder>
+  <zorder>pushButton_FovOtherPic</zorder>
+  <zorder>pushButton_HVOtherPic</zorder>
   <zorder>pushButton_AlltoOtherPic</zorder>
-  <zorder>pushButton_FtoOtherPic_2</zorder>
+  <zorder>label_fov_max</zorder>
+  <zorder>label_8</zorder>
+  <zorder>horizontalSlide_FOV</zorder>
+  <zorder>label_fov_cut</zorder>
+  <zorder>label_6</zorder>
+  <zorder>label_fov_min</zorder>
+  <zorder>label_7</zorder>
+  <zorder>label_9</zorder>
+  <zorder>label_H_min</zorder>
+  <zorder>label_H_max</zorder>
+  <zorder>label_10</zorder>
+  <zorder>horizontalSlide_H</zorder>
+  <zorder>label_12</zorder>
+  <zorder>label_V_min</zorder>
+  <zorder>label_V_max</zorder>
+  <zorder>label_13</zorder>
+  <zorder>horizontalSlide_V</zorder>
   <zorder>label_title_4</zorder>
-  <zorder>pushButton_done</zorder>
+  <zorder>label_title_5</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MultiPosSlider_FOV</class>
+   <extends>QSlider</extends>
+   <header>MultiPosSlider_FOV.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MultiPosSlider_H</class>
+   <extends>QSlider</extends>
+   <header>MultiPosSlider_H.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MultiPosSlider_V</class>
+   <extends>QSlider</extends>
+   <header>MultiPosSlider_V.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

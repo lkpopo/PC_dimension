@@ -157,7 +157,9 @@ void Space_3D::onDeleteProject(QString pName) {
 }
 
 void Space_3D::onLoadProject(QString pName) {
-  // 1. 获取数据库中的路径
+  if (!m_earthWindow || !m_earthWindow->getEarthInitStatus()) return;
+  
+  // 1. 获取数据库中场景文件路径
   QSqlQuery query;
   query.prepare("SELECT file_path FROM t_project_assets WHERE p_name = ?");
   query.addBindValue(pName);
@@ -167,32 +169,30 @@ void Space_3D::onLoadProject(QString pName) {
     return;
   }
 
-  // 2. 准备加载，先把当前的 OSGEarthApp 窗口切出来
-  // 假设 m_osgApp 是你保存在 Space_3D 里的 OSGEarthApp 实例指针
-  if (!m_earthWindow) return;
-
-  // 这里的逻辑：显示 OSG 窗口，并可以设置项目名称到它的输入框
+  // 2. 把当前的 OSGEarthApp 窗口切出来
+  m_earthWindow->setEditMode(true, pName);
   m_earthWindow->onReShow();
 
   // 3. 循环加载文件
-  int loadCount = 0;
   while (query.next()) {
     QString path = query.value(0).toString();
     QFileInfo info(path);
     QString suffix = info.suffix().toLower();
 
-    // 根据后缀分发给 OSGEarthApp 的对应函数
+    osg::ref_ptr<osg::Object> loadedObj = nullptr;
+
     if (suffix == "las") {
-      m_earthWindow->onSlotLoadLas(path);
-    } else if (suffix == "tif" || suffix == "img") {
-      // 注意：这里可能需要区分是 Elevation 还是 Imagery
-      // 简单处理可以先默认作为影像加载，或者根据你数据库的设计增加类型字段
-      m_earthWindow->onSlotTif(path);
+      loadedObj = m_earthWindow->onSlotLoadLas(path);
+    } else if (suffix == "tif") {
+      loadedObj = m_earthWindow->onSlotTif(path);
     } else if (suffix == "shp") {
-      m_earthWindow->onSlotShp(path);
+      loadedObj = m_earthWindow->onSlotShp(path);
     } else if (suffix == "obj") {
-      m_earthWindow->onSlotLoadObj(path);
+      loadedObj = m_earthWindow->onSlotLoadObj(path);
     }
-    loadCount++;
+
+    if (loadedObj.valid()) {
+      m_earthWindow->registerLoadedObject(path, loadedObj.get());
+    }
   }
 }

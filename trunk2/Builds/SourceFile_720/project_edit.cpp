@@ -765,12 +765,18 @@ void project_edit::slotSeeAngle()
 		slotclearStackedWidget(m_hotpoint);//删除以前的
 		delete m_seeAngle;
 	}
-	m_seeAngle = new project_edit_seeAngle(m_projUUID, this);
+	m_seeAngle = new project_edit_seeAngle(m_projUUID, m_mapPicPathUUid[m_picPath], this);
 	connect(m_seeAngle, SIGNAL(sig_Msg(QString)), this, SLOT(slotMsg(QString)));
 	connect(this, SIGNAL(sig_Pixmap(QPixmap&)), m_seeAngle, SLOT(slotSetPixmap(QPixmap&)));
 	connect(m_seeAngle, SIGNAL(sig_save()), this, SLOT(slotSeeAngleSave()));
-	connect(this, SIGNAL(sig_roration_zoom(QVector3D, float)), m_seeAngle, SLOT(slotSetRoration_Zoom(QVector3D, float)));
 
+	connect(m_seeAngle, SIGNAL(sig_setFirstAnglePic(std::vector<QString>&)), this, SLOT(slotSetSelPicFirstAngle(std::vector<QString>&)));
+	connect(m_seeAngle, SIGNAL(sig_setPicFOV(std::vector<QString>&, float, float, float)), this, SLOT(slotSetSelPicFOV(std::vector<QString>&, float, float, float)));
+	connect(m_seeAngle, SIGNAL(sig_setPicHV(std::vector<QString>&, int, int, int,int)), this, SLOT(slotSetSelPicHV(std::vector<QString>&, int, int, int, int)));
+
+	connect(m_seeAngle, SIGNAL(sig_cut_zoom_angle(float)), this, SLOT(slotSetCutZoom(float)));
+	connect(m_seeAngle, SIGNAL(sig_H_angle(int)), this, SLOT(slotHAngle(int)));
+	connect(m_seeAngle, SIGNAL(sig_V_angle(int)), this, SLOT(slotVAngle(int)));
 
 	ui.stackedWidget_right->addWidget(m_seeAngle);
 	ui.stackedWidget_right->setCurrentWidget(m_seeAngle);
@@ -804,13 +810,16 @@ void project_edit::slotCompass()
 		slotclearStackedWidget(m_hotpoint);//删除以前的
 		delete m_compass;
 	}
-	m_compass = new project_edit_compass(m_projUUID,this);
+	m_compass = new project_edit_compass(m_projUUID, m_mapPicPathUUid[m_picPath],this);
 	//指北针图片
-	QString compassPic = m_panWidget->m_mapPicCompass[m_picPath].picPath;
-	m_compass->setCompassPic(compassPic);
+	m_compass->setCompassPic(m_panWidget->m_mapPicCompass[m_picPath].picPath);
 	connect(m_compass, SIGNAL(sig_Msg(QString)), this, SLOT(slotMsg(QString)));
 	connect(this, SIGNAL(sig_Pixmap(QPixmap&)), m_compass, SLOT(slotSetPixmap(QPixmap&)));
-	connect(m_compass, SIGNAL(sig_save()), this, SLOT(slotCompassSave()));
+	connect(m_compass, SIGNAL(sig_setPicCompass(std::vector<QString>&, float, QString, QString)), this, SLOT(slotSetSelPicCompass(std::vector<QString>&, float, QString, QString)));
+	connect(m_compass, SIGNAL(sig_setCompassPic(QString)), this, SLOT(slotSetPicCompassPic(QString)));
+	connect(m_compass, SIGNAL(sig_setCompassPos(QString)), this, SLOT(slotSetPicCompassPos(QString)));
+	connect(this, SIGNAL(sig_Angle(float)), m_compass, SLOT(slotSetAngle(float)));
+	
 	ui.stackedWidget_right->addWidget(m_compass);
 	ui.stackedWidget_right->setCurrentWidget(m_compass);
 	slotSetFirstAngle();
@@ -913,10 +922,7 @@ void project_edit::slotHotPoint()
 	connect(m_hotpoint, SIGNAL(sig_edit_hp_DelIcon(QString)), this, SLOT(slotDelIcon(QString)));
 	connect(this, SIGNAL(sig_clearHpList()), m_hotpoint, SLOT(slotclearHpList()));
 	connect(m_hotpoint, SIGNAL(sig_setItemShow_Lock(QString, QString)), this, SLOT(slotSetItemShow_Lock(QString, QString)));
-
 	connect(m_hotpoint, SIGNAL(sig_edit_hp_RotateCutHotPoint(QString)), this, SLOT(slotRotateCutHotPoint(QString)));
-
-	//connect(m_hotpoint, SIGNAL(sig_Test(QString)), this, SLOT(slotRotateCutHotPoint(QString)));
 
 	ui.stackedWidget_right->addWidget(m_hotpoint);
 	ui.stackedWidget_right->setCurrentWidget(m_hotpoint);
@@ -952,8 +958,6 @@ void project_edit::slotSetFirstAngle()
 	QImage img = ui.openGLWidget_center->grabFramebuffer(); 
 	QPixmap pixmap = QPixmap::fromImage(img);
 	emit sig_Pixmap(pixmap);
-	//初始视角
-	emit sig_roration_zoom(m_rotation, m_zoom);
 }
 
 void project_edit::slotSetSeeAngle(QString angle)
@@ -992,6 +996,110 @@ void project_edit::slotSetFirstAngle_FrontCover()
 	}
 }
 
+void project_edit::slotSetSelPicFirstAngle(std::vector<QString>& vecPicID)
+{
+	for (auto picID : vecPicID)
+	{
+		QString strRotation = QString::number(m_rotation.x(), 10, 1) + ";" + QString::number(m_rotation.y(), 10, 1) + ";" + QString::number(m_rotation.z(), 10, 1);
+		QString strFOV= QString::number(60.0 / m_zoom, 10, 1);
+
+		//数据库
+		{
+			QString updata = QString("update picture set start_angle = '%1', fov = '%2' where id = '%3'").arg(strRotation).arg(strFOV).arg(picID);
+			QSqlQuery query;
+			query.exec(updata);
+		}
+		//场景
+		WindowParameter tmpPam = m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]];
+		tmpPam.start_angle = QString::number(m_rotation.x(), 'f', 1) + ";" + QString::number(m_rotation.y(), 'f', 1) + ";" + QString::number(m_rotation.z(), 'f', 1);
+		tmpPam.zoom = QString::number(m_zoom, 'f', 1);
+		m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]] = tmpPam;
+	}
+	noticeWin.Notice(this, u8"保存完成！", 2000);
+}
+
+void project_edit::slotSetSelPicFOV(std::vector<QString>& vecPicID, float zoom, float zoom_min, float zoom_max)
+{
+	for (auto picID : vecPicID)
+	{
+		QString zoom_range = QString::number(zoom_min, 10, 1) + ";" + QString::number(zoom_max, 10, 1);
+		QString strFOV = QString::number(60.0 / zoom, 10, 1);
+		//数据库
+		{
+			QString updata = QString("update picture set zoom_range = '%1', fov = '%2' where id = '%3'").arg(zoom_range).arg(strFOV).arg(picID);
+			QSqlQuery query;
+			query.exec(updata);
+		}
+		//场景
+		WindowParameter tmpPam = m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]];
+		tmpPam.start_angle = QString::number(m_rotation.x(), 'f', 1) + ";" + QString::number(m_rotation.y(), 'f', 1) + ";" + QString::number(m_rotation.z(), 'f', 1);
+		tmpPam.zoom = QString::number(m_zoom, 'f', 1);
+		m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]] = tmpPam;
+	}
+	noticeWin.Notice(this, u8"保存完成！", 2000);
+}
+
+void project_edit::slotSetSelPicHV(std::vector<QString>& vecPicID, int H_min, int H_max, int V_min, int V_max)
+{
+	for (auto picID : vecPicID)
+	{
+		QString H_range = QString::number(H_min, 10, 1) + ";" + QString::number(H_max, 10, 1);
+		QString V_range = QString::number(-V_max, 10, 1) + ";" + QString::number(-V_min, 10, 1);
+		//数据库
+		{
+			QString updata = QString("update picture set h_range = '%1', v_range = '%2' where id = '%3'").arg(H_range).arg(V_range).arg(picID);
+			QSqlQuery query;
+			query.exec(updata);
+		}
+		//场景
+		WindowParameter tmpPam = m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]];
+		tmpPam.h_range = H_range;
+		tmpPam.v_range = V_range;
+		m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]] = tmpPam;
+	}
+	noticeWin.Notice(this, u8"保存完成！", 2000);
+}
+
+void project_edit::slotSetSelPicCompass(std::vector<QString>& vecPicID, float angle, QString path, QString pos)
+{
+	for (auto picID : vecPicID)
+	{
+		QString compass_s_angle = QString::number(angle, 10, 1) ;
+		//数据库
+		{
+			QString updata = QString("update picture set compass_s_angle = '%1', compass_pic_path = '%2', compass_location  = '%3' where id = '%4'")
+				.arg(compass_s_angle).arg(path).arg(pos).arg(picID);
+			QSqlQuery query;
+			query.exec(updata);
+		}
+		//场景
+		CompassParameter tmpPam = m_panWidget->m_mapPicCompass[m_mapUUidPicPath[picID]];
+		tmpPam.compassAngle = angle;
+		tmpPam.picPath = path;
+		tmpPam.location = pos;
+		m_panWidget->m_mapPicCompass[m_mapUUidPicPath[picID]] = tmpPam;
+	}
+	noticeWin.Notice(this, u8"保存完成！", 2000);
+}
+
+void project_edit::slotSetPicCompassPic(QString picPath)
+{
+	//场景
+	CompassParameter tmpPam = m_panWidget->m_mapPicCompass[m_picPath];
+	tmpPam.picPath = picPath;
+	m_panWidget->m_mapPicCompass[m_picPath] = tmpPam;
+	m_panWidget->setCompassImagePath(picPath);
+}
+
+void project_edit::slotSetPicCompassPos(QString pos)
+{
+	//场景
+	CompassParameter tmpPam = m_panWidget->m_mapPicCompass[m_picPath];
+	tmpPam.location = pos;
+	m_panWidget->m_mapPicCompass[m_picPath] = tmpPam;
+	m_panWidget->setCompassLocation(pos);
+}
+
 void project_edit::slotSetGroupAngle()
 {
 	GroupSeeAngleZoom cutANgZ;
@@ -1014,6 +1122,8 @@ void project_edit::slotSetCompassN()
 	QImage img = ui.openGLWidget_center->grabFramebuffer();
 	QPixmap pixmap = QPixmap::fromImage(img);
 	emit sig_Pixmap(pixmap);
+	//角度
+	emit sig_Angle(currentYaw);
 }
 
 void project_edit::slotAddPic()
@@ -1186,8 +1296,17 @@ void project_edit::slotSetTitleTextSize(int size)
 
 void project_edit::slotSetCutZoom(float zoom)
 {
-	slotSetSeeAngle( QString::number(60.0/zoom,10,1));
 	m_panWidget->setCutZoom(zoom);
+}
+
+void project_edit::slotHAngle(int angle)
+{
+	m_panWidget->setRotateY(angle);
+}
+
+void project_edit::slotVAngle(int angle)
+{
+	m_panWidget->setRotateX(angle);
 }
 
 void project_edit::slotReloadLevel()
@@ -1497,10 +1616,17 @@ void project_edit::LoadPic_SeeAngle(const QString& picPath)
 		slotclearStackedWidget(m_hotpoint);//删除以前的
 		delete m_seeAngle;
 	}
-	m_seeAngle = new project_edit_seeAngle(m_projUUID, this);
+	m_seeAngle = new project_edit_seeAngle(m_projUUID, m_mapPicPathUUid[picPath], this);
 	connect(m_seeAngle, SIGNAL(sig_Msg(QString)), this, SLOT(slotMsg(QString)));
 	connect(this, SIGNAL(sig_Pixmap(QPixmap&)), m_seeAngle, SLOT(slotSetPixmap(QPixmap&)));
 	connect(m_seeAngle, SIGNAL(sig_save()), this, SLOT(slotSeeAngleSave()));
+	connect(m_seeAngle, SIGNAL(sig_setFirstAnglePic(std::vector<QString>&)), this, SLOT(slotSetSelPicFirstAngle(std::vector<QString>&)));
+	connect(m_seeAngle, SIGNAL(sig_setPicFOV(std::vector<QString>&, float, float, float)), this, SLOT(slotSetSelPicFOV(std::vector<QString>&, float, float, float)));
+	connect(m_seeAngle, SIGNAL(sig_setPicHV(std::vector<QString>&, int, int, int, int)), this, SLOT(slotSetSelPicHV(std::vector<QString>&, int, int, int, int)));
+
+	connect(m_seeAngle, SIGNAL(sig_cut_zoom_angle(float)), this, SLOT(slotSetCutZoom(float)));
+	connect(m_seeAngle, SIGNAL(sig_H_angle(int)), this, SLOT(slotHAngle(int)));
+	connect(m_seeAngle, SIGNAL(sig_V_angle(int)), this, SLOT(slotVAngle(int)));
 	ui.stackedWidget_right->addWidget(m_seeAngle);
 	ui.stackedWidget_right->setCurrentWidget(m_seeAngle);
 }
@@ -1512,13 +1638,17 @@ void project_edit::LoadPic_Compass(const QString& picPath)
 		slotclearStackedWidget(m_hotpoint);//删除以前的
 		delete m_compass;
 	}
-	m_compass = new project_edit_compass(m_projUUID, this);
+	m_compass = new project_edit_compass(m_projUUID, m_mapPicPathUUid[m_picPath], this);
 	//指北针图片
 	QString compassPic = m_panWidget->m_mapPicCompass[m_picPath].picPath;
 	m_compass->setCompassPic(compassPic);
 	connect(m_compass, SIGNAL(sig_Msg(QString)), this, SLOT(slotMsg(QString)));
 	connect(this, SIGNAL(sig_Pixmap(QPixmap&)), m_compass, SLOT(slotSetPixmap(QPixmap&)));
-	connect(m_compass, SIGNAL(sig_save()), this, SLOT(slotCompassSave()));
+	connect(m_compass, SIGNAL(sig_setPicCompass(std::vector<QString>&, float, QString, QString)), this, SLOT(slotSetSelPicCompass(std::vector<QString>&, float, QString, QString)));
+	connect(m_compass, SIGNAL(sig_setCompassPic(QString)), this, SLOT(slotSetPicCompassPic(QString)));
+	connect(m_compass, SIGNAL(sig_setCompassPos(QString)), this, SLOT(slotSetPicCompassPos(QString)));
+	connect(this, SIGNAL(sig_Angle(float)), m_compass, SLOT(slotSetAngle(float)));
+
 	ui.stackedWidget_right->addWidget(m_compass);
 	ui.stackedWidget_right->setCurrentWidget(m_compass);
 }

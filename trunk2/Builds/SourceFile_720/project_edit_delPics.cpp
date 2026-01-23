@@ -108,9 +108,25 @@ void project_edit_delPics::slotOK()
 		}
 		emit sig_delList(vecIconID);
 	}
-	else if (ui.label_title->text() == u8"选择要应用到的场景")
+	else if (ui.label_title->text() == u8"选择要应用到的场景(初始视角)")
 	{
-		//emit sig_selList(vecIconID);
+		emit sig_sel_setFirstAnglePic(vecIconID);
+	}
+	else if (ui.label_title->text() == u8"选择要应用到的场景(FOV视角范围)")
+	{
+		emit sig_sel_setFOVPic(vecIconID);
+	}
+	else if (ui.label_title->text() == u8"选择要应用到的场景(水平垂直视角范围)")
+	{
+		emit sig_sel_setHVPic(vecIconID);
+	}
+	else if(ui.label_title->text() == u8"选择要应用到的场景(全部视角范围)")
+	{
+		emit sig_sel_setAllPic(vecIconID);
+	}
+	else if (ui.label_title->text() == u8"选择要应用到的场景(指北针)")
+	{
+		emit sig_sel_setCompassPic(vecIconID);
 	}
 	//
 	slotClose();

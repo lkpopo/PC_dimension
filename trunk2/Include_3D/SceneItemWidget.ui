@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SceneItemWidgetClass</class>
+ <widget class="QWidget" name="SceneItemWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>72</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SceneItemWidget</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#SceneItemWidget {
+    background-color: transparent;
+}</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
+    <widget class="QLabel" name="lblName">
+     <property name="styleSheet">
+      <string notr="true">QLabel#lblName {
+    color: #E0E0E0; /* 浅灰色文字，不刺眼 */
+    font: 10pt &quot;Microsoft YaHei&quot;;
+    background: transparent;
+}</string>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnLocate">
+     <property name="styleSheet">
+      <string notr="true">/* 按钮通用样式 */
+QPushButton {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 20); /* 半透明白色背景 */
+    border: 1px solid rgba(255, 255, 255, 40);
+    color: white;
+}
+
+/* 鼠标悬停在按钮上 */
+QPushButton:hover {
+    background-color: #0055ff; /* 经典科技蓝 */
+    border: 1px solid #3388ff;
+}
+
+/* 按钮被按下 */
+QPushButton:pressed {
+    background-color: #0033aa;
+}</string>
+     </property>
+     <property name="text">
+      <string>定位</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnDelete">
+     <property name="styleSheet">
+      <string notr="true">/* 按钮通用样式 */
+QPushButton {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 20); /* 半透明白色背景 */
+    border: 1px solid rgba(255, 255, 255, 40);
+    color: white;
+}
+
+/* 鼠标悬停在按钮上 */
+QPushButton:hover {
+    background-color: #0055ff; /* 经典科技蓝 */
+    border: 1px solid #3388ff;
+}
+
+/* 按钮被按下 */
+QPushButton:pressed {
+    background-color: #0033aa;
+}
+QPushButton#btnDelete:hover {
+    background-color: #e81123; /* 警示红 */
+    border: 1px solid #ff4d4f;
+}</string>
+     </property>
+     <property name="text">
+      <string>删除</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Maximum</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

@@ -11,8 +11,8 @@
 #include <QMessageBox>
 
 
-project_edit_compass::project_edit_compass(QString projUUID, QWidget *parent)
-	:m_projUUID(projUUID), QWidget(parent)
+project_edit_compass::project_edit_compass(QString projUUID, QString picID, QWidget *parent)
+	:m_projUUID(projUUID), m_picID(picID), QWidget(parent)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinimizeButtonHint);
@@ -26,14 +26,17 @@ project_edit_compass::project_edit_compass(QString projUUID, QWidget *parent)
 	int scrHeight = screenRect.height() - getBottomPix();
 
 	resize(250, scrHeight - 60);
-
 	ui.label_bg->resize(250, scrHeight - 60);
 
-	connect(ui.pushButton_selPic, SIGNAL(clicked()), this, SLOT(slotSetCompassStyle())); //选择指北针样式
-	connect(ui.pushButton_done, SIGNAL(clicked()), this, SLOT(slotDone()));
-	connect(ui.compass_position, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotSetPosition()));   //设置指北针位置
+	selectedFile = QApplication::applicationDirPath() + "/Resource/compass/compass1.png";
 
-	ui.pushButton_done->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
+	connect(ui.pushButton_selPic, SIGNAL(clicked()), this, SLOT(slotSetCompassStyle())); //选择指北针样式
+	connect(ui.compass_position, SIGNAL(currentIndexChanged(QString)), this, SLOT(slotSetPosition()));   //设置指北针位置
+	connect(ui.pushButton_CtoOtherPic, SIGNAL(clicked()), this, SLOT(slotSetCampass()));
+	
+	ui.pushButton_selPic->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
+		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
+	ui.pushButton_CtoOtherPic->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
 		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
 }
 
@@ -55,72 +58,23 @@ void project_edit_compass::slotSetPixmap(QPixmap& pix)
 	ui.label_compassN->setPixmap(fitpixmap);
 }
 
-//void project_edit_compass::slotDone()
-//{
-//	emit sig_save(); //保存
-//
-//}
-
-void project_edit_compass::slotDone()
+void project_edit_compass::slotSetAngle(float angle)
 {
-	if (m_projUUID.isEmpty()) {
-		qDebug() << "No current project UUID!";
-		return;
-	}
-
-	QString compassPicPath = selectedFile /* 你的图片路径，例如 m_selectedCompassPath */;
-
-	//使用参数化查询，防止 SQL 注入
-	QSqlQuery query;
-	query.prepare("UPDATE picture SET compass_pic_path = ?, compass_location = ? WHERE project_name_id = ?");
-	query.addBindValue(compassPicPath);
-	query.addBindValue(compassPosition);
-	query.addBindValue(m_projUUID);  
-
-	if (!query.exec()) {
-		qDebug() << "SQL exec failed:" << query.lastError();
-		QMessageBox::warning(this, u8"保存失败", query.lastError().text());
-		return;
-	}
-
-	qDebug() << "Compass style updated for project:" << m_projUUID;
-
-	noticeWin.Notice(this, u8"保存成功！", 2000);
-
-	//emit sig_save(); // 通知主窗口保存成功，但是不知道为什么会导致更新数据库失败
+	m_CAngle = angle;
 }
 
-
-
-void project_edit_compass::setPanoramaWidget(PanoramaWidget* widget)
-{
-	//将已存在的全景控件实例传入
-	m_panWidget = widget;
-}
 void project_edit_compass::slotSetPosition()
 {
-	if (!m_panWidget) {
-		qWarning() << "m_panWidget is null!";
-		return;
-	}
-
 	QString text = ui.compass_position->currentText();
-	if (text == u8"左上角") {
+	if (text == u8"左上角") 
 		compassPosition = "LeftTop";
-		m_panWidget->setCompassLocation("LeftTop");
-
-	}
-	else if (text == u8"底部居中") {
+	else if (text == u8"底部居中") 
 		compassPosition = "BottomCenter";
-		m_panWidget->setCompassLocation("BottomCenter");
-	}
-	else if (text == u8"右上角") {
-		compassPosition = "RightTop";
-		m_panWidget->setCompassLocation("RightTop");
-	}
-
+	else if (text == u8"右上角") 
+		compassPosition = "RightTop";		
+	
+	emit sig_setCompassPos(compassPosition);
 }
-
 
 void project_edit_compass::slotSetCompassStyle()
 {
@@ -139,18 +93,34 @@ void project_edit_compass::slotSetCompassStyle()
 		u8"图片文件 (*.png *.jpg *.jpeg *.bmp *.gif);;所有文件 (*)"  // 文件过滤器
 	);
 
-	if (!selectedFile.isEmpty()) {
+	if (!selectedFile.isEmpty()) 
+	{
 		// 验证是否为有效图片
 		if (QPixmap(selectedFile).isNull()) {
 			noticeWin.Notice(this, u8"所选文件不是有效的图片格式！", 2000);
 			return;
 		}
-
-		// 将选中的路径传递给 PanoramaWidget
-		if (m_panWidget) {
-			m_panWidget->setCompassImagePath(selectedFile); 
-		}
 		setCompassPic(selectedFile);  // 更新指北针样式窗口的预览
+		//
+		emit sig_setCompassPic(selectedFile);	
 	}
+}
 
+void project_edit_compass::slotSetCampass()
+{
+	if (m_delPics)
+	{
+		delete m_delPics;
+	}
+	m_delPics = new project_edit_delPics(m_projUUID);
+	m_delPics->setTitle(u8"选择要应用到的场景(指北针)");
+	connect(m_delPics, SIGNAL(sig_sel_setCompassPic(std::vector<QString>&)), this, SLOT(slotSetPicCompass(std::vector<QString>&)));
+	connect(m_delPics, SIGNAL(sig_Msg(QString)), this, SLOT(slotMsg(QString)));
+	m_delPics->setWindowModality(Qt::ApplicationModal);
+	m_delPics->showNormal();
+}
+
+void project_edit_compass::slotSetPicCompass(std::vector<QString>& vecPicID)
+{
+	emit sig_setPicCompass(vecPicID, m_CAngle, selectedFile, compassPosition);
 }

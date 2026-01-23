@@ -61,23 +61,6 @@
     <string/>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_done">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>580</y>
-     <width>231</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 85, 255);</string>
-   </property>
-   <property name="text">
-    <string>保存设置</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_frontCover">
    <property name="geometry">
     <rect>
@@ -94,21 +77,22 @@ background-color: rgb(0, 85, 255);</string>
     <string/>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_CtoOtherPic_2">
+  <widget class="QPushButton" name="pushButton_CtoOtherPic">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>10</x>
      <y>530</y>
-     <width>151</width>
+     <width>231</width>
      <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
    </property>
    <property name="text">
-    <string>把初始视角应用于...</string>
+    <string>把指北针应用于...</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_frontCover_2">
@@ -171,7 +155,8 @@ color: rgb(255, 255, 255);</string>
    </property>
    <property name="styleSheet">
     <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 85, 255);</string>
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
    </property>
    <property name="text">
     <string>选择图片</string>
@@ -256,11 +241,10 @@ color: rgb(255, 255, 255);</string>
    </property>
   </widget>
   <zorder>label_bg</zorder>
-  <zorder>pushButton_done</zorder>
   <zorder>label_frontCover</zorder>
   <zorder>label_title</zorder>
   <zorder>label_compassN</zorder>
-  <zorder>pushButton_CtoOtherPic_2</zorder>
+  <zorder>pushButton_CtoOtherPic</zorder>
   <zorder>label_frontCover_2</zorder>
   <zorder>label_title_2</zorder>
   <zorder>label_compassN_2</zorder>

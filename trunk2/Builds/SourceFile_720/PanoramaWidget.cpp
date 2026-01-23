@@ -33,13 +33,13 @@ PanoramaWidget::PanoramaWidget(QString picPath, bool autoRotate, bool blCompassS
     , m_picPath(picPath)//场景图片地址
     , m_autoRotate(autoRotate)//是否自动旋转
     , m_blCompassShow(blCompassShow)//是否显示指北针
-    , m_fov(30.0)//初始视角范围
+    , m_fov(60.0)//初始视角范围
     , m_rotation(QVector3D(0, 0, 0))//初始位置
     , m_zoom(1.0f)//初始缩放
     , m_zoom_min(0.5f)//最小缩放倍数
     , m_zoom_max(3.0f)//最大缩放倍数
-    , m_H_min(-360.0f)//左侧水平视角，负值
-    , m_H_max(360.0f)//右侧水平视角，正值
+    , m_H_min(-180.0f)//左侧水平视角，负值
+    , m_H_max(180.0f)//右侧水平视角，正值
     , m_V_min(-90.0f)//下方垂直视角，负值
     , m_V_max(90.0f)//上方垂直视角，正值
     , m_compassN(0)//正北方向
@@ -252,7 +252,6 @@ void PanoramaWidget::changePic(QString picPath, QString id, bool isTransitioning
 
 void PanoramaWidget::SetAllPicAngle(std::map<QString, WindowParameter>& mapPicAngle)
 {
-    emit sig_cutSeeAngle("60.0");//显示视角大小
     m_mapPicAngle = mapPicAngle;
 }
 
@@ -367,7 +366,7 @@ void PanoramaWidget::randerHotspotList()
         tmpModel.rotate(m_rotation.z(), 0, 0, 1);
         // ========== 步骤2：平移（带缩放，但仅改位置，不改朝向） ==========
         QVector3D originalPos = hotspot.position.normalized();
-        QVector3D translatePos = originalPos/* * m_zoom*/;
+        QVector3D translatePos = originalPos;
         tmpModel.translate(translatePos);
         // ========== 步骤3：强制朝向摄像机（仅绕Y轴旋转，禁用Z轴） ==========
         QVector3D cameraPos(0.0f, 0.0f, 1.0f);
@@ -393,7 +392,6 @@ void PanoramaWidget::randerHotspotList()
         tmpModel *= billboardMatrix;
         // ========== 步骤4：缩放 ==========
         tmpModel.scale(hotspot.scale_x , hotspot.scale_y);
-        //tmpModel.scale(hotspot.scale_x * m_zoom, hotspot.scale_y * m_zoom);
         m_hotspotProgram->setUniformValue("model", tmpModel);
 
         glActiveTexture(GL_TEXTURE0);
@@ -668,7 +666,7 @@ void PanoramaWidget::paintGL()
     m_program->setUniformValue("view", m_view);
     //
     m_projection.setToIdentity();
-    m_projection.perspective(m_fov/m_zoom, static_cast<float>(width()) / height(), 0.1f, 100.0f);
+    m_projection.perspective(60.0/m_zoom, static_cast<float>(width()) / height(), 0.1f, 100.0f);
     m_program->setUniformValue("projection", m_projection);
     //
     if (m_isTransitioning && m_nextTexture)
@@ -1026,10 +1024,6 @@ QPoint PanoramaWidget::sphereToScreen(const QVector3D& worldPos, const QMatrix4x
     int screenX = qRound((ndcX + 1.0f) * width() / 2.0f);
     int screenY = qRound((1.0f - ndcY) * height() / 2.0f);
     
-    // 边界修正：确保坐标在控件范围内
-    //screenX = qBound(0, screenX, width() - 1);
-    //screenY = qBound(0, screenY, height() - 1);
-
     return QPoint(screenX, screenY);
 }
 
@@ -1277,14 +1271,17 @@ void PanoramaWidget::wheelEvent(QWheelEvent* event)
     // 应用缩放
     float newZoom = m_zoom * zoomMultiplier;
     // 应用缩放限制
+    m_zoom_min = m_mapPicAngle[m_picPath].zoom_range.split(';')[0].toFloat();
+    m_zoom_max = m_mapPicAngle[m_picPath].zoom_range.split(';')[1].toFloat();
     newZoom = qMax(m_zoom_min, qMin(newZoom, m_zoom_max));
+     
     // 只有当缩放值发生变化时才更新
     if (fabs(newZoom - m_zoom) > 0.001) 
     {
         m_zoom = newZoom;
         //场景视角
-        emit sig_seeAngle(2.0 * m_fov / m_zoom);
-        emit sig_cutSeeAngle(QString::number(2.0 * m_fov / m_zoom,10,1));
+        emit sig_seeAngle(m_fov / m_zoom);
+        emit sig_cutSeeAngle(QString::number(m_fov / m_zoom,10,1));
         update(); 
     }
 }
@@ -1327,9 +1324,17 @@ void PanoramaWidget::mouseMoveEvent(QMouseEvent* event)
             float tmp_x = m_rotation.x() - delta.y() * 0.05f;
             float tmp_y = m_rotation.y() - delta.x() * 0.05f;
 
-            float newX = qMax(m_V_min, qMin(tmp_x, m_V_max));
-            float newY = qMax(m_H_min, qMin(tmp_y, m_H_max));
+            float newX, newY;
+    
+            m_H_min = m_mapPicAngle[m_picPath].h_range.split(';')[0].toFloat();
+            m_H_max = m_mapPicAngle[m_picPath].h_range.split(';')[1].toFloat();
+            m_V_min = m_mapPicAngle[m_picPath].v_range.split(';')[0].toFloat();
+            m_V_max = m_mapPicAngle[m_picPath].v_range.split(';')[1].toFloat();
 
+            newX = qMax(m_V_min, qMin(tmp_x, m_V_max));
+            newY = qMax(m_H_min, qMin(tmp_y, m_H_max));
+            
+           
             m_rotation.setX(newX);
             m_rotation.setY(newY);
 
