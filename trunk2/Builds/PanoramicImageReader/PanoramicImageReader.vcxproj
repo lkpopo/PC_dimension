@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A345C3AD-7326-45B1-A257-FDFC416D1EDC}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
+    <QtInstall>5.15.2_msvc2019_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
+    <QtInstall>5.15.2_msvc2019_64</QtInstall>
+    <QtModules>core;sql;opengl;gui;widgets;winextras;openglextensions;concurrent</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <TargetName>720全景图片浏览器</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../Include_3D;../../Include_720;../../ThirdParty/OpenSSL_1.1/include;../../ThirdParty/jsoncpp/include;../../ThirdParty/gdal201/include;../../ThirdParty/laslib/origin/LAStools/;../../ThirdParty/osg340/include;../../ThirdParty/osgEarth290/include;..\..\ThirdParty\laslib\origin\LAStools\LASzip\src;..\..\ThirdParty\laslib\origin\LAStools\LASlib\inc;..\..\ThirdParty\laslib\origin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>../../ThirdParty/OpenSSL_1.1/lib;../../ThirdParty/jsoncpp/lib;../../ThirdParty/laslib/lib;../../ThirdParty/osgEarth290/lib;../../ThirdParty/osg340/lib;../../ThirdParty/gdal201/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>openssl.lib;libcrypto.lib;jsoncpp.lib;gdal_i.lib;OpenThreads.lib;osgQt.lib;osg.lib;osgAnimation.lib;osgDB.lib;osgUtil.lib;osgGA.lib;osgFX.lib;osgManipulator.lib;osgParticle.lib;osgShadow.lib;osgSim.lib;osgTerrain.lib;osgViewer.lib;osgText.lib;osgWidget.lib;osgVolume.lib;osgUI.lib;osgPresentation.lib;osgEarth.lib;osgEarthAnnotation.lib;osgEarthFeatures.lib;osgEarthSplat.lib;osgEarthSymbology.lib;osgdb_osgearth_feature_ogr.lib;osgdb_osgearth_feature_tfs.lib;osgdb_osgearth_feature_wfs.lib;osgdb_osgearth_feature_xyz.lib;osgEarthUtil.lib;LASlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <QtRcc Include="..\..\Resource\PanoramicImageReader.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="..\..\Include_3D\OSGEarthApp.ui" />
+    <QtUic Include="..\..\Include_3D\SceneItemWidget.ui" />
+    <QtUic Include="..\..\Include_3D\Space_3D.ui" />
+    <QtUic Include="..\..\Include_3D\Space_3D_project_item.ui" />
+    <QtUic Include="..\..\Include_720\LoginWindows.ui" />
+    <QtUic Include="..\..\Include_720\PanoramicImageReader.ui" />
+    <QtUic Include="..\..\Include_720\project_edit.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_compass.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_delPics.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_delPics_item.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_globle.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_globle_frontCover.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_globle_frontCover_selPic.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_group_item.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_batch.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group_item.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group_ResetGroupStyle.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group_set.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_item.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level_item.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level_set.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level_set_item.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_set.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_mask.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_resee.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_seeAngle.ui" />
+    <QtUic Include="..\..\Include_720\project_hotpoint_icon.ui" />
+    <QtUic Include="..\..\Include_720\project_item.ui" />
+    <QtUic Include="..\..\Include_720\project_new.ui" />
+    <QtUic Include="..\..\Include_720\project_new_pictrue_resee.ui" />
+    <QtUic Include="..\..\Include_720\project_new_picture.ui" />
+    <QtUic Include="..\..\Include_720\project_new_todo.ui" />
+    <QtUic Include="..\..\Include_720\project_see.ui" />
+    <QtUic Include="..\..\Include_720\project_see_item.ui" />
+    <QtUic Include="MainPage.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\Include_720\CommonTool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\Include_720\CustomListWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\Include_720\HoverMenuButton.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\Include_720\LoginWindows.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\..\Include_720\MarqueeLabel.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="CustomDialog.h" />
+    <QtMoc Include="NoticeToast.h" />
+    <QtMoc Include="..\..\Include_3D\OSGEarthApp.h" />
+    <QtMoc Include="..\..\Include_3D\Space_3D.h" />
+    <QtMoc Include="..\..\Include_3D\Space_3D_project_item.h" />
+    <QtMoc Include="..\..\Include_3D\SceneItemWidget.h" />
+    <ClInclude Include="..\..\Include_3D\utils.h" />
+    <ClInclude Include="..\..\Include_720\md5.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_H.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_V.h" />
+    <ClInclude Include="..\..\Include_720\OpeateDB.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_delPics.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_delPics_item.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group_ResetGroupStyle.h" />
+    <ClInclude Include="..\..\Include_720\styleSheet.h" />
+    <QtMoc Include="MainPage.h" />
+    <QtMoc Include="..\..\Include_720\RotatableLabel.h" />
+    <QtMoc Include="..\..\Include_720\project_see_item.h" />
+    <QtMoc Include="..\..\Include_720\project_see.h" />
+    <QtMoc Include="..\..\Include_720\project_new_todo.h" />
+    <QtMoc Include="..\..\Include_720\project_new_picture.h" />
+    <QtMoc Include="..\..\Include_720\project_new_pictrue_resee.h" />
+    <QtMoc Include="..\..\Include_720\project_new.h" />
+    <QtMoc Include="..\..\Include_720\project_item.h" />
+    <QtMoc Include="..\..\Include_720\project_hotpoint_icon.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_seeAngle.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_resee.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_mask.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_set.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level_set_item.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level_set.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level_item.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_item.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group_set.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group_item.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_batch.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_group_item.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_globle_frontCover_selPic.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_globle_frontCover.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_globle.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_compass.h" />
+    <QtMoc Include="..\..\Include_720\project_edit.h" />
+    <QtMoc Include="..\..\Include_720\PanoramicImageReader.h" />
+    <QtMoc Include="..\..\Include_720\PanoramaWidget.h" />
+    <QtMoc Include="..\..\Include_720\NoticeWidget.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider.h" />
+    <QtMoc Include="..\..\Include_720\MsgBox.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\SourceFile_3D\OSGEarthApp.cpp" />
+    <ClCompile Include="..\SourceFile_3D\SceneItemWidget.cpp" />
+    <ClCompile Include="..\SourceFile_3D\Space_3D.cpp" />
+    <ClCompile Include="..\SourceFile_3D\Space_3D_project_item.cpp" />
+    <ClCompile Include="..\SourceFile_3D\utils.cpp" />
+    <ClCompile Include="..\SourceFile_720\CustomListWidget.cpp" />
+    <ClCompile Include="..\SourceFile_720\HoverMenuButton.cpp" />
+    <ClCompile Include="..\SourceFile_720\LoginWindows.cpp" />
+    <ClCompile Include="..\SourceFile_720\MarqueeLabel.cpp" />
+    <ClCompile Include="..\SourceFile_720\md5.cpp" />
+    <ClCompile Include="..\SourceFile_720\MsgBox.cpp" />
+    <ClCompile Include="..\SourceFile_720\NoticeWidget.cpp" />
+    <ClCompile Include="..\SourceFile_720\PanoramaWidget.cpp" />
+    <ClCompile Include="..\SourceFile_720\PanoramicImageReader.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_compass.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_delPics.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_delPics_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_globle.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_globle_frontCover.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_globle_frontCover_selPic.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_group_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_batch.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group_ResetGroupStyle.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group_set.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level_set.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level_set_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_set.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_mask.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_resee.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_seeAngle.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_hotpoint_icon.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_new.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_new_pictrue_resee.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_new_picture.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_new_todo.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_see.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_see_item.cpp" />
+    <ClCompile Include="CustomDialog.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainPage.cpp" />
+    <ClCompile Include="NoticeToast.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

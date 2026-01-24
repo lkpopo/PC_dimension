@@ -1,0 +1,484 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>qml;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{f941aa89-ad79-422a-b505-f9842befa315}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form Files\720">
+      <UniqueIdentifier>{f0179ae1-0bb8-4a09-a27e-88bf104badd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form Files\3D">
+      <UniqueIdentifier>{2cbc3688-287a-4c1c-b9a9-397bece3ef6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\720">
+      <UniqueIdentifier>{cd07fbd7-1e73-4951-9c6a-ffc0bae0cdb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\3D">
+      <UniqueIdentifier>{c1456692-4775-422f-b122-e1e48744020c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\720">
+      <UniqueIdentifier>{b38e4839-37cf-468e-848c-c695d0ecad09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\3D">
+      <UniqueIdentifier>{7ba12c90-1c2d-40ad-8569-d6b2b8d97f83}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="..\..\Resource\PanoramicImageReader.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="MainPage.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\LoginWindows.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\PanoramicImageReader.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_compass.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_globle.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_globle_frontCover.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_globle_frontCover_selPic.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_group_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_batch.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group_set.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level_set.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_level_set_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_set.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_mask.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_resee.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_seeAngle.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_hotpoint_icon.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_new.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_new_pictrue_resee.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_new_picture.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_new_todo.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_see.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_see_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_delPics.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_delPics_item.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_hotpoint_group_ResetGroupStyle.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\Space_3D.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\Space_3D_project_item.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\OSGEarthApp.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\SceneItemWidget.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="MainPage.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\CommonTool.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\CustomListWidget.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\HoverMenuButton.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\LoginWindows.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MarqueeLabel.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MsgBox.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\NoticeWidget.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\PanoramaWidget.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\PanoramicImageReader.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_compass.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_globle.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_globle_frontCover.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_globle_frontCover_selPic.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_group_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_batch.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group_set.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level_set.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_level_set_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_set.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_mask.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_resee.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_seeAngle.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_hotpoint_icon.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_new.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_new_pictrue_resee.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_new_picture.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_new_todo.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_see.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_see_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\RotatableLabel.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_delPics.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_delPics_item.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group_ResetGroupStyle.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\Space_3D.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\Space_3D_project_item.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_H.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_V.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\OSGEarthApp.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\SceneItemWidget.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="NoticeToast.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="CustomDialog.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include_720\md5.h">
+      <Filter>Header Files\720</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include_720\OpeateDB.h">
+      <Filter>Header Files\720</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include_720\styleSheet.h">
+      <Filter>Header Files\720</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include_3D\utils.h">
+      <Filter>Header Files\3D</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_see_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\CustomListWidget.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\HoverMenuButton.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\LoginWindows.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\MarqueeLabel.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\md5.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\MsgBox.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\NoticeWidget.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\PanoramaWidget.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\PanoramicImageReader.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_compass.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_globle.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_globle_frontCover.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_globle_frontCover_selPic.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_group_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_batch.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group_set.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level_set.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_level_set_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_set.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_mask.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_resee.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_seeAngle.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_hotpoint_icon.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_new.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_new_pictrue_resee.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_new_picture.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_new_todo.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_see.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\OSGEarthApp.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\Space_3D.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\Space_3D_project_item.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\utils.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_delPics.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_delPics_item.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_group_ResetGroupStyle.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\SceneItemWidget.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="NoticeToast.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomDialog.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
