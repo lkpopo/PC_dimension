@@ -311,10 +311,10 @@
     <QtMoc Include="..\..\Include_3D\SceneItemWidget.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
-    <QtMoc Include="NoticeToast.h">
+    <QtMoc Include="..\..\Include_3D\NoticeToast.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
-    <QtMoc Include="CustomDialog.h">
+    <QtMoc Include="..\..\Include_3D\CustomDialog.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
   </ItemGroup>
@@ -474,10 +474,10 @@
     <ClCompile Include="..\SourceFile_3D\SceneItemWidget.cpp">
       <Filter>Source Files\3D</Filter>
     </ClCompile>
-    <ClCompile Include="NoticeToast.cpp">
+    <ClCompile Include="..\SourceFile_3D\CustomDialog.cpp">
       <Filter>Source Files\3D</Filter>
     </ClCompile>
-    <ClCompile Include="CustomDialog.cpp">
+    <ClCompile Include="..\SourceFile_3D\NoticeToast.cpp">
       <Filter>Source Files\3D</Filter>
     </ClCompile>
   </ItemGroup>

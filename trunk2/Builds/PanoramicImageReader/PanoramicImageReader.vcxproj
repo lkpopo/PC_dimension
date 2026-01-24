@@ -164,12 +164,12 @@
     <QtMoc Include="..\..\Include_720\MarqueeLabel.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="CustomDialog.h" />
-    <QtMoc Include="NoticeToast.h" />
     <QtMoc Include="..\..\Include_3D\OSGEarthApp.h" />
     <QtMoc Include="..\..\Include_3D\Space_3D.h" />
     <QtMoc Include="..\..\Include_3D\Space_3D_project_item.h" />
     <QtMoc Include="..\..\Include_3D\SceneItemWidget.h" />
+    <QtMoc Include="..\..\Include_3D\NoticeToast.h" />
+    <QtMoc Include="..\..\Include_3D\CustomDialog.h" />
     <ClInclude Include="..\..\Include_3D\utils.h" />
     <ClInclude Include="..\..\Include_720\md5.h" />
     <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h" />
@@ -217,6 +217,8 @@
     <QtMoc Include="..\..\Include_720\MsgBox.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\SourceFile_3D\CustomDialog.cpp" />
+    <ClCompile Include="..\SourceFile_3D\NoticeToast.cpp" />
     <ClCompile Include="..\SourceFile_3D\OSGEarthApp.cpp" />
     <ClCompile Include="..\SourceFile_3D\SceneItemWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\Space_3D.cpp" />
@@ -262,10 +264,8 @@
     <ClCompile Include="..\SourceFile_720\project_new_todo.cpp" />
     <ClCompile Include="..\SourceFile_720\project_see.cpp" />
     <ClCompile Include="..\SourceFile_720\project_see_item.cpp" />
-    <ClCompile Include="CustomDialog.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainPage.cpp" />
-    <ClCompile Include="NoticeToast.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
