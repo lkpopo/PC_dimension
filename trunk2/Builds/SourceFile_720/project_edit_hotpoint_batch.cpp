@@ -181,8 +181,7 @@ void project_edit_hotpoint_batch::processNextIconItem()
     project_edit_hotpoint_level_set_item* item2 = new project_edit_hotpoint_level_set_item(hp);
     connect(item2, SIGNAL(sig_SelStatus(int)), this, SLOT(slotSelStatus(int)));
     connect(item2, SIGNAL(sig_edit_hp_batch_item_RotateCutHotPoint(QString)), this, SIGNAL(sig_edit_hp_batch_RotateCutHotPoint(QString)));
-   
-
+ 
     item2->setFocusPolicy(Qt::NoFocus);
     item2->resize(QSize(230, 36));
     ui.listWidget->setItemWidget(item, item2);
@@ -303,7 +302,6 @@ void project_edit_hotpoint_batch::slotOperationHide()
     ui.pushButton_unlock->hide();
     ui.pushButton_del->hide();
 }
-
 
 std::vector<QString> project_edit_hotpoint_batch::getSelIconID()
 {

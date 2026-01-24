@@ -1711,6 +1711,7 @@ void project_edit::LoadPic_HotPoint(const QString& picPath)
 	connect(m_hotpoint, SIGNAL(sig_edit_hp_DelIcon(QString)), this, SLOT(slotDelIcon(QString)));
 	connect(this, SIGNAL(sig_clearHpList()), m_hotpoint, SLOT(slotclearHpList()));
 	connect(m_hotpoint, SIGNAL(sig_setItemShow_Lock(QString, QString)), this, SLOT(slotSetItemShow_Lock(QString, QString)));
+	connect(m_hotpoint, SIGNAL(sig_edit_hp_RotateCutHotPoint(QString)), this, SLOT(slotRotateCutHotPoint(QString)));
 
 	ui.stackedWidget_right->addWidget(m_hotpoint);
 	ui.stackedWidget_right->setCurrentWidget(m_hotpoint);

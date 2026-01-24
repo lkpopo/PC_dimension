@@ -18,6 +18,9 @@ public:
 signals:
 	void sig_SelStatus(int);
 
+public slots:
+	void slotSelOperation();
+
 private:
 	QString m_projID;
 	QString m_picID;

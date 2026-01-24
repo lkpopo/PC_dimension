@@ -19,9 +19,18 @@ project_edit_delPics_item::project_edit_delPics_item(QString projID, QString pic
 	ui.pushButton_title->setText(file_name);
 
 	connect(ui.checkBox, SIGNAL(stateChanged(int)), this, SIGNAL(sig_SelStatus(int)));
+	connect(ui.pushButton_title, SIGNAL(clicked()), this, SLOT(slotSelOperation()));
 
 }
 
 project_edit_delPics_item::~project_edit_delPics_item()
 {}
+
+void project_edit_delPics_item::slotSelOperation()
+{
+	bool blCheck = ui.checkBox->isChecked();
+	ui.checkBox->setChecked(!blCheck);
+}
+
+
 

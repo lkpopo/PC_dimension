@@ -167,19 +167,6 @@ background-color: rgba(255, 255, 255, 0);</string>
     <string>创建时间：</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_frontCover">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>20</y>
-     <width>64</width>
-     <height>64</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btnViewPro">
    <property name="geometry">
     <rect>
@@ -204,7 +191,7 @@ QPushButton::hover {
     <string>浏览</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_bg">
+  <widget class="QPushButton" name="btnBackGround">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -220,7 +207,20 @@ QPushButton::hover {
     <string/>
    </property>
   </widget>
-  <zorder>pushButton_bg</zorder>
+  <widget class="QLabel" name="lbl_selPic_change">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>20</y>
+     <width>71</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>btnBackGround</zorder>
   <zorder>label_3</zorder>
   <zorder>lbl_lastChange</zorder>
   <zorder>checkBox_sel</zorder>
@@ -229,8 +229,8 @@ QPushButton::hover {
   <zorder>btnDelPro</zorder>
   <zorder>lbl_createTime</zorder>
   <zorder>label_5</zorder>
-  <zorder>pushButton_frontCover</zorder>
   <zorder>btnViewPro</zorder>
+  <zorder>lbl_selPic_change</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

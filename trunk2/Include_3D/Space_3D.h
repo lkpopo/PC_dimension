@@ -13,6 +13,7 @@
 
 #include "OSGEarthApp.h"
 #include "ui_Space_3D.h"
+#include "NoticeToast.h"
 
 class Space_3D : public QWidget {
   Q_OBJECT
@@ -32,10 +33,13 @@ class Space_3D : public QWidget {
   void initDatabase();
   void onDeleteProject(QString pName);
   void onLoadProject(QString pName);
+  void onBrowseProject(QString pName);
+  void loadProjectCommon(QString pName, OSGEarthApp::WorkMode mode);
   
 
   int _scrWidth = 1920;
   int _scrHeight = 1080;
+  NoticeToast* m_noticeToast;
 
   OSGEarthApp* m_earthWindow = nullptr;
 

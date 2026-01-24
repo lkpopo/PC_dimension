@@ -500,9 +500,6 @@ void project_edit_hotpoint::slotPiSetPic()
 	connect(m_batch, SIGNAL(sig_batch_edit_hp_DelIcon(QString)), this, SIGNAL(sig_edit_hp_DelIcon(QString)));
 	connect(m_batch, SIGNAL(sig_batch_ReloadHp(QString)), this, SLOT(addIcon2List(QString)));
 	connect(m_batch, SIGNAL(sig_edit_hp_batch_RotateCutHotPoint(QString)), this, SIGNAL(sig_edit_hp_RotateCutHotPoint(QString)));
-	//connect(m_batch, SIGNAL(sig_edit_hp_batch_RotateCutHotPoint(QString)), this, SLOT(slotTest(QString)));
-	//connect(m_batch, SIGNAL(sig_edit_hp_batch_RotateCutHotPoint(QString)), this, SIGNAL(sig_Test(QString)));
-
 
 	m_batch->move(scrWidth - 250, 60);
 	m_batch->showNormal();

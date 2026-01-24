@@ -1,5 +1,7 @@
 ﻿#include "OSGEarthApp.h"
 
+#include "MsgBox.h"
+
 #include "SceneItemWidget.h"
 #include "utils.h"
 
@@ -46,29 +48,43 @@ void OSGEarthApp::initEnvironment() {
                                          osg::StateAttribute::ON);
   m_dataGroup = new osg::Group();
   m_root->addChild(m_dataGroup.get());
+
+  m_noticeToast = new NoticeToast(this);
 }
 
 void OSGEarthApp::startAsyncLoad() {
-  QtConcurrent::run([this]() {
-    osg::ref_ptr<osg::Node> loadedNode =
-        osgDB::readNodeFile("./earth/mymap0.earth");
+  // 使用 QPointer 监控 this 的生命周期
+  QPointer<OSGEarthApp> weakThis = this;
 
-    // 2. 加载完成后，不能直接操作 m_root，必须回到主线程
-    // 使用 invokeMethod 安全地在主线程执行挂载
+  QtConcurrent::run([weakThis]() {
+    // 1. 线程开始，先尝试加载
+    osg::ref_ptr<osg::Node> loadedNode = nullptr;
+    try {
+      loadedNode = osgDB::readNodeFile("./earth/mymap0.earth");
+    } catch (...) {
+      return;
+    }
+    if (weakThis.isNull()) {
+      return;
+    }
+    // 3. 回到主线程执行挂载
     QMetaObject::invokeMethod(
-        this,
-        [this, loadedNode]() {
-          if (loadedNode.valid()) {
-            m_earthNode = loadedNode;
-            m_earthNode->setName("earth");
-            m_root->addChild(m_earthNode.get());
-            m_mapNode = osgEarth::MapNode::findMapNode(m_earthNode.get());
+        weakThis.data(),
+        [weakThis, loadedNode]() {
+          if (weakThis.isNull() || !loadedNode.valid()) return;
 
-            if (m_mapNode.valid()) {
-              m_geoSRS = m_mapNode->getMapSRS()->getGeographicSRS();
-            }
-            m_earth_init = true;
+          OSGEarthApp* self = weakThis.data();
+
+          self->m_earthNode = loadedNode;
+          self->m_earthNode->setName("earth");
+          self->m_root->addChild(self->m_earthNode.get());
+          self->m_mapNode =
+              osgEarth::MapNode::findMapNode(self->m_earthNode.get());
+
+          if (self->m_mapNode.valid()) {
+            self->m_geoSRS = self->m_mapNode->getMapSRS()->getGeographicSRS();
           }
+          self->m_earth_init = true;
         },
         Qt::QueuedConnection);
   });
@@ -103,7 +119,6 @@ void OSGEarthApp::initOSGViewer() {
       30.0f,
       static_cast<double>(traits->width) / static_cast<double>(traits->height),
       1.0f, 10000.0f);
-
   // 4. 配置 Viewer
   m_viewer = new osgViewer::Viewer;
   m_viewer->setCamera(m_camera);
@@ -112,6 +127,10 @@ void OSGEarthApp::initOSGViewer() {
 
   // 5. 配置操作器 (Manipulator)
   m_earthManipulator = new osgEarth::Util::EarthManipulator;
+  osgEarth::Util::EarthManipulator::Settings* settings =
+      m_earthManipulator->getSettings();
+  settings->setTerrainAvoidanceEnabled(false);
+  settings->setMinMaxDistance(0.1, 1e8);
   m_viewer->setCameraManipulator(m_earthManipulator.get());
 
   // 6. 添加事件处理
@@ -475,73 +494,6 @@ void OSGEarthApp::onLoadScene() {
   registerLoadedObject(filePath, loadedNode.get());
 }
 
-/*
-void OSGEarthApp::onSlotShpPos() {}
-
- void OSGEarthApp::onSlotElePos() {
-   // 定位
-   // tif文件读取
-   // GDALAllRegister();  //注册所有的驱动
-   CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");  //
-   以防中文名不能正常读取 GDALDataset* poDataset =
-       (GDALDataset*)GDALOpen(m_elePath.c_str(), GA_ReadOnly);  // GDAL数据集
-   if (poDataset == NULL) return;
-
-   // 获取图像的尺寸
-   int nImgSizeX = poDataset->GetRasterXSize();
-   int nImgSizeY = poDataset->GetRasterYSize();
-
-   // 获取坐标变换系数
-   double trans[6];
-   CPLErr err = poDataset->GetGeoTransform(trans);
-   delete poDataset;
-
-   // 中心点
-   double centlon = trans[0] + trans[1] * nImgSizeX / 2.0;
-   double centlat = trans[3] + trans[5] * nImgSizeY / 2.0;
-
-   m_earthManipulator->setViewpoint(
-       osgEarth::Viewpoint(u8"高程", centlon, centlat, 3000, 0.0, -90.0, 0.0),
-       1.0);
- }
-
- void OSGEarthApp::onSlotTifPos() {
-   //定位
-   //tif文件读取
-    GDALAllRegister(); //注册所有的驱动
-    CPLSetConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
-   以防中文名不能正常读取
-    GDALDataset* poDataset = (GDALDataset*)GDALOpen(m_tifPath.c_str(),
-    GA_ReadOnly); //GDAL数据集 if (poDataset == NULL)
-        return;
-
-   //获取图像的尺寸
-    int nImgSizeX = poDataset->GetRasterXSize();
-    int nImgSizeY = poDataset->GetRasterYSize();
-
-    double trans[6];
-    CPLErr err = poDataset->GetGeoTransform(trans);
-
-    const char* PrjRef = poDataset->GetProjectionRef(); //获取影像投影信息;
-    OGRSpatialReference projSRS;
-
-    delete poDataset;
-
-   //中心点
-    double centlon = trans[0] + trans[1] * nImgSizeX / 2.0;
-    double centlat = trans[3] + trans[5] * nImgSizeY / 2.0;
-
-    m_earthManipulator->setViewpoint(osgEarth::Viewpoint(u8"影像", centlon,
-    centlat, 3000, 0.0, -90.0, 0.0), 1.0);
- }
-
- void OSGEarthApp::onSlotLasPos() {
-   m_earthManipulator->setViewpoint(
-       osgEarth::Viewpoint("las Model", m_lon, m_lat, 2000, 0.0, -90.0, 0.0),
-       1.5);
- }
- */
-
 /*-------------------辅助函数-------------------*/
 void OSGEarthApp::flyToNode(osg::Node* node) {
   if (!node || !m_mapNode || !m_earthManipulator) return;
@@ -635,7 +587,7 @@ void OSGEarthApp::applyFullLayout(int w, int h) {
     // 同步更新相机
     if (osgH > 0 && m_camera.valid()) {
       double aspect = static_cast<double>(osgW) / static_cast<double>(osgH);
-      m_camera->setProjectionMatrixAsPerspective(45.0f, aspect, 1.0f, 10000.0f);
+      m_camera->setProjectionMatrixAsPerspective(30.0f, aspect, 1.0f, 10000.0f);
       m_camera->setViewport(0, 0, osgW, osgH);
       auto gw = dynamic_cast<osgQt::GraphicsWindowQt*>(
           m_camera->getGraphicsContext());
@@ -686,6 +638,9 @@ void OSGEarthApp::applyFullLayout(int w, int h) {
   if (ui.btn_Close) {
     ui.btn_Close->setGeometry(w - 45, 10, 35, 35);
     ui.btn_Close->raise();
+    ui.btn_Close->setStyleSheet(
+        QString("QPushButton{border-image:url(%1/Resource/common/close.png)};")
+            .arg(QApplication::applicationDirPath()));
   }
 }
 
@@ -707,7 +662,8 @@ void OSGEarthApp::onSavePro() {
   bool isNewProject = true;
 
   // 如果当前已经是编辑模式，且输入框名字没改，说明是覆盖保存
-  if (m_isEditMode && pName == m_currentData.projectName) {
+  if (m_currentMode == WorkMode::EditMode &&
+      pName == m_currentData.projectName) {
     isNewProject = false;
   }
 
@@ -780,14 +736,14 @@ void OSGEarthApp::onSavePro() {
 
   // 4. 提交
   if (db.commit()) {
-    m_currentProjectName = pName;
-    m_isEditMode = true;  // 保存后进入编辑状态
+    m_currentData.projectName = pName;
     emit projectSavedSuccess();
-    QMessageBox::information(this, QStringLiteral("成功"),
-                             QStringLiteral("项目保存成功！"));
+
   } else {
     db.rollback();
   }
+
+  m_noticeToast->popup(this, u8"项目保存成功", 2000);
 }
 
 void OSGEarthApp::onSlotClose() {
@@ -802,23 +758,6 @@ void OSGEarthApp::onSlotClose() {
   // 停止 OSG 的定时器，节省不显示的性能开销
   if (m_frameTimer) {
     m_frameTimer->stop();
-  }
-}
-
-void OSGEarthApp::setEditMode(bool edit, QString pName) {
-  m_isEditMode = edit;
-  ui.leProjectName->setText(pName);
-
-  if (m_isEditMode) {
-    // 编辑模式：锁定输入框，不允许改名
-    ui.leProjectName->setReadOnly(true);
-    ui.lblText->setText(
-        QStringLiteral("当前状态：正在编辑项目 [%1]").arg(pName));
-  } else {
-    // 新建模式：恢复可写
-    ui.leProjectName->setReadOnly(false);
-    ui.lblText->setText(QStringLiteral("支持模型格式：las,tif,obj,dem,shp"));
-    ui.leProjectName->clear();
   }
 }
 
@@ -1033,5 +972,59 @@ void OSGEarthApp::resetSceneUI() {
   for (int i = 0; i < ui.treeSceneManager->topLevelItemCount(); ++i) {
     QTreeWidgetItem* root = ui.treeSceneManager->topLevelItem(i);
     qDeleteAll(root->takeChildren());
+  }
+}
+
+void OSGEarthApp::setWorkMode(WorkMode mode, QString pName) {
+  m_currentMode = mode;
+  m_currentData.projectName = pName;
+
+  // 1. 处理UI
+  ui.leProjectName->setText(pName);
+  ui.leProjectName->setReadOnly(mode != WorkMode::NewMode);
+  ui.btnSavePro->setVisible(mode != WorkMode::BrowseMode);
+  ui.btnLoadScene->setVisible(mode != WorkMode::BrowseMode);
+
+  // 2. 刷新 Tree 列表里的所有删除按钮
+  updateTreeWidgetsState();
+
+  // 3. 处理特殊的样式提示
+  switch (mode) {
+    case WorkMode::NewMode:
+      ui.lblText->setText(QStringLiteral("模式：新建项目"));
+      ui.leProjectName->setPlaceholderText(
+          QStringLiteral("请输入新项目名称..."));
+      ui.leProjectName->setStyleSheet(
+          "QLineEdit { border: 2px solid #3498db; }");
+      break;
+    case WorkMode::EditMode:
+      ui.lblText->setText(QStringLiteral("模式：编辑项目 [%1]").arg(pName));
+      ui.leProjectName->setStyleSheet("QLineEdit { background: #f0f0f0; }");
+      break;
+    case WorkMode::BrowseMode:
+      ui.lblText->setText(
+          QStringLiteral("模式：浏览项目 [%1] (受保护)").arg(pName));
+      ui.leProjectName->setStyleSheet(
+          "QLineEdit { background: #eee; color: #888; }");
+      break;
+  }
+}
+
+void OSGEarthApp::updateTreeWidgetsState() {
+  bool canDelete = (m_currentMode != WorkMode::BrowseMode);
+
+  // 直接遍历我们维护的 Map
+  QMapIterator<QString, QTreeWidgetItem*> it(m_pathItemMap);
+  while (it.hasNext()) {
+    it.next();
+    QTreeWidgetItem* item = it.value();
+    if (item) {
+      // 获取对应的自定义 Widget
+      SceneItemWidget* w = qobject_cast<SceneItemWidget*>(
+          ui.treeSceneManager->itemWidget(item, 0));
+      if (w) {
+        w->setDeleteButtonVisible(canDelete);
+      }
+    }
   }
 }

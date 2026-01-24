@@ -10,8 +10,14 @@ class SceneItemWidget : public QWidget {
  public:
   explicit SceneItemWidget(QString name, QString path,
                            QWidget *parent = nullptr);
-  QString filePath;
   ~SceneItemWidget();
+
+
+  void setDeleteButtonVisible(bool visible) {
+    ui.btnDelete->setVisible(visible);
+  }
+
+  QString filePath;
 
  signals:
   void signalLocate(QString path);

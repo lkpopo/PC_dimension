@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "ui_OSGEarthApp.h"
+#include "NoticeToast.h"
 
 using namespace std;
 
@@ -54,13 +55,19 @@ class OSGEarthApp : public QWidget {
   explicit OSGEarthApp(QWidget* parent = nullptr);
   ~OSGEarthApp();
 
+  enum class WorkMode {
+    NewMode,    // 新建模式：可写项目名，可增删，有保存
+    EditMode,   // 编辑模式：只读项目名，可增删，有保存
+    BrowseMode  // 浏览模式：只读项目名，不可增删，无保存
+  };
+
   void applyFullLayout(int w, int h);
   void onReShow();
   void resetScene();
-  void setEditMode(bool edit, QString pName);
   bool getEarthInitStatus() const { return m_earth_init; }
   void addFileToTree(QString filePath);
   void registerLoadedObject(const QString& filePath, osg::Object* obj);
+  void setWorkMode(WorkMode mode, QString pName = "");
 
  signals:
   void projectSavedSuccess();
@@ -87,6 +94,7 @@ class OSGEarthApp : public QWidget {
   void onSlotLocateFile(QString path);
   void onSlotDeleteFile(QString path);
   void resetSceneUI();
+  void updateTreeWidgetsState();
 
  private:
   Ui::OSGEarthAppClass ui;
@@ -104,8 +112,9 @@ class OSGEarthApp : public QWidget {
   std::string m_elePath;
   double m_lon = 0.0;
   double m_lat = 0.0;
-  bool m_isEditMode = false;
   bool m_earth_init = false;
+  WorkMode m_currentMode;
+  NoticeToast* m_noticeToast;
 
   // OSG
   osg::ref_ptr<osgViewer::Viewer> m_viewer;

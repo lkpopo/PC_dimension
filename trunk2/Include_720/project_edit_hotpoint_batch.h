@@ -24,7 +24,6 @@ public slots:
 	void slotOperationShowHide();
 	void slotOperationShow();
 	void slotOperationHide();
-
 	void slotHide();
 	void slotShow();
 	void slotLock();
