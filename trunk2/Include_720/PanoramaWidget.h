@@ -143,6 +143,8 @@ protected:
 
 signals:
     void sigShowElement(bool);
+    void sig_style_picText(QString);
+    void sig_style_picChange(QString);
 public:
    // QLabel* m_compassLabel;
 	RotatableLabel* m_compassLabel;  //指北针标签
@@ -157,6 +159,10 @@ public:
 
     Hotspot m_cutHotPoint;//临时热点
     QPoint m_cutHpScreenPos;//临时热点屏幕坐标
+
+    std::map<QString, Hotspot> m_mapIconIDUP;
+    std::map<QString, QPoint> m_mapAllHpScreenPos;
+
     void setCompassLocation(const QString& location);
 
     // 全景图加载
@@ -264,7 +270,7 @@ private:
         m_cutHotPoint.iconPath = "";
         m_cutHotPoint.name = "";
         m_cutHotPoint.description = "";
-        m_cutHotPoint.style = "";
+        m_cutHotPoint.style = "normal;";
         m_cutHotPoint.scale_x = 0.0;
         m_cutHotPoint.scale_y = 0.0;
         m_cutHotPoint.lock = false;
@@ -526,6 +532,10 @@ public:
     {
         m_cutHotPoint.title_visible = blShow;
         update();
+    };
+    void slotSetStyle(QString style) //设置类型
+    {
+        m_cutHotPoint.style = style;
     };
     void slotAddIconEnd() //添加热点
     {

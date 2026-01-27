@@ -1,8 +1,8 @@
 #include "Space_3D.h"
 
-#include "CustomDialog.h"
-#include "NoticeToast.h"
+
 #include "Space_3D_project_item.h"
+
 
 Space_3D::Space_3D(QWidget* parent) : QWidget(parent) {
   ui.setupUi(this);
@@ -128,27 +128,8 @@ void Space_3D::initSignalsAndSlots() {
 }
 
 void Space_3D::initDatabase() {
-  QSqlQuery query;
-
-  // 1. 创建项目主表
-  QString createProjectTable =
-      "CREATE TABLE IF NOT EXISTS t_project ("
-      "p_name TEXT PRIMARY KEY, "
-      "create_time DATETIME, "
-      "modify_time DATETIME)";
-  if (!query.exec(createProjectTable)) {
-    qDebug() << "创建主表失败:" << query.lastError().text();
-  }
-
-  // 2. 创建资源路径表
-  QString createAssetsTable =
-      "CREATE TABLE IF NOT EXISTS t_project_assets ("
-      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-      "p_name TEXT, "
-      "file_path TEXT, "
-      "FOREIGN KEY(p_name) REFERENCES t_project(p_name) ON DELETE CASCADE)";
-  if (!query.exec(createAssetsTable)) {
-    qDebug() << "创建辅表失败:" << query.lastError().text();
+  if (!ProjectDataManager::initDatabase()) {
+    qDebug() << "Database Error:" << ProjectDataManager::lastError();
   }
 }
 
@@ -232,39 +213,17 @@ void Space_3D::loadProjectCommon(QString pName, OSGEarthApp::WorkMode mode) {
     return;
   }
 
-  // 1. 获取数据库中场景文件路径
-  QSqlQuery query;
-  query.prepare("SELECT file_path FROM t_project_assets WHERE p_name = ?");
-  query.addBindValue(pName);
-
-  if (!query.exec()) {
-    QMessageBox::warning(this, "Error", "Failed to query project assets.");
-    return;
-  }
-
-  // 3. 循环加载文件
-  while (query.next()) {
-    QString path = query.value(0).toString();
-    QFileInfo info(path);
-    QString suffix = info.suffix().toLower();
-
-    osg::ref_ptr<osg::Object> loadedObj = nullptr;
-
-    if (suffix == "las") {
-      loadedObj = m_earthWindow->onSlotLoadLas(path);
-    } else if (suffix == "tif") {
-      loadedObj = m_earthWindow->onSlotTif(path);
-    } else if (suffix == "shp") {
-      loadedObj = m_earthWindow->onSlotShp(path);
-    } else if (suffix == "obj") {
-      loadedObj = m_earthWindow->onSlotLoadObj(path);
-    }
-
-    if (loadedObj.valid()) {
-      m_earthWindow->registerLoadedObject(path, loadedObj.get());
-    }
-  }
-
   m_earthWindow->setWorkMode(mode, pName);
+
+  // 使用管理器获取数据
+  QList<AssetRecord> assets = ProjectDataManager::getProjectAssets(pName);
+
+  for (const auto& asset : assets) {
+    // 直接调用加载逻辑，坐标可以通过参数传给 onLoadScene 或者后续处理
+    m_earthWindow->onLoadScene(asset.filePath, asset.lon, asset.lat, asset.alt);
+    // 如果需要恢复 OBJ 的位置，可以在这里通过 asset.lon/lat 调用定位函数
+  }
+
+  m_earthWindow->updateUIByWorkMode();
   m_earthWindow->onReShow();
 }

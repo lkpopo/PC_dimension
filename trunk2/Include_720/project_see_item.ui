@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>80</width>
-    <height>80</height>
+    <width>76</width>
+    <height>71</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,10 +88,27 @@ text-align: center;</string>
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_del">
+   <property name="geometry">
+    <rect>
+     <x>52</x>
+     <y>3</y>
+     <width>24</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
   <zorder>label_bg</zorder>
   <zorder>pushButton_pic</zorder>
   <zorder>label_baseName</zorder>
   <zorder>pushButton_baseName</zorder>
+  <zorder>pushButton_del</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

@@ -83,6 +83,7 @@ signals:
 	void sig_Test(QString);
 
 	void sig_UpdateHotpointList(QVector<Hotspot>&);
+	void sig_style(QString);
 private:
 
 	QString m_projUUID;

@@ -25,6 +25,7 @@ signals:
 	void sig_sel_setHVPic(std::vector<QString>&);
 	void sig_sel_setAllPic(std::vector<QString>&);
 	void sig_sel_setCompassPic(std::vector<QString>&);
+	void sig_sel_ChangePic(QString);
 public slots:
 	void slotClose();
 	void slotSelStatus(int);

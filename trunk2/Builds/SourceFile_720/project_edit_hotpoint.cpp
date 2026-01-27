@@ -290,7 +290,7 @@ void project_edit_hotpoint::slotAddHotPoint()
 		emit sig_del_tmp_icon();
 		delete m_hpSet;
 	}
-	m_hpSet = new project_edit_hotpoint_set("", this);
+	m_hpSet = new project_edit_hotpoint_set(m_projUUID, m_picID,"", this);
 	connect(m_hpSet, SIGNAL(sig_Msg_Set(QString)), this, SIGNAL(sig_Msg(QString)));
 	connect(m_hpSet, SIGNAL(sig_addIconSet(Hotspot)), this, SIGNAL(sig_addIcon(Hotspot)));
 	connect(m_hpSet, SIGNAL(sig_updateIconSet(QString)), this, SIGNAL(sig_updateIcon(QString)));
@@ -306,6 +306,7 @@ void project_edit_hotpoint::slotAddHotPoint()
 	connect(m_hpSet, SIGNAL(sig_setTitleTextColor(QColor)), this, SIGNAL(sig_set_titleText_color(QColor)));
 	connect(m_hpSet, SIGNAL(sig_setTextSize(int)), this, SIGNAL(sig_set_titleText_Size(int)));
 	connect(m_hpSet, SIGNAL(sig_clearFocus()), this, SLOT(slot_clear_focus()));
+	connect(m_hpSet, SIGNAL(sig_setStyle(QString)), this, SIGNAL(sig_style(QString)));
 	connect(this, SIGNAL(sig_close()), m_hpSet, SLOT(slotClose()));
 	connect(m_hpSet, SIGNAL(sig_edit_hp_set_SetHPLocation(bool)), this, SIGNAL(sig_edit_hp_SetHPLocation(bool)));
 	m_hpSet->move(scrWidth - 250, 60);
@@ -359,6 +360,21 @@ void project_edit_hotpoint::slot_update_icon(Hotspot hp)
 
 void project_edit_hotpoint::slot_insert_new(QString oldUUID, Hotspot newHp)
 {
+	//如果是图文展示，复制图片
+	if(newHp.style.contains("picText") == true)
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+		QString dirName_hp = dirName + "/HotPoints";
+		QString dirName_hp_icon_old = dirName_hp + "/" + oldUUID;
+		QString dirName_hp_icon_new = dirName_hp + "/" + newHp.iconID;
+		QDir dir(dirName_hp_icon_new);
+		if (!dir.exists())
+		{
+			dir.mkdir(dirName_hp_icon_new);
+		}
+		//复制	
+		copyDirectoryContents(dirName_hp_icon_old, dirName_hp_icon_new, true);
+	}
 	for (size_t i = 0; i < ui.listWidget->count(); i++)
 	{
 		QListWidgetItem* listItem = ui.listWidget->item(i);
@@ -409,7 +425,7 @@ void project_edit_hotpoint::slot_edit_icon(QString iconID)
 	//
 	emit sig_edit_copyTo_tmp_icon(iconID);
 
-	m_hpSet = new project_edit_hotpoint_set(iconID, this);
+	m_hpSet = new project_edit_hotpoint_set(m_projUUID, m_picID, iconID, this);
 	connect(m_hpSet, SIGNAL(sig_Msg_Set(QString)), this, SIGNAL(sig_Msg(QString)));
 	connect(m_hpSet, SIGNAL(sig_addIconSet(Hotspot)), this, SIGNAL(sig_addIcon(Hotspot)));
 	connect(m_hpSet, SIGNAL(sig_updateIconSet(QString)), this, SIGNAL(sig_updateIcon(QString)));
@@ -424,7 +440,8 @@ void project_edit_hotpoint::slot_edit_icon(QString iconID)
 	connect(m_hpSet, SIGNAL(sig_DelTmpIcon()), this, SIGNAL(sig_del_tmp_icon()));
 	connect(m_hpSet, SIGNAL(sig_setTitleBgColor(QColor)), this, SIGNAL(sig_set_titleBg_color(QColor)));
 	connect(m_hpSet, SIGNAL(sig_setTitleTextColor(QColor)), this, SIGNAL(sig_set_titleText_color(QColor)));
-	connect(m_hpSet, SIGNAL(sig_setTextSize(int)), this, SIGNAL(sig_set_titleText_Size(int)));	
+	connect(m_hpSet, SIGNAL(sig_setTextSize(int)), this, SIGNAL(sig_set_titleText_Size(int)));
+	connect(m_hpSet, SIGNAL(sig_setStyle(QString)), this, SIGNAL(sig_style(QString)));
 	connect(this, SIGNAL(sig_close()), m_hpSet, SLOT(slotClose()));
 	connect(m_hpSet, SIGNAL(sig_edit_hp_set_SetHPLocation(bool)), this, SIGNAL(sig_edit_hp_SetHPLocation(bool)));
 	m_hpSet->move(scrWidth - 250, 60);
@@ -585,6 +602,13 @@ void project_edit_hotpoint::slot_Operation(QString iconID, QString opera)
 					break;
 				}
 			}
+		}
+		//删除文件夹
+		{
+			QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+			QString dirName_hp = dirName + "/HotPoints";
+			QString dirName_hp_icon = dirName_hp + "/" + iconID;
+			deleteDirectory(dirName_hp_icon);
 		}
 		//场景
 		emit sig_edit_hp_DelIcon(iconID);

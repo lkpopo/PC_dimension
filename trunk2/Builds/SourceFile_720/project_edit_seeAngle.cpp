@@ -58,7 +58,7 @@ project_edit_seeAngle::project_edit_seeAngle(QString projUUID, QString picID, QW
 	ui.horizontalSlide_FOV->setTickInterval(0.1);
 	ui.label_fov_min->setText(QString::number(60.0 / zoom_range[1].toFloat(),10,1));
 	ui.label_fov_max->setText(QString::number(60.0 / zoom_range[0].toFloat(), 10, 1));
-	ui.label_fov_min->setText(QString::number(pam.fov.toFloat(), 10, 1));
+	ui.label_fov_cut->setText(QString::number(pam.fov.toFloat(), 10, 1));
 	connect(ui.horizontalSlide_FOV, SIGNAL(handleValueChangedFOV(HandlePos_FOV, double)), this, SLOT(slotSlideValueChanged_FOV(HandlePos_FOV, double)));
 	
 	ui.horizontalSlide_H->setStyleSheet("QSlider::handle { background: transparent; }"

@@ -128,6 +128,15 @@ void project_edit_delPics::slotOK()
 	{
 		emit sig_sel_setCompassPic(vecIconID);
 	}
+	else if (ui.label_title->text() == u8"选择要切换的场景")
+	{
+		if (vecIconID.size() != 1)
+		{
+			emit sig_Msg(u8"请选择一个场景");
+			return;
+		}
+		emit sig_sel_ChangePic(m_mapIDPicPath[vecIconID[0]]);
+	}
 	//
 	slotClose();
 }

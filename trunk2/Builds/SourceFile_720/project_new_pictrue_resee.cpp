@@ -1,6 +1,6 @@
 #include "project_new_pictrue_resee.h"
 
-project_new_pictrue_resee::project_new_pictrue_resee(QString picPath, QWidget *parent)
+project_new_pictrue_resee::project_new_pictrue_resee( QString picPath, QWidget *parent)
 	:m_picPath(picPath),
 	QWidget(parent)
 {
@@ -10,7 +10,9 @@ project_new_pictrue_resee::project_new_pictrue_resee(QString picPath, QWidget *p
 	setAttribute(Qt::WA_TranslucentBackground, true);
 	setAttribute(Qt::WA_QuitOnClose, true);
 
-	m_panoramaWidget = new PanoramaWidget(picPath);
+	m_panoramaWidget = new PanoramaWidget(picPath, false, false, this);
+	m_panoramaWidget->setHotspotShow(true);
+	m_panoramaWidget->setGroupStatus(u8"²é¿´");
 	ui.horizontalLayout->addWidget(m_panoramaWidget);
 
 	connect(ui.pushButton_close, SIGNAL(clicked()), this, SLOT(slotClose()));
@@ -20,9 +22,11 @@ project_new_pictrue_resee::project_new_pictrue_resee(QString picPath, QWidget *p
 project_new_pictrue_resee::~project_new_pictrue_resee()
 {}
 
+
 void project_new_pictrue_resee::slotClose()
 {
 	this->close();
 	this->destroy(true);
 }
+
 

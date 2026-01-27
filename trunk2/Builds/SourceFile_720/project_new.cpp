@@ -306,6 +306,7 @@ void project_new::slotCreate()
 	QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_Project_UUID;
 	QString Groups = dirName + "/Groups";
 	QString dirName_pic = dirName + "/Pictures";
+	QString dirName_hp = dirName + "/HotPoints";
 	QString dirName_pic_thumb = dirName + "/Pictures_Thumb";
 	QString dirName_pic_thumb_tmp = dirName + "/Pictures_Thumb_tmp";
 	QDir dir(dirName);
@@ -317,6 +318,11 @@ void project_new::slotCreate()
 	if (!dir2.exists())
 	{
 		dir2.mkdir(dirName_pic);
+	}
+	QDir dirHp(dirName_hp);
+	if (!dirHp.exists())
+	{
+		dirHp.mkdir(dirName_hp);
 	}
 	QDir dir3(dirName_pic_thumb);
 	if (!dir3.exists())

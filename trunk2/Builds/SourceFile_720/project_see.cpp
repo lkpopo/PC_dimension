@@ -30,6 +30,8 @@ project_see::project_see(QString projUUID, QStringList listPicPath,QWidget* pare
 
 	m_panWidget = new PanoramaWidget(m_listPicPath[0], true, true, this);
 	connect(m_panWidget, SIGNAL(sigShowElement(bool)), this, SLOT(SlotShowElement(bool)));
+	connect(m_panWidget, SIGNAL(sig_style_picText(QString)), this, SLOT(slotStyle_picText(QString)));
+	connect(m_panWidget, SIGNAL(sig_style_picChange(QString)), this, SLOT(slotStyle_picChange(QString)));
 	ui.checkBox_autoRotate->setChecked(true);
 	m_panWidget->setHotspotShow(true);
 	m_panWidget->setGroupStatus(u8"²é¿´");
@@ -421,6 +423,38 @@ void project_see::SlotShowElement(bool bl)
 		ui.pushButton_full->show();
 		ui.pushButton_info->show();
 		ui.pushButton_selPic->show();
+	}
+}
+
+void project_see::slotStyle_picText(QString style)
+{
+	QStringList styleList = style.split(';');
+	if (styleList.size() == 2)
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+		QString dirName_hp = dirName + "/HotPoints";
+		QString dirName_hp_icon = dirName_hp + "/" + styleList[0];
+		QStringList picList = searchImages(dirName_hp_icon);
+
+		if (m_picText)
+		{
+			delete m_picText;
+		}
+		m_picText = new project_style_picText(picList, styleList[1]);
+		m_picText->setWindowModality(Qt::ApplicationModal);
+		m_picText->showNormal();
+	}
+}
+
+void project_see::slotStyle_picChange(QString style)
+{
+	QStringList styleList = style.split(';');
+	if (styleList.size() == 2)
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+		QString dirName_pic = dirName + "/Pictures";
+		QString dirName_picPath = dirName_pic + "/" + styleList[1];
+		slotNewPicClick(dirName_picPath);
 	}
 }
 

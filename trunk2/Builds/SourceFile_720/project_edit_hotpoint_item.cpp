@@ -13,9 +13,15 @@ project_edit_hotpoint_item::project_edit_hotpoint_item(Hotspot& hp, QWidget *par
 	setAttribute(Qt::WA_TranslucentBackground, true);
 	setAttribute(Qt::WA_QuitOnClose, true);
 
-
 	m_iconUUID = hp.iconID;
 	m_iconPath = hp.iconPath;
+
+	if (hp.style == "nornmal;")
+		ui.pushButton_changPic->setText(u8"一般热点");
+	else if (hp.style.contains("picText;") == true)
+		ui.pushButton_changPic->setText(u8"图文展示");
+	else
+		ui.pushButton_changPic->setText(u8"场景切换");
 
 	QPixmap pixmap(hp.iconPath);
 	QPixmap fitpixmap = pixmap.scaled(20, 20, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -36,7 +42,6 @@ project_edit_hotpoint_item::project_edit_hotpoint_item(Hotspot& hp, QWidget *par
 	connect(ui.pushButton_changPic, SIGNAL(clicked()), this, SLOT(slotChangePic()));
 	connect(ui.pushButton_copy, SIGNAL(clicked()), this, SLOT(slotCopyHotPoint()));
 	connect(ui.pushButton_changPic, SIGNAL(clicked()), this, SLOT(slotChangePic()));
-
 	connect(ui.pushButton_more, SIGNAL(sig_Txt(QString)), this, SLOT(slotMore(QString)));
 
 	ui.pushButton_copy->setToolTip(u8"复制");
@@ -87,6 +92,12 @@ void project_edit_hotpoint_item::updateItem(Hotspot& hp)
 	QPixmap fitpixmap = pixmap.scaled(20, 20, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	ui.label_icon->setPixmap(fitpixmap);
 	ui.pushButton_title->setText(hp.name);
+	if (hp.style == "nornmal;")	
+		ui.pushButton_changPic->setText(u8"一般热点");
+	else if (hp.style == "picText;")
+		ui.pushButton_changPic->setText(u8"图文展示");
+	else
+		ui.pushButton_changPic->setText(u8"场景切换");
 }
 
 void project_edit_hotpoint_item::slotCopyHotPoint()
@@ -208,7 +219,7 @@ void project_edit_hotpoint_item::slotCopyHotPoint()
 		{
 			qDebug() << QString::fromLocal8Bit("failed!") << query.lastError();
 		}
-	}
+	}	
 	//复制到场景
 	emit sig_CopyIcon(hp);
 	//复制到list

@@ -17,6 +17,7 @@
 #include "project_edit_hotpoint_set.h"
 #include "project_edit_resee.h"
 #include "project_edit_delPics.h"
+#include "project_style_picText.h"
 
 class project_edit : public QWidget
 {
@@ -78,6 +79,7 @@ public slots:
 	void slotSetScaleY(float);//设置缩放Y
 	void slotSetName(QString);//设置图标名称
 	void slotNameShow(bool);//是否显示标题
+	void slotSetStyle(QString);//类型
 	void slotAddIconEnd();
 	void slotEditIconEnd();
 	void slotDelTmpIcon();
@@ -105,6 +107,9 @@ public slots:
 	void slotDelIcon(QString);
 	void slotclearStackedWidget(QWidget* delWgt);
 	void slotSetItemShow_Lock(QString, QString);
+
+	void slotStyle_picText(QString);
+	void slotStyle_picChange(QString);
 
 signals:
 	void sig_updateSeeAngle(float);
@@ -136,6 +141,9 @@ private:
 	project_edit_mask* m_mask;
 	project_edit_hotpoint* m_hotpoint;
 	project_edit_delPics* m_delPics;
+	project_style_picText* m_picText;
+
+	project_edit_resee* m_projSee;
 
 	QVector3D m_rotation = QVector3D(-9999,-9999,-9999);
 	float m_zoom = -9999.0;
@@ -147,7 +155,7 @@ private:
 	int m_curInsertNum;
 	
 	QString m_cutPage;//当前界面的编辑功能
-	project_edit_resee* m_projSee;
+
 
 	int m_curInsertGroupNum;
 

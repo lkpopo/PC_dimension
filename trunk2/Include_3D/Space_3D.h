@@ -14,6 +14,8 @@
 #include "OSGEarthApp.h"
 #include "ui_Space_3D.h"
 #include "NoticeToast.h"
+#include "CustomDialog.h"
+#include "ProjectDAO.h"
 
 class Space_3D : public QWidget {
   Q_OBJECT

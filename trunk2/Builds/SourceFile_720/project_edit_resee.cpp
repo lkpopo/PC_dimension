@@ -30,6 +30,9 @@ project_edit_resee::project_edit_resee(QString projUUID, QStringList listPicPath
 	
 	m_panWidget = new PanoramaWidget(m_listPicPath[0], true, true, this);
 	connect(m_panWidget, SIGNAL(sigShowElement(bool)), this, SLOT(SlotShowElement(bool)));
+	connect(m_panWidget, SIGNAL(sig_style_picText(QString)), this, SLOT(slotStyle_picText(QString)));
+	connect(m_panWidget, SIGNAL(sig_style_picChange(QString)), this, SLOT(slotStyle_picChange(QString)));
+
 	ui.checkBox_autoRotate->setChecked(true);
 	m_panWidget->setHotspotShow(true);
 	m_panWidget->setGroupStatus(u8"查看");
@@ -486,6 +489,38 @@ void project_edit_resee::SlotShowElement(bool bl)
 	}
 }
 
+void project_edit_resee::slotStyle_picText(QString style)
+{
+	QStringList styleList = style.split(';');
+	if (styleList.size() == 2)
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+		QString dirName_hp = dirName + "/HotPoints";
+		QString dirName_hp_icon = dirName_hp + "/" + styleList[0];
+		QStringList picList = searchImages(dirName_hp_icon);
+
+		if (m_picText)
+		{
+			delete m_picText;
+		}
+		m_picText = new project_style_picText(picList, styleList[1]);
+		m_picText->setWindowModality(Qt::ApplicationModal);
+		m_picText->showNormal();
+	}
+}
+
+void project_edit_resee::slotStyle_picChange(QString style)
+{
+	QStringList styleList = style.split(';');
+	if (styleList.size() == 2)
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+		QString dirName_pic = dirName + "/Pictures";
+		QString dirName_picPath = dirName_pic + "/" + styleList[1];
+		slotNewPicClick(dirName_picPath);
+	}
+}
+
 void project_edit_resee::Reload()
 {
 	//设置第一视角
@@ -565,7 +600,7 @@ void project_edit_resee::Reload()
 		m_panWidget->setIconShowZooms(mapVecIconID_Zoom);
 		//是否按层次显示
 		{
-			QString data = QString("select isLevelShow from picture where id = '%1' LIMIT 1").arg(m_mapPicPathUUid[m_picPath]);
+			QString data = QString("select isLevelShow from picture where id = '%1'").arg(m_mapPicPathUUid[m_picPath]);
 			QSqlQuery query(data);//查询表的内容
 			while (query.next())
 			{

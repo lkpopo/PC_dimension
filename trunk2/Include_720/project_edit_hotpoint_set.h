@@ -7,16 +7,19 @@
 #include <QParallelAnimationGroup>
 #include "project_hotpoint_icon.h"
 #include "PanoramaWidget.h"
+#include <QProgressDialog>
+#include "project_edit_delPics.h"
 
 class project_edit_hotpoint_set : public QWidget
 {
 	Q_OBJECT
 
 public:
-	project_edit_hotpoint_set(QString iconID, QWidget *parent = nullptr);
+	project_edit_hotpoint_set(QString projUUID, QString picID, QString iconID, QWidget *parent = nullptr);
 	~project_edit_hotpoint_set();
 
-	
+	void processNextPicItem();
+	void InitProcessNextPicItem();
 	void slideOut(QWidget*);
 	void slideInHide();
 public slots:
@@ -35,6 +38,14 @@ public slots:
 	void slotSetTitleTextColor();
 	void slotTextSizeChanged(int);
 
+	void slotStyleChanged(int);
+	void slotAddPic();
+	void slotDelSelPic(QString);
+
+	void selPicText();
+	void setPicChange();
+
+	void SlotSetChangePic(QString);
 signals:
 	void sig_Msg_Set(QString);
 	void sig_addIconSet(Hotspot);
@@ -54,8 +65,13 @@ signals:
 	void sig_setTextSize(int);
 	void sig_clearFocus();
 	void sig_edit_hp_set_SetHPLocation(bool);
+	void sig_setStyle(QString);
 private:
 	QParallelAnimationGroup* m_AnimationGroup; // 动画组管理
+	project_edit_delPics* m_delPics;
+	QString m_projUUID;
+	QString m_picID;
+
 	QString m_iconUUID;
 	QString m_iconPath;
 
@@ -68,6 +84,11 @@ private:
 
 	project_hotpoint_icon* m_iconWin;
 
+	QProgressDialog* m_progressDialog;
+	int m_currentItemIndex;
+	QStringList m_tmpPathList;
+	QStringList m_ListWidgetPathList;
+	QString m_ChangePic;
 
 	Ui::project_edit_hotpoint_setClass ui;
 };

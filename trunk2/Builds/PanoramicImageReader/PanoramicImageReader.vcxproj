@@ -111,6 +111,7 @@
   <ItemGroup>
     <QtUic Include="..\..\Include_3D\OSGEarthApp.ui" />
     <QtUic Include="..\..\Include_3D\SceneItemWidget.ui" />
+    <QtUic Include="..\..\Include_3D\SimPanel.ui" />
     <QtUic Include="..\..\Include_3D\Space_3D.ui" />
     <QtUic Include="..\..\Include_3D\Space_3D_project_item.ui" />
     <QtUic Include="..\..\Include_720\LoginWindows.ui" />
@@ -146,6 +147,7 @@
     <QtUic Include="..\..\Include_720\project_new_todo.ui" />
     <QtUic Include="..\..\Include_720\project_see.ui" />
     <QtUic Include="..\..\Include_720\project_see_item.ui" />
+    <QtUic Include="..\..\Include_720\project_style_picText.ui" />
     <QtUic Include="MainPage.ui" />
   </ItemGroup>
   <ItemGroup>
@@ -164,12 +166,20 @@
     <QtMoc Include="..\..\Include_720\MarqueeLabel.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="..\..\Include_3D\SimPanel.h" />
+    <QtMoc Include="..\..\Include_3D\AssetLoader.h" />
+    <QtMoc Include="..\..\Include_3D\InteractionManager.h" />
+    <ClInclude Include="..\..\Include_3D\ProjectDAO.h" />
+    <ClInclude Include="resource1.h" />
     <QtMoc Include="..\..\Include_3D\OSGEarthApp.h" />
     <QtMoc Include="..\..\Include_3D\Space_3D.h" />
     <QtMoc Include="..\..\Include_3D\Space_3D_project_item.h" />
     <QtMoc Include="..\..\Include_3D\SceneItemWidget.h" />
-    <QtMoc Include="..\..\Include_3D\NoticeToast.h" />
     <QtMoc Include="..\..\Include_3D\CustomDialog.h" />
+    <QtMoc Include="..\..\Include_3D\CoordinateHandler.h" />
+    <QtMoc Include="..\..\Include_3D\NoticeToast.h" />
+    <ClInclude Include="..\..\Include_3D\Controller.h" />
+    <ClInclude Include="..\..\Include_3D\ManipulatorHelper.h" />
     <ClInclude Include="..\..\Include_3D\utils.h" />
     <ClInclude Include="..\..\Include_720\md5.h" />
     <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h" />
@@ -179,6 +189,7 @@
     <QtMoc Include="..\..\Include_720\project_edit_delPics.h" />
     <QtMoc Include="..\..\Include_720\project_edit_delPics_item.h" />
     <QtMoc Include="..\..\Include_720\project_edit_hotpoint_group_ResetGroupStyle.h" />
+    <QtMoc Include="..\..\Include_720\project_style_picText.h" />
     <ClInclude Include="..\..\Include_720\styleSheet.h" />
     <QtMoc Include="MainPage.h" />
     <QtMoc Include="..\..\Include_720\RotatableLabel.h" />
@@ -217,10 +228,17 @@
     <QtMoc Include="..\..\Include_720\MsgBox.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\SourceFile_3D\AssetLoader.cpp" />
+    <ClCompile Include="..\SourceFile_3D\Controller.cpp" />
+    <ClCompile Include="..\SourceFile_3D\CoordinateHandler.cpp" />
     <ClCompile Include="..\SourceFile_3D\CustomDialog.cpp" />
+    <ClCompile Include="..\SourceFile_3D\InteractionManager.cpp" />
+    <ClCompile Include="..\SourceFile_3D\ManipulatorHelper.cpp" />
     <ClCompile Include="..\SourceFile_3D\NoticeToast.cpp" />
     <ClCompile Include="..\SourceFile_3D\OSGEarthApp.cpp" />
+    <ClCompile Include="..\SourceFile_3D\ProjectDAO.cpp" />
     <ClCompile Include="..\SourceFile_3D\SceneItemWidget.cpp" />
+    <ClCompile Include="..\SourceFile_3D\SimPanel.cpp" />
     <ClCompile Include="..\SourceFile_3D\Space_3D.cpp" />
     <ClCompile Include="..\SourceFile_3D\Space_3D_project_item.cpp" />
     <ClCompile Include="..\SourceFile_3D\utils.cpp" />
@@ -264,8 +282,12 @@
     <ClCompile Include="..\SourceFile_720\project_new_todo.cpp" />
     <ClCompile Include="..\SourceFile_720\project_see.cpp" />
     <ClCompile Include="..\SourceFile_720\project_see_item.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_style_picText.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainPage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PanoramicImageReader1.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

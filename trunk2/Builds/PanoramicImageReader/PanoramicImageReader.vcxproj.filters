@@ -159,6 +159,9 @@
     <QtUic Include="..\..\Include_3D\SceneItemWidget.ui">
       <Filter>Form Files\3D</Filter>
     </QtUic>
+    <QtUic Include="..\..\Include_720\project_style_picText.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainPage.h">
@@ -311,11 +314,17 @@
     <QtMoc Include="..\..\Include_3D\SceneItemWidget.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
+    <QtMoc Include="..\..\Include_3D\CustomDialog.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\CoordinateHandler.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
     <QtMoc Include="..\..\Include_3D\NoticeToast.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
-    <QtMoc Include="..\..\Include_3D\CustomDialog.h">
-      <Filter>Header Files\3D</Filter>
+    <QtMoc Include="..\..\Include_720\project_style_picText.h">
+      <Filter>Header Files\720</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +488,12 @@
     </ClCompile>
     <ClCompile Include="..\SourceFile_3D\NoticeToast.cpp">
       <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\CoordinateHandler.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_style_picText.cpp">
+      <Filter>Source Files\720</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SimPanelClass</class>
+ <widget class="QWidget" name="SimPanelClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>468</width>
+    <height>358</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SimPanel</string>
+  </property>
+  <widget class="QStackedWidget" name="stackedWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>451</width>
+     <height>341</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/* 面板整体样式 */
+QWidget#TowerSimPanel {
+    background-color: rgba(45, 52, 54, 230); /* 深灰色半透明 */
+    border: 1px solid #636e72;
+    border-radius: 8px;
+}</string>
+   </property>
+   <property name="currentIndex">
+    <number>2</number>
+   </property>
+   <widget class="QWidget" name="page0">
+    <widget class="QLabel" name="lblTip">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>20</y>
+       <width>201</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/* 文字标签 */
+QLabel {
+    color: #dfe6e9;
+    font-family: &quot;Microsoft YaHei&quot;;
+    font-size: 13px;
+}</string>
+     </property>
+     <property name="text">
+      <string>请通过拖拽手柄调整位置和旋转</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnGoToSelect">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>290</y>
+       <width>91</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/* 通用按钮 */
+QPushButton {
+    background-color: #0984e3;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #74b9ff; }
+QPushButton:pressed { background-color: #0d2fb5; }</string>
+     </property>
+     <property name="text">
+      <string>选择方向</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page_1">
+    <widget class="QLabel" name="lblTip_2">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>30</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/* 文字标签 */
+QLabel {
+    color: #dfe6e9;
+    font-family: &quot;Microsoft YaHei&quot;;
+    font-size: 13px;
+}</string>
+     </property>
+     <property name="text">
+      <string>请选择倒塌方向</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QWidget" name="gridLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>90</y>
+       <width>241</width>
+       <height>121</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+       <widget class="QPushButton" name="btnFront">
+        <property name="styleSheet">
+         <string notr="true">/* 通用按钮 */
+QPushButton {
+    background-color: #0984e3;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #74b9ff; }
+QPushButton:pressed { background-color: #0d2fb5; }</string>
+        </property>
+        <property name="text">
+         <string>前</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="btnLeft">
+        <property name="styleSheet">
+         <string notr="true">/* 通用按钮 */
+QPushButton {
+    background-color: #0984e3;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #74b9ff; }
+QPushButton:pressed { background-color: #0d2fb5; }</string>
+        </property>
+        <property name="text">
+         <string>左</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="btnBack">
+        <property name="styleSheet">
+         <string notr="true">/* 通用按钮 */
+QPushButton {
+    background-color: #0984e3;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #74b9ff; }
+QPushButton:pressed { background-color: #0d2fb5; }</string>
+        </property>
+        <property name="text">
+         <string>后</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="btnRight">
+        <property name="styleSheet">
+         <string notr="true">/* 通用按钮 */
+QPushButton {
+    background-color: #0984e3;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #74b9ff; }
+QPushButton:pressed { background-color: #0d2fb5; }</string>
+        </property>
+        <property name="text">
+         <string>右</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="btnGoToSim">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>270</y>
+       <width>101</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/* 通用按钮 */
+QPushButton {
+    background-color: #0984e3;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #74b9ff; }
+QPushButton:pressed { background-color: #0d2fb5; }</string>
+     </property>
+     <property name="text">
+      <string>开始模拟</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page_2">
+    <widget class="QLabel" name="lblTip_3">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>121</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/* 文字标签 */
+QLabel {
+    color: #dfe6e9;
+    font-family: &quot;Microsoft YaHei&quot;;
+    font-size: 13px;
+}</string>
+     </property>
+     <property name="text">
+      <string>模拟中...</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnExit">
+     <property name="geometry">
+      <rect>
+       <x>344</x>
+       <y>292</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">/* 通用按钮 */
+QPushButton {
+    background-color: #0984e3;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-weight: bold;
+}
+QPushButton:hover { background-color: #74b9ff; }
+QPushButton:pressed { background-color: #0d2fb5; }</string>
+     </property>
+     <property name="text">
+      <string>结束模拟</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

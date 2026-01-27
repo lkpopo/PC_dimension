@@ -47,6 +47,33 @@
     </spacer>
    </item>
    <item>
+    <widget class="QPushButton" name="btnSimulate">
+     <property name="styleSheet">
+      <string notr="true">/* 按钮通用样式 */
+QPushButton {
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 20); /* 半透明白色背景 */
+    border: 1px solid rgba(255, 255, 255, 40);
+    color: white;
+}
+
+/* 鼠标悬停在按钮上 */
+QPushButton:hover {
+    background-color: #0055ff; /* 经典科技蓝 */
+    border: 1px solid #3388ff;
+}
+
+/* 按钮被按下 */
+QPushButton:pressed {
+    background-color: #0033aa;
+}</string>
+     </property>
+     <property name="text">
+      <string>模拟</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="btnLocate">
      <property name="styleSheet">
       <string notr="true">/* 按钮通用样式 */

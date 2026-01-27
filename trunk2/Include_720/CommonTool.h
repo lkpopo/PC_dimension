@@ -1263,4 +1263,99 @@ static QVector3D getNearPointOnUnitSphere(const QVector3D& P, double dist = 0.05
     return Q;
 }
 
+/**
+ * @brief 递归复制文件夹内容到目标路径
+ * @param srcDir 源文件夹路径
+ * @param destDir 目标文件夹路径
+ * @param coverIfExist 是否覆盖已存在的文件（true=覆盖，false=跳过）
+ * @return bool 复制是否成功
+ */
+static bool copyDirectoryContents(const QString& srcDir, const QString& destDir, bool coverIfExist = true)
+{
+    // 1. 校验源文件夹是否存在
+    QDir sourceDirectory(srcDir);
+    if (!sourceDirectory.exists()) {
+        return false;
+    }
+
+    // 2. 创建目标文件夹（如果不存在）
+    QDir destDirectory(destDir);
+    if (!destDirectory.exists()) {
+        if (!destDirectory.mkpath(destDir)) { // 递归创建多级目录
+            return false;
+        }
+    }
+
+    // 3. 遍历源文件夹的所有条目（文件+子文件夹）
+    QFileInfoList fileInfoList = sourceDirectory.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+    foreach(QFileInfo fileInfo, fileInfoList) {
+        QString srcPath = fileInfo.filePath();
+        QString destPath = destDir + "/" + fileInfo.fileName();
+
+        if (fileInfo.isDir()) {
+            // 4. 如果是子文件夹：递归复制其内容
+            if (!copyDirectoryContents(srcPath, destPath, coverIfExist)) {
+                return false; // 子文件夹复制失败，整体返回失败
+            }
+        }
+        else {
+            // 5. 如果是文件：复制文件
+            if (QFile::exists(destPath) && !coverIfExist) {
+                qDebug() << "文件已存在，跳过：" << destPath;
+                continue; // 不覆盖，跳过该文件
+            }
+
+            // 执行文件复制
+            bool copySuccess = QFile::copy(srcPath, destPath);
+            if (!copySuccess) {
+                return false;
+            }
+            qDebug() << "文件复制成功：" << srcPath << " -> " << destPath;
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief 递归删除文件夹（支持非空文件夹，删除所有内容+文件夹本身）
+ * @param dirPath 要删除的文件夹路径
+ * @return bool 删除是否成功
+ */
+static bool deleteDirectory(const QString& dirPath)
+{
+    // 1. 校验文件夹是否存在
+    QDir targetDir(dirPath);
+    if (!targetDir.exists()) {
+        return true; // 不存在视为“删除成功”，避免报错
+    }
+
+    // 2. 遍历文件夹内的所有内容（文件+子文件夹）
+    QFileInfoList fileInfoList = targetDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+    foreach(QFileInfo fileInfo, fileInfoList) {
+        QString filePath = fileInfo.filePath();
+
+        if (fileInfo.isDir()) {
+            // 3. 递归删除子文件夹（先删子文件夹内容，再删文件夹本身）
+            if (!deleteDirectory(filePath)) {
+                return false;
+            }
+        }
+        else {
+            // 4. 删除文件（先设置文件可写，避免权限问题导致删除失败）
+            QFile file(filePath);
+            file.setPermissions(file.permissions() | QFile::WriteOwner); // 增加写权限
+            if (!file.remove()) {
+                return false;
+            }
+            qDebug() << "文件删除成功：" << filePath;
+        }
+    }
+
+    // 5. 删除空的根文件夹
+    if (!targetDir.rmdir(dirPath)) {
+        return false;
+    }
+    return true;
+}
+
 #endif

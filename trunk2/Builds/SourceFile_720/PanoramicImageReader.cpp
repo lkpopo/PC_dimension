@@ -654,6 +654,7 @@ void PanoramicImageReader::create_levelshow_sqlite()
 		( \
 		`icon_id` varchar(64)  NOT NULL, \
 		`level_id` varchar(64) NULL DEFAULT NULL,\
+		`pic_id` varchar(64) NULL DEFAULT NULL,\
 		`more1` varchar(32)  NULL DEFAULT NULL,\
 		`more2` varchar(64)  NULL DEFAULT NULL);");
 	QSqlQuery query;

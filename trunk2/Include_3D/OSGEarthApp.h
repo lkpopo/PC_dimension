@@ -1,9 +1,12 @@
 #pragma once
+#include <gdal_priv.h>
+
 #include <QButtonGroup>
 #include <QDebug>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFuture>
+#include <QInputDialog>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QSqlError>
@@ -19,22 +22,31 @@
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 #include <osgEarth/ImageLayer>
-#include <osgEarth/ModelLayer>
 #include <osgEarth/MapNode>
+#include <osgEarth/ModelLayer>
 #include <osgEarth/ShaderUtils>
 #include <osgEarth/VirtualProgram>
+#include <osgEarthAnnotation/ModelNode>
 #include <osgEarthUtil/AutoClipPlaneHandler>
 #include <osgEarthUtil/EarthManipulator>
 #include <osgEarthUtil/ExampleResources>
 #include <osgGA/StateSetManipulator>
 #include <osgGA/TrackballManipulator>
+#include <osgManipulator/TabBoxDragger>
+#include <osgManipulator/TrackballDragger>
 #include <osgQt/GraphicsWindowQt>
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 #include <vector>
 
-#include "ui_OSGEarthApp.h"
+#include "Controller.h"
+#include "CoordinateHandler.h"
 #include "NoticeToast.h"
+#include "ui_OSGEarthApp.h"
+#include "ManipulatorHelper.h"
+#include "AssetLoader.h"
+#include "ProjectDAO.h"
+#include "InteractionManager.h"
 
 using namespace std;
 
@@ -68,20 +80,17 @@ class OSGEarthApp : public QWidget {
   void addFileToTree(QString filePath);
   void registerLoadedObject(const QString& filePath, osg::Object* obj);
   void setWorkMode(WorkMode mode, QString pName = "");
+  void updateUIByWorkMode();
 
  signals:
   void projectSavedSuccess();
 
  public slots:
-  osg::Object* onSlotLoadLas(const QString& filePath);
-  void onSlotLasEle();
-  osg::Object* onSlotTif(const QString& filePath);
-  osg::Object* onSlotElevation(const QString& filePath);
-  osg::Object* onSlotShp(const QString& filePath);
-  osg::Object* onSlotLoadObj(const QString& filePath);
+
   void onSlotClose();
   void onSavePro();
-  void onLoadScene();
+  void onLoadScene(QString filePath = QString(), double lon=0.0, double lat=0.0,
+                   double alt=0.0);
 
  private:
   void initEnvironment();    // 路径与环境配置
@@ -89,12 +98,15 @@ class OSGEarthApp : public QWidget {
   void initUIConnections();  // 信号与槽绑定
   void startAsyncLoad();     // 异步读取地球模型
   void flyToNode(osg::Node* node);
-  void flyToImageCenter(const QString& filePath);
+  void flyToLayer(osgEarth::Layer* layer);
   void initSceneManagerTree();
   void onSlotLocateFile(QString path);
   void onSlotDeleteFile(QString path);
+  void enterTowerEditMode(const QString& path);
   void resetSceneUI();
   void updateTreeWidgetsState();
+  void onCoordinateChanged(double lon, double lat, double alt, bool isOut);
+  //void startCollapseAnimation();
 
  private:
   Ui::OSGEarthAppClass ui;
@@ -102,19 +114,36 @@ class OSGEarthApp : public QWidget {
   QButtonGroup* m_cameraGroup = nullptr;
   QWidget* m_glWidget;
   QString m_lastOpenPath;
+  double m_lon, m_lat, m_alt = 0.0;
+
+  // TreeWidget 的分类根节点映射（如 "影像", "点云"）
   QMap<QString, QTreeWidgetItem*> m_categoryNodes;
+
+  // 文件路径与 OSG 对象的映射（核心资源管理器）
   QMap<QString, osg::ref_ptr<osg::Object>> m_pathNodeMap;
+
+  // 文件路径与 TreeWidget 列表项的映射（用于同步 UI 删除）
   QMap<QString, QTreeWidgetItem*> m_pathItemMap;
 
-  // 业务数据
+  // 文件后缀名与加载函数指针的映射表（优雅的分流器）
+  //std::map<QString, SceneLoaderFunc> m_sceneFuncMap;
+
+  // 当前项目内存数据（记录已加载的文件列表等信息）
   ProjectMemoryData m_currentData;
-  std::string m_tifPath;
-  std::string m_elePath;
-  double m_lon = 0.0;
-  double m_lat = 0.0;
+
+  // 地球环境是否初始化完成的标志
   bool m_earth_init = false;
+
+  // 当前工作模式（编辑、浏览、新建）
   WorkMode m_currentMode;
+
+  // 自定义的浮动提示通知框（Toast 效果）
   NoticeToast* m_noticeToast;
+
+  Controller* m_currentTower;
+  ManipulatorHelper* m_towerManip;
+  AssetLoader* m_assetLoader;
+  InteractionManager* m_interManager;
 
   // OSG
   osg::ref_ptr<osgViewer::Viewer> m_viewer;
@@ -123,9 +152,10 @@ class OSGEarthApp : public QWidget {
   osg::ref_ptr<osg::Node> m_earthNode;
   osg::ref_ptr<osgEarth::MapNode> m_mapNode;
   osg::ref_ptr<const osgEarth::SpatialReference> m_geoSRS;
-  osg::ref_ptr<osgEarth::ImageLayer> m_layer;
-  osg::ref_ptr<osgEarth::ElevationLayer> m_eleLayer;
   osg::ref_ptr<osg::Camera> m_camera;
   osg::AnimationPathCallback* m_aniCallback = nullptr;
+  osg::ref_ptr<CoordinateHandler> m_coordHandler;
+
+  // 数据节点分组，专门用于挂载 OBJ、LAS 等非图层类模型
   osg::ref_ptr<osg::Group> m_dataGroup;
 };

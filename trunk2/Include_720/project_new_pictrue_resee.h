@@ -5,18 +5,16 @@
 #include "PanoramaWidget.h"
 
 
-
 class project_new_pictrue_resee : public QWidget
 {
 	Q_OBJECT
 
 public:
-	project_new_pictrue_resee(QString picPath, QWidget *parent = nullptr);
+	project_new_pictrue_resee( QString picPath, QWidget *parent = nullptr);
 	~project_new_pictrue_resee();
 
 public slots:
 	void slotClose();
-
 
 private:
 

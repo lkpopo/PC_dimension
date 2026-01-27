@@ -38,6 +38,8 @@ project_edit::project_edit(QString projUUID,QString project_name, QStringList li
 	connect(m_panWidget, SIGNAL(sig_transEnd()), this, SLOT(slotSetFirstAngle()));
 	connect(m_panWidget, SIGNAL(sig_cutSeeAngle(QString)), this, SLOT(slotSetSeeAngle(QString)));
 	connect(m_panWidget, SIGNAL(sig_seeAngle(float)), this, SIGNAL(sig_updateSeeAngle(float)));
+	connect(m_panWidget, SIGNAL(sig_style_picText(QString)), this, SLOT(slotStyle_picText(QString)));
+	connect(m_panWidget, SIGNAL(sig_style_picChange(QString)), this, SLOT(slotStyle_picChange(QString)));
 	{
 		std::map<QString, WindowParameter> mapPicAngle;
 		std::map<QString, CompassParameter> mapPicCompass;
@@ -923,6 +925,7 @@ void project_edit::slotHotPoint()
 	connect(this, SIGNAL(sig_clearHpList()), m_hotpoint, SLOT(slotclearHpList()));
 	connect(m_hotpoint, SIGNAL(sig_setItemShow_Lock(QString, QString)), this, SLOT(slotSetItemShow_Lock(QString, QString)));
 	connect(m_hotpoint, SIGNAL(sig_edit_hp_RotateCutHotPoint(QString)), this, SLOT(slotRotateCutHotPoint(QString)));
+	connect(m_hotpoint, SIGNAL(sig_style(QString)), this, SLOT(slotSetStyle(QString)));
 
 	ui.stackedWidget_right->addWidget(m_hotpoint);
 	ui.stackedWidget_right->setCurrentWidget(m_hotpoint);
@@ -1005,7 +1008,7 @@ void project_edit::slotSetSelPicFirstAngle(std::vector<QString>& vecPicID)
 
 		//数据库
 		{
-			QString updata = QString("update picture set start_angle = '%1', fov = '%2' where id = '%3'").arg(strRotation).arg(strFOV).arg(picID);
+			QString updata = QString("update picture set start_angle = '%1', fov = '%2' ,zoom = '%3' where id = '%4'").arg(strRotation).arg(strFOV).arg(m_zoom).arg(picID);
 			QSqlQuery query;
 			query.exec(updata);
 		}
@@ -1247,6 +1250,11 @@ void project_edit::slotSetName( QString name)
 void project_edit::slotNameShow( bool blShow)
 {
 	m_panWidget->slotNameShow(blShow);
+}
+
+void project_edit::slotSetStyle(QString style)
+{
+	m_panWidget->slotSetStyle(style);
 }
 
 void project_edit::slotAddIconEnd()
@@ -1577,6 +1585,38 @@ void project_edit::slotSetItemShow_Lock(QString iconID, QString opera)
 	m_panWidget->Update();
 }
 
+void project_edit::slotStyle_picText(QString style)
+{
+	QStringList styleList = style.split(';');
+	if (styleList.size() == 2)
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+		QString dirName_hp = dirName + "/HotPoints";
+		QString dirName_hp_icon = dirName_hp + "/" + styleList[0];
+		QStringList picList = searchImages(dirName_hp_icon);
+
+		if (m_picText)
+		{
+			delete m_picText;
+		}
+		m_picText = new project_style_picText(picList, styleList[1]);
+		m_picText->setWindowModality(Qt::ApplicationModal);
+		m_picText->showNormal();
+	}
+}
+
+void project_edit::slotStyle_picChange(QString style)
+{
+	QStringList styleList = style.split(';');
+	if (styleList.size() == 2)
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+		QString dirName_pic = dirName + "/Pictures";
+		QString dirName_picPath = dirName_pic + "/" + styleList[1];
+		slotNewPicClick(dirName_picPath);
+	}
+}
+
 void project_edit::clearListWidgetGroup()
 {
 	// 1. 遍历所有项（从后往前删，避免索引错乱）
@@ -1712,6 +1752,7 @@ void project_edit::LoadPic_HotPoint(const QString& picPath)
 	connect(this, SIGNAL(sig_clearHpList()), m_hotpoint, SLOT(slotclearHpList()));
 	connect(m_hotpoint, SIGNAL(sig_setItemShow_Lock(QString, QString)), this, SLOT(slotSetItemShow_Lock(QString, QString)));
 	connect(m_hotpoint, SIGNAL(sig_edit_hp_RotateCutHotPoint(QString)), this, SLOT(slotRotateCutHotPoint(QString)));
+	connect(m_hotpoint, SIGNAL(sig_style(QString)), this, SLOT(slotSetStyle(QString)));
 
 	ui.stackedWidget_right->addWidget(m_hotpoint);
 	ui.stackedWidget_right->setCurrentWidget(m_hotpoint);

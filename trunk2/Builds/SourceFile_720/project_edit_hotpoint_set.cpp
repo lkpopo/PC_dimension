@@ -7,10 +7,12 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QColorDialog>
+#include <QFileDialog>
+#include "project_see_item.h"
+#include "LockedFileDialog.h"
 
-
-project_edit_hotpoint_set::project_edit_hotpoint_set(QString iconID, QWidget *parent)
-	: QWidget(parent), m_AnimationGroup(nullptr)
+project_edit_hotpoint_set::project_edit_hotpoint_set(QString projUUID, QString picID, QString iconID, QWidget *parent)
+    :m_projUUID(projUUID), m_picID(picID), m_iconUUID(iconID), QWidget(parent), m_AnimationGroup(nullptr)
 {
 	ui.setupUi(this);
 
@@ -28,10 +30,8 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString iconID, QWidget *pa
     }
 
     m_isExist = false;
-    m_iconUUID = iconID;
     m_iconPath = "";
  
-
     ui.horizontalSlider_w->setMinimum(1);
     ui.horizontalSlider_w->setMaximum(200);
     ui.horizontalSlider_w->setTickInterval(1);
@@ -66,6 +66,20 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString iconID, QWidget *pa
     ui.horizontalSlider_w->setValue(5);
     ui.pushButton_close->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/common/close.png)};").arg(QApplication::applicationDirPath()));
 
+    //热点类型
+    ui.comboBox_style->addItem(u8"一般热点");
+    ui.comboBox_style->addItem(u8"图文展示");
+    ui.comboBox_style->addItem(u8"场景切换");
+    ui.comboBox_style->setCurrentIndex(-1);
+
+    ui.listWidget_pic->setViewMode(QListView::IconMode);
+    ui.listWidget_pic->setSpacing(5);
+    ui.listWidget_pic->setFocusPolicy(Qt::NoFocus);
+    ui.listWidget_pic->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    connect(ui.comboBox_style, SIGNAL(currentIndexChanged(int)), this, SLOT(slotStyleChanged(int)));
+    connect(ui.pushButton_selPic_style, SIGNAL(clicked()), this, SLOT(slotAddPic()));
+    ui.comboBox_style->setCurrentIndex(0);
 
     //新热点默认设置
     m_titleBgColor = QColor(30, 30, 30, 255);
@@ -78,6 +92,7 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString iconID, QWidget *pa
 
         QString iconName;
         QString iconPath;
+        QString iconStyle;
         QString iconPosition;
         QString strWzoom;
         QString strHzoom;
@@ -89,6 +104,7 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString iconID, QWidget *pa
         {    
             iconName = query.value(1).toString();
             iconPath = query.value(3).toString();
+            iconStyle = query.value(4).toString();
             iconPosition = query.value(5).toString();
             strWzoom = query.value(6).toString();
             strHzoom = query.value(7).toString();
@@ -138,6 +154,42 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString iconID, QWidget *pa
             m_oldHpPam.title_bg_color = m_titleBgColor;
             m_oldHpPam.title_text_color = m_titleTextColor;
             m_oldHpPam.title_text_size = m_titleTextSize;
+        }
+        //热点类型
+        if (iconStyle == "normal;")
+        {
+            ui.comboBox_style->setCurrentIndex(0);
+        }
+        else if (iconStyle.contains("picText;") == true)
+        {
+            ui.comboBox_style->setCurrentIndex(1);
+            //搜索图册  
+            QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+            QString dirName_hp = dirName + "/HotPoints";
+            QString dirName_hp_icon = dirName_hp + "/" + m_iconUUID;
+            m_ListWidgetPathList = searchImages(dirName_hp_icon);
+            m_currentItemIndex = 0;
+            // 使用定时器开始处理
+            QTimer::singleShot(0, this, &project_edit_hotpoint_set::InitProcessNextPicItem);
+        }
+        else
+        {
+            ui.comboBox_style->setCurrentIndex(2);
+            QStringList changeList = iconStyle.split(';');
+            if (changeList.size() == 2)
+            {
+                QString picName = changeList[1];
+                QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+                QString dirName_picChange = dirName + "/Pictures/" + picName; 
+                m_ChangePic = dirName_picChange;
+                QPixmap pix(m_ChangePic);
+                QPixmap fitpixmap = pix.scaled(211, 111, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                ui.label_selPic_change->setPixmap(fitpixmap);
+                ui.label_selPic_change->setAlignment(Qt::AlignCenter); 
+
+                QString file_name = dirName_picChange.section("/", -1).section(".", 0, -1);
+                ui.label_selPic_change_name->setText(file_name);
+            }
         }
     }    
     ui.pushButton_BgColor->setStyleSheet(QString("QPushButton{background-color: rgb(%1, %2, %3)};") \
@@ -397,6 +449,60 @@ void project_edit_hotpoint_set::slotTextSizeChanged(int index)
     emit sig_setTextSize(m_titleTextSize);
 }
 
+void project_edit_hotpoint_set::slotStyleChanged(int index)
+{
+    if (index == 0)
+    {
+        ui.label_style->resize(231,71);
+
+        ui.label_selPic->hide();
+        ui.label_selPic_change->hide();
+        ui.label_selPic_change_name->hide();
+        ui.listWidget_pic->hide();
+        
+        ui.pushButton_selPic_style->hide();
+
+        ui.label_selPicTitle->hide();
+        ui.lineEdit_picsTitle->hide();
+
+        //emit sig_setStyle("normal;");
+    }
+    else if (index == 1)
+    {
+        ui.label_style->resize(231, 301);
+
+        ui.label_selPic->setText(u8"图册");
+        ui.label_selPic->show();
+
+        ui.label_selPic_change->hide();
+        ui.label_selPic_change_name->hide();
+        ui.listWidget_pic->show();
+
+        ui.pushButton_selPic_style->setText(u8"选择图册");
+        ui.pushButton_selPic_style->show();
+
+        ui.label_selPicTitle->show();
+        ui.lineEdit_picsTitle->show();
+    }
+    else
+    {
+        ui.label_style->resize(231, 241);
+
+        ui.label_selPic->setText(u8"场景切换");
+        ui.label_selPic->show();
+
+        ui.label_selPic_change->show();
+        ui.label_selPic_change_name->show();
+        ui.listWidget_pic->hide();
+
+        ui.pushButton_selPic_style->setText(u8"选择场景");
+        ui.pushButton_selPic_style->show();
+
+        ui.label_selPicTitle->hide();
+        ui.lineEdit_picsTitle->hide();
+    }
+}
+
 void project_edit_hotpoint_set::slotDone()
 {
     if (m_iconPath == "")
@@ -410,7 +516,28 @@ void project_edit_hotpoint_set::slotDone()
         emit sig_Msg_Set(u8"请设置标题！");
         return;
     }
-
+    if (ui.comboBox_style->currentIndex() == 1)
+    {
+        if (ui.listWidget_pic->count() == 0)
+        {
+            emit sig_Msg_Set(u8"请选择图册！");
+            return;
+        } 
+        if (ui.lineEdit_picsTitle->text() == "")
+        {
+            emit sig_Msg_Set(u8"请设置图册标题！");
+            return;
+        }
+    }
+    else if (ui.comboBox_style->currentIndex() == 2)
+    {
+        if (m_ChangePic == "")
+        {
+            emit sig_Msg_Set(u8"请设置转场场景！");
+            return;
+        }
+    }
+    //
     Hotspot hpIcon;
     hpIcon.iconID = m_iconUUID;
     hpIcon.iconPath = m_iconPath;
@@ -423,6 +550,25 @@ void project_edit_hotpoint_set::slotDone()
     hpIcon.title_text_color = m_titleTextColor;
     hpIcon.title_text_size = m_titleTextSize;
 
+    if (ui.comboBox_style->currentIndex() == 0)
+    {
+        hpIcon.style = "nornmal;";
+      
+    }
+    else if (ui.comboBox_style->currentIndex() == 1)
+    {
+        hpIcon.style = "picText;" + ui.lineEdit_picsTitle->text();
+       
+    }
+    else
+    {
+        QString changePic = m_ChangePic;
+        QString file_name = changePic.section("/", -1).section(".", 0, -1);
+        hpIcon.style = "picChange;" + file_name;
+    }
+    //
+    emit sig_setStyle(hpIcon.style);
+    //
     if (m_isExist == false)//添加新热点
     {
         //添加到场景
@@ -442,4 +588,204 @@ void project_edit_hotpoint_set::slotDone()
     emit sig_edit_hp_set_SetHPLocation(false);
     slotClose();
 }
+
+void project_edit_hotpoint_set::slotAddPic()
+{
+    if (ui.pushButton_selPic_style->text() == u8"选择图册")
+    {
+        //选择图册
+        selPicText();
+    }
+    else
+    {
+        //选择转场
+        setPicChange();
+    }
+}
+
+void project_edit_hotpoint_set::slotDelSelPic(QString picPath)
+{
+    for (int i = 0; i < ui.listWidget_pic->count(); i++)
+    {
+        QListWidgetItem* pItem = ui.listWidget_pic->item(i);
+        QString tip = pItem->toolTip();
+        if (tip.compare(picPath) == 0)
+        {
+            ui.listWidget_pic->removeItemWidget(pItem);
+            delete pItem;
+            int index = m_ListWidgetPathList.indexOf(tip);
+            if (index != -1) 
+                m_ListWidgetPathList.removeAt(index);
+            
+            break;
+        }
+    }
+}
+
+void project_edit_hotpoint_set::selPicText()
+{
+    if (m_iconPath == "")
+    {
+        emit sig_Msg_Set(u8"请选择图标！");
+        return;
+    }
+    QStringList tmpPathList = QFileDialog::getOpenFileNames(this, u8"选择图片", "", u8"图片 (*.png *.jpg *.jpeg)");
+
+    //删除路径重复的
+    std::map<QString, bool> mapPicHave;
+    for (auto tmpI : tmpPathList)
+    {
+        mapPicHave[tmpI] = false;
+    }
+    //创建文件夹
+    QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+    QString dirName_hp = dirName + "/HotPoints";
+    QString dirName_hp_icon = dirName_hp + "/" + m_iconUUID;
+    QDir dir(dirName);
+    if (!dir.exists())
+    {
+        dir.mkdir(dirName);
+    }
+    QDir dirHp(dirName_hp);
+    if (!dirHp.exists())
+    {
+        dirHp.mkdir(dirName_hp);
+    }
+    QDir dirHpIcon(dirName_hp_icon);
+    if (!dirHpIcon.exists())
+    {
+        dirHpIcon.mkdir(dirName_hp_icon);
+    }
+    //搜索图册  
+    m_ListWidgetPathList = searchImages(dirName_hp_icon);
+
+    for (auto tmpI : tmpPathList)
+    {
+        for (auto tmpJ : m_ListWidgetPathList)
+        {
+            QString file_name1 = tmpI.section("/", -1).section(".", 0, -2);
+            QString file_name2 = tmpJ.section("/", -1).section(".", 0, -2);
+            if (file_name1 == file_name2)
+            {
+                mapPicHave[tmpI] = true;
+                break;
+            }
+        }
+    }
+    //添加
+    m_tmpPathList.clear();
+    for (auto tmp : mapPicHave)
+    {
+        if (tmp.second == false)
+        {
+            m_tmpPathList.append(tmp.first);
+        }
+    }
+
+    if (m_tmpPathList.count() == 0) return;
+    m_currentItemIndex = 0;
+
+
+    //
+    //emit sig_setStyle("picText;");
+
+    // 使用定时器开始处理
+    QTimer::singleShot(0, this, &project_edit_hotpoint_set::processNextPicItem);
+}
+
+void project_edit_hotpoint_set::setPicChange()
+{
+    QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+    QString dirName_hp = dirName + "/Pictures";
+    QStringList picList = searchImages(dirName_hp);
+
+    if (m_delPics)
+    {
+        delete m_delPics;
+    }
+    m_delPics = new project_edit_delPics(m_projUUID);
+    m_delPics->setTitle(u8"选择要切换的场景");
+    connect(m_delPics, SIGNAL(sig_sel_ChangePic(QString)), this, SLOT(SlotSetChangePic(QString)));
+    connect(m_delPics, SIGNAL(sig_Msg(QString)), this, SIGNAL(sig_Msg_Set(QString)));
+    m_delPics->setWindowModality(Qt::ApplicationModal);
+    m_delPics->showNormal();  
+}
+
+void project_edit_hotpoint_set::SlotSetChangePic(QString picPath)
+{
+    m_ChangePic = picPath;
+    QPixmap pix(picPath);
+    QPixmap fitpixmap = pix.scaled(211, 111, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    ui.label_selPic_change->setPixmap(fitpixmap);
+    ui.label_selPic_change->setAlignment(Qt::AlignCenter); // 图片居中显示
+
+    QString file_name = picPath.section("/", -1).section(".", 0, -1);
+    ui.label_selPic_change_name->setText(file_name);
+
+    emit sig_setStyle("picChange;" + file_name);
+}
+
+void project_edit_hotpoint_set::processNextPicItem()
+{
+    if (m_currentItemIndex >= m_tmpPathList.size())
+    {
+        return;
+    }
+    QString picPath = m_tmpPathList[m_currentItemIndex];
+    QListWidgetItem* item = new QListWidgetItem(ui.listWidget_pic);
+    item->setSizeHint(QSize(80, 80));
+    item->setData(Qt::UserRole, picPath);
+    ui.listWidget_pic->addItem(item);
+    project_see_item* item2 = new project_see_item(picPath,false);
+    item2->resize(QSize(80, 80));
+    connect(item2, SIGNAL(sig_delPic(QString)), this, SLOT(slotDelSelPic(QString)));
+    ui.listWidget_pic->setItemWidget(item, item2);
+    //if (m_currentItemIndex == 0)
+    //{
+    //    item2->setFocus();
+    //    item2->slotPicPath();
+    //}
+    m_currentItemIndex++;
+
+    //复制
+    {
+        QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
+        QString dirName_hp = dirName + "/HotPoints";
+        QString dirName_hp_icon = dirName_hp + "/" + m_iconUUID;
+        QString newPath = dirName_hp_icon + "/" + picPath.section("/", -1).section(".", 0, -2);
+        QFileInfo fileInfo(picPath);
+        QString suf = fileInfo.completeSuffix();
+        QString newFullPath = newPath + "." + suf;
+        CopyFile(picPath, newFullPath, true);
+    }
+
+    // 继续处理下一个图片，保持UI响应
+    QTimer::singleShot(30, this, &project_edit_hotpoint_set::processNextPicItem);
+}
+
+void project_edit_hotpoint_set::InitProcessNextPicItem()
+{
+    if (m_currentItemIndex >= m_ListWidgetPathList.size())
+    {      
+        return;
+    }
+    QString picPath = m_ListWidgetPathList[m_currentItemIndex];
+    QListWidgetItem* item = new QListWidgetItem(ui.listWidget_pic);
+    item->setSizeHint(QSize(80, 80));
+    item->setData(Qt::UserRole, picPath);
+    ui.listWidget_pic->addItem(item);
+    project_see_item* item2 = new project_see_item(picPath, false);
+    item2->resize(QSize(80, 80));
+    connect(item2, SIGNAL(sig_delPic(QString)), this, SLOT(slotDelSelPic(QString)));
+    ui.listWidget_pic->setItemWidget(item, item2);
+    //if (m_currentItemIndex == 0)
+    //{
+    //    item2->setFocus();
+    //    item2->slotPicPath();
+    //}
+    m_currentItemIndex++;
+    // 继续处理下一个图片，保持UI响应
+    QTimer::singleShot(30, this, &project_edit_hotpoint_set::InitProcessNextPicItem);
+}
+
 

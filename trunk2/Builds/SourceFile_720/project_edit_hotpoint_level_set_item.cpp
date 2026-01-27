@@ -20,11 +20,16 @@ project_edit_hotpoint_level_set_item::project_edit_hotpoint_level_set_item(Hotsp
 	ui.label_icon->setPixmap(fitpixmap);
 	ui.pushButton_title->setText(hp.name);
 
+	if (hp.style == "nornmal;")
+		ui.pushButton_changPic->setText(u8"一般热点");
+	else if (hp.style.contains("picText;") == true)
+		ui.pushButton_changPic->setText(u8"图文展示");
+	else
+		ui.pushButton_changPic->setText(u8"场景切换");
+
 	connect(ui.pushButton_title, SIGNAL(clicked()), this, SLOT(slotSelOperation()));
 	connect(ui.pushButton_changPic, SIGNAL(clicked()), this, SLOT(slotChangePic()));
-
 	connect(ui.checkBox, SIGNAL(stateChanged(int)), this, SIGNAL(sig_SelStatus(int)));
-
 }
 
 project_edit_hotpoint_level_set_item::~project_edit_hotpoint_level_set_item()

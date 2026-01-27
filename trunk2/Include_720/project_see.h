@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QOpenGLWidget>
 #include "project_edit_group_item.h"
-
+#include "project_style_picText.h"
 class project_see : public QWidget
 {
 	Q_OBJECT
@@ -27,8 +27,10 @@ public slots:
 	void slotSetSelStyle(QString groupID);
 	void Slot_autoRotate(int);
 	void SlotShowElement(bool bl);
+	void slotStyle_picText(QString);
+	void slotStyle_picChange(QString);
 private:
-
+	project_style_picText* m_picText;
 	QString m_projUUID;
 	QStringList m_listPicPath;
 	QString m_picPath;

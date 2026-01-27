@@ -26,8 +26,6 @@
 #include <QDebug>
 #include "CommonTool.h"
 
-
-//PanoramaWidget::PanoramaWidget(QString picPath, bool autoRotate, bool blCompassShow, QString compassN_location, QWidget* parent)
 PanoramaWidget::PanoramaWidget(QString picPath, bool autoRotate, bool blCompassShow, QWidget* parent)
     : QOpenGLWidget(parent)
     , m_picPath(picPath)//场景图片地址
@@ -205,6 +203,9 @@ void PanoramaWidget::initHotspotGeometry()
 void PanoramaWidget::changePic(QString picPath, QString id, bool isTransitioning)
 {
     if (picPath == m_picPath)  return;
+    //重置热点对应的屏幕位置
+    m_mapAllHpScreenPos.clear();
+    //
     // 更新当前图片路径
     m_picID = id;
     m_picPath = picPath;
@@ -357,7 +358,7 @@ void PanoramaWidget::randerHotspotList()
 
         m_hotspotProgram->setUniformValue("view", m_view);
         m_hotspotProgram->setUniformValue("projection", m_projection);
-        m_hotspotProgram->setUniformValue("texture", 0);
+        m_hotspotProgram->setUniformValue("hotspotTexture", 0);
 
         QMatrix4x4 tmpModel;
         // ========== 步骤1：仅应用全景旋转（纯旋转，无缩放） ==========
@@ -418,6 +419,11 @@ void PanoramaWidget::randerHotspotList()
                 return;
             }
             m_cutHpScreenPos = sphereToScreen(sphericalCoo, m_view, m_projection);
+            //
+            m_mapIconIDUP.insert(std::make_pair(hotspot.iconID, hotspot));
+
+            m_mapAllHpScreenPos[hotspot.iconID] = m_cutHpScreenPos;
+
             // 设置字体大小
             QFont font("微软雅黑", hotspot.title_text_size);
             painter.setFont(font);
@@ -463,7 +469,7 @@ void PanoramaWidget::randerHotspot_tmp()
 
         m_hotspotProgram->setUniformValue("view", m_view);
         m_hotspotProgram->setUniformValue("projection", m_projection);
-        m_hotspotProgram->setUniformValue("texture", 0);
+        m_hotspotProgram->setUniformValue("hotspotTexture", 0);
 
         QMatrix4x4 tmpModel;
         // ========== 步骤1：仅应用全景旋转（纯旋转，无缩放） ==========
@@ -1300,6 +1306,29 @@ void PanoramaWidget::mousePressEvent(QMouseEvent* event)
             m_isDragging = true;
             m_isMovingHotspot = false;
         }
+        //图文、场景切换 
+        if (m_cutHotPoint.iconID != 0) return;
+        for (auto tmpHp : m_mapAllHpScreenPos)
+        {
+            float distance = QVector2D(m_lastMousePos - tmpHp.second).length();
+            if (distance < 20)
+            {
+                if (m_mapIconIDUP[tmpHp.first].style.contains("picText;") == true)
+                {
+                    QStringList textList = m_mapIconIDUP[tmpHp.first].style.split(';');
+                    if (textList.size() == 2)
+                    {
+                        emit sig_style_picText(tmpHp.first + ";" + textList[1]);
+                        break;
+                    }             
+                }
+                else if (m_mapIconIDUP[tmpHp.first].style.contains("picChange;") == true)
+                {
+                    emit sig_style_picChange(m_mapIconIDUP[tmpHp.first].style);
+                    break;
+                }
+            }   
+        }
     }
 }
 
@@ -1325,12 +1354,19 @@ void PanoramaWidget::mouseMoveEvent(QMouseEvent* event)
             float tmp_y = m_rotation.y() - delta.x() * 0.05f;
 
             float newX, newY;
-    
-            m_H_min = m_mapPicAngle[m_picPath].h_range.split(';')[0].toFloat();
-            m_H_max = m_mapPicAngle[m_picPath].h_range.split(';')[1].toFloat();
-            m_V_min = m_mapPicAngle[m_picPath].v_range.split(';')[0].toFloat();
-            m_V_max = m_mapPicAngle[m_picPath].v_range.split(';')[1].toFloat();
-
+          
+            m_H_min = -180;
+            m_H_max = 180;
+            m_V_min = -90;
+            m_V_max = 90;
+               
+            if (m_mapPicAngle[m_picPath].h_range.split(';').size() == 2 && m_mapPicAngle[m_picPath].v_range.split(';').size() == 2)
+            {
+                m_H_min = m_mapPicAngle[m_picPath].h_range.split(';')[0].toFloat();
+                m_H_max = m_mapPicAngle[m_picPath].h_range.split(';')[1].toFloat();
+                m_V_min = m_mapPicAngle[m_picPath].v_range.split(';')[0].toFloat();
+                m_V_max = m_mapPicAngle[m_picPath].v_range.split(';')[1].toFloat();
+            }
             newX = qMax(m_V_min, qMin(tmp_x, m_V_max));
             newY = qMax(m_H_min, qMin(tmp_y, m_H_max));
             
@@ -1344,7 +1380,6 @@ void PanoramaWidget::mouseMoveEvent(QMouseEvent* event)
         resetInactivityTimer();
     }
 }
-
 
 void PanoramaWidget::setCompassLocation(const QString& location)
 {
