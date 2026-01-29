@@ -162,6 +162,7 @@
     <QtUic Include="..\..\Include_720\project_style_picText.ui">
       <Filter>Form Files\720</Filter>
     </QtUic>
+    <QtUic Include="..\..\Include_3D\SimPanel.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainPage.h">
@@ -326,6 +327,15 @@
     <QtMoc Include="..\..\Include_720\project_style_picText.h">
       <Filter>Header Files\720</Filter>
     </QtMoc>
+    <QtMoc Include="..\..\Include_3D\AssetLoader.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\InteractionManager.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\SimPanel.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Include_720\md5.h">
@@ -338,6 +348,18 @@
       <Filter>Header Files\720</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Include_3D\utils.h">
+      <Filter>Header Files\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include_3D\Controller.h">
+      <Filter>Header Files\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include_3D\ManipulatorHelper.h">
+      <Filter>Header Files\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include_3D\ProjectDAO.h">
       <Filter>Header Files\3D</Filter>
     </ClInclude>
   </ItemGroup>
@@ -495,5 +517,28 @@
     <ClCompile Include="..\SourceFile_720\project_style_picText.cpp">
       <Filter>Source Files\720</Filter>
     </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\AssetLoader.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\Controller.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\InteractionManager.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\ManipulatorHelper.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\ProjectDAO.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\SimPanel.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PanoramicImageReader1.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

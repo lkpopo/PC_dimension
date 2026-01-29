@@ -10,12 +10,12 @@ OSGEarthApp::OSGEarthApp(QWidget* parent) : QWidget(parent) {
   setAttribute(Qt::WA_DeleteOnClose);
   setWindowTitle("osgEarth Eigen APP");
 
+
   initEnvironment();       // 1. 环境准备
   initOSGViewer();         // 2. 配置相机和渲染窗口
   initUIConnections();     // 3. 绑定按钮逻辑
   startAsyncLoad();        // 4. 异步加载地球模型
   initSceneManagerTree();  // 5.初始化场景管理树
-  // initScenceFuncMap();     // 6.绑定不同场景的加载函数
 }
 
 OSGEarthApp::~OSGEarthApp() {
@@ -62,26 +62,15 @@ void OSGEarthApp::startAsyncLoad() {
     } catch (...) {
       return;
     }
-    if (weakThis.isNull()) return;
+    if (weakThis.isNull() || !loadedNode.valid()) return;
+
     // 3. 回到主线程执行挂载
     QMetaObject::invokeMethod(
         weakThis.data(),
         [weakThis, loadedNode]() {
-          if (weakThis.isNull() || !loadedNode.valid()) return;
-
           OSGEarthApp* self = weakThis.data();
           self->m_earthNode = loadedNode;
-          self->m_earthNode->setName("earth");
-          self->m_root->addChild(self->m_earthNode.get());
-          self->m_mapNode =
-              osgEarth::MapNode::findMapNode(self->m_earthNode.get());
-          
-          if (self->m_mapNode.valid()) {
-            // 初始化坐标处理器、鼠标坐标显示
-            self->m_assetLoader = new AssetLoader(self->m_mapNode, self);
-            self->m_geoSRS = self->m_mapNode->getMapSRS()->getGeographicSRS();
-          }
-          self->m_earth_init = true;
+          self->initMembers();
         },
         Qt::QueuedConnection);
   });
@@ -112,6 +101,7 @@ void OSGEarthApp::initOSGViewer() {
   m_camera->setGraphicsContext(gw);
   m_camera->setViewport(new osg::Viewport(0, 0, traits->width, traits->height));
   m_camera->setClearColor(osg::Vec4(0.93, 0.93, 0.93, 1.0));
+  m_camera->setNearFarRatio(0.00001);
   m_camera->setProjectionMatrixAsPerspective(
       30.0f,
       static_cast<double>(traits->width) / static_cast<double>(traits->height),
@@ -153,28 +143,24 @@ void OSGEarthApp::initUIConnections() {
           [this]() { this->onLoadScene(); });
   connect(ui.btn_Close, &QPushButton::clicked, this, &OSGEarthApp::onSlotClose);
   connect(ui.btnSavePro, &QPushButton::clicked, this, &OSGEarthApp::onSavePro);
-  connect(ui.btnMeasure, &QPushButton::clicked, this, [this]() {
-    m_interManager =
-        new InteractionManager(m_viewer.get(), m_dataGroup, this);
+  connect(ui.btnMeasure, &QPushButton::clicked, this, &OSGEarthApp::onMeasure);
+  
+  connect(ui.btnClipMode, &QPushButton::toggled, this, [this](bool checked) {
+    ui.clipSubToolbar->setVisible(checked);
 
-    // 2. 将它加入 OSG 的事件处理链（关键步骤）
-    m_viewer->addEventHandler(m_interManager);
-
-    // 3. 连接信号到 UI
-    connect(
-        m_interManager, &InteractionManager::signalDistanceMeasured, this,
-        [this](double dist) {
-              ui.lblCoordinate->setText(
-                  QString("距离: %1 米").arg(dist, 0, 'f', 2));
-        });
-    connect(ui.btnStartMeasure, &QPushButton::clicked, this,
-            [this]() { m_interManager->setMode(InterMode::MEASURE); });
+    // 2. 切换模式
+    if (checked) {
+      m_interManager->setMode(InterMode::CLIP);
+    } else {
+      m_interManager->setMode(InterMode::VIEW);
+    }
   });
 
   // 渲染定时器
   m_frameTimer = new QTimer(this);
   connect(m_frameTimer, &QTimer::timeout, this, [this]() {
     if (m_viewer.valid()) {
+      updateCameraSensitivity(m_earthManipulator.get());
       m_viewer->frame();
     }
   });
@@ -267,16 +253,30 @@ void OSGEarthApp::onSavePro() {
 void OSGEarthApp::onSlotClose() {
   this->hide();
 
-  // 清空场景管理器资源
-  resetSceneUI();
-
-  // 清空渲染的模型
   resetScene();
 
-  // 停止 OSG 的定时器，节省不显示的性能开销
   if (m_frameTimer) {
     m_frameTimer->stop();
   }
+}
+
+void OSGEarthApp::onMeasure(bool checked) {
+  if (!m_interManager) return;
+
+  if (checked) {
+    // --- 进入测量模式 ---
+    m_interManager->clearAll();
+    m_interManager->setMode(InterMode::MEASURE);
+    ui.btnMeasure->setProperty("active", true);
+  } else {
+    // --- 退出测量模式 ---
+    m_interManager->setMode(InterMode::VIEW);
+    m_interManager->clearAll();
+    ui.btnMeasure->setProperty("active", false);
+  }
+
+  ui.btnMeasure->style()->unpolish(ui.btnMeasure);
+  ui.btnMeasure->style()->polish(ui.btnMeasure);
 }
 
 /*-------------------辅助函数-------------------*/
@@ -356,12 +356,19 @@ void OSGEarthApp::onReShow() {
 }
 
 void OSGEarthApp::resetScene() {
+  // 清空成员变量
+  m_currentData.clear();
+  m_pathNodeMap.clear();
+  m_pathItemMap.clear();
+
   if (ui.leProjectName) ui.leProjectName->clear();
 
+  // 清楚数据节点
   if (m_dataGroup.valid()) {
     m_dataGroup->removeChildren(0, m_dataGroup->getNumChildren());
   }
 
+  // 清除layer
   if (m_mapNode.valid()) {
     osgEarth::Map* map = m_mapNode->getMap();
     osgEarth::LayerVector layers;
@@ -375,97 +382,19 @@ void OSGEarthApp::resetScene() {
       map->removeLayer(layer);
     }
   }
+
+  // 清楚场景管理树控件种的item
+  for (int i = 0; i < ui.treeSceneManager->topLevelItemCount(); ++i) {
+    QTreeWidgetItem* root = ui.treeSceneManager->topLevelItem(i);
+    qDeleteAll(root->takeChildren());
+  }
 }
 
 void OSGEarthApp::applyFullLayout(int w, int h) {
   // 1. 调整主窗口几何尺寸
   this->setGeometry(0, 0, w, h);
 
-  // 2. 调整全局背景
-  if (ui.lblBackground) {
-    ui.lblBackground->setGeometry(0, 0, w, h);
-    ui.lblBackground->lower();
-  }
-
-  // --- 核心布局参数 ---
-  int rightPanelWidth = 320;  // 右侧面板总宽
-  int btnW = 280;    // 内部组件宽度（稍微加宽点，更美观）
-  int btnH = 35;     // 按钮高度
-  int spacing = 15;  // 组件间的垂直间距
-  int sideMargin = (rightPanelWidth - btnW) / 2;
-  int panelX = w - rightPanelWidth;
-  int compX = panelX + sideMargin;  // 组件起始 X
-  int currentY = 50;                // 起始顶部间距
-
-  // 3. 渲染区域 (左侧 OSG Widget)
-  if (ui.widgetOSG) {
-    int osgW = w - rightPanelWidth - 30;  // 留 30px 间隙
-    int osgH = h - 40;
-    ui.widgetOSG->setGeometry(15, 20, osgW, osgH);
-
-    // 同步更新相机
-    if (osgH > 0 && m_camera.valid()) {
-      double aspect = static_cast<double>(osgW) / static_cast<double>(osgH);
-      m_camera->setViewport(0, 0, osgW, osgH);
-      m_camera->setProjectionMatrixAsPerspective(30.0f, aspect, 10.0, 1e10);
-      auto gw = dynamic_cast<osgQt::GraphicsWindowQt*>(
-          m_camera->getGraphicsContext());
-      if (gw) gw->getEventQueue()->windowResize(0, 0, osgW, osgH);
-    }
-  }
-
-  // 4. 右侧面板背景
-  if (ui.lblBtnbackground) {
-    ui.lblBtnbackground->setGeometry(panelX, 0, rightPanelWidth, h);
-  }
-
-  // 5. [顶部] 项目名称输入框
-  if (ui.leProjectName) {
-    ui.leProjectName->setGeometry(compX, currentY, btnW, btnH);
-    currentY += (btnH + spacing);
-  }
-
-  // 6. [顶部] 加载场景按钮
-  if (ui.btnLoadScene) {
-    ui.btnLoadScene->setGeometry(compX, currentY, btnW, btnH);
-    currentY += (btnH + spacing);
-  }
-
-  // --- 计算底部区域高度，以便给 Tree 留出空间 ---
-  int bottomAreaHeight = 120;  // 给 lblText 和 btnSavePro 预留的总高度
-  int treeY = currentY;
-  int treeH = h - treeY - bottomAreaHeight - 20;  // 20 为底部留白
-
-  // 7. [中间核心] 文件树控件 (treeSceneManager)
-  if (ui.treeSceneManager) {
-    ui.treeSceneManager->setGeometry(compX, treeY, btnW, treeH);
-  }
-
-  // 8. [底部] 提示文本 (lblText)
-  int lblTextY = treeY + treeH + 10;
-  if (ui.lblText) {
-    ui.lblText->setGeometry(compX, lblTextY, btnW, 40);
-    ui.lblText->setAlignment(Qt::AlignCenter);
-  }
-
-  if (ui.lblCoordinate) {
-    ui.lblCoordinate->setGeometry(compX, lblTextY + 20, btnW, 40);
-    ui.lblCoordinate->setAlignment(Qt::AlignCenter);
-  }
-
-  // 9. [底部] 保存按钮 (btnSavePro)
-  if (ui.btnSavePro) {
-    ui.btnSavePro->setGeometry(compX, h - 30 - btnH, btnW, btnH);
-  }
-
-  // 10. 右上角关闭按钮 (不变)
-  if (ui.btn_Close) {
-    ui.btn_Close->setGeometry(w - 45, 10, 35, 35);
-    ui.btn_Close->raise();
-    ui.btn_Close->setStyleSheet(
-        QString("QPushButton{border-image:url(%1/Resource/common/close.png)};")
-            .arg(QApplication::applicationDirPath()));
-  }
+  adjustUI(&ui, w, h);
 }
 
 void OSGEarthApp::initSceneManagerTree() {
@@ -534,8 +463,8 @@ void OSGEarthApp::addFileToTree(QString filePath) {
           &OSGEarthApp::onSlotLocateFile);
   connect(widget, &SceneItemWidget::signalDelete, this,
           &OSGEarthApp::onSlotDeleteFile);
-  connect(widget, &SceneItemWidget::signalSimulate, this,
-          &OSGEarthApp::enterTowerEditMode);
+  // connect(widget, &SceneItemWidget::signalSimulate, this,
+  //         &OSGEarthApp::enterTowerEditMode);
 
   // 设置 Widget 的固定高度，防止被 Tree 压缩
   widget->setFixedHeight(itemH);
@@ -547,32 +476,6 @@ void OSGEarthApp::addFileToTree(QString filePath) {
 
   // 5. 确保父节点展开，否则看不见子项
   parentNode->setExpanded(true);
-}
-
-void OSGEarthApp::enterTowerEditMode(const QString& path) {
-  // startCollapseAnimation();
-  //  1. 获取对应的物体
-  //  osg::Object* obj = m_pathNodeMap[path].get();
-
-  //// 注意：我们要操作的是 GeoTransform 里面的那个动画/校准节点
-  //// 这样不会破坏地理坐标，只是在局部做微调
-  // osgEarth::GeoTransform* xform = dynamic_cast<osgEarth::GeoTransform*>(obj);
-  // if (!xform || xform->getNumChildren() == 0) return;
-
-  //// 假设第一个孩子是我们的 TowerController 里的 fallMT
-  // osg::MatrixTransform* towerRoot =
-  //     dynamic_cast<osg::MatrixTransform*>(xform->getChild(0));
-
-  // if (towerRoot) {
-  //   if (!m_towerManip) {
-  //     m_towerManip = new ManipulatorHelper(m_root.get());
-  //   }
-  //   m_towerManip->attach(towerRoot);
-  // }
-
-  //// 2. UI 切换
-  ////ui.simulateControlPanel->show();
-  // qDebug() << "Tower Edit Mode Active for: " << path;
 }
 
 void OSGEarthApp::onSlotLocateFile(QString path) {
@@ -654,17 +557,6 @@ void OSGEarthApp::registerLoadedObject(const QString& filePath,
                           .arg(QFileInfo(filePath).suffix().toLower()));
 }
 
-void OSGEarthApp::resetSceneUI() {
-  m_currentData.clear();
-  m_pathNodeMap.clear();
-  m_pathItemMap.clear();
-
-  for (int i = 0; i < ui.treeSceneManager->topLevelItemCount(); ++i) {
-    QTreeWidgetItem* root = ui.treeSceneManager->topLevelItem(i);
-    qDeleteAll(root->takeChildren());
-  }
-}
-
 void OSGEarthApp::setWorkMode(WorkMode mode, QString pName) {
   m_currentMode = mode;
   m_currentData.projectName = pName;
@@ -678,7 +570,22 @@ void OSGEarthApp::updateUIByWorkMode() {
   ui.btnLoadScene->setVisible(m_currentMode != WorkMode::BrowseMode);
 
   // 2. 刷新 Tree 列表里的所有删除按钮
-  updateTreeWidgetsState();
+  bool canDelete = (m_currentMode != WorkMode::BrowseMode);
+
+  // 直接遍历我们维护的 Map
+  QMapIterator<QString, QTreeWidgetItem*> it(m_pathItemMap);
+  while (it.hasNext()) {
+    it.next();
+    QTreeWidgetItem* item = it.value();
+    if (item) {
+      // 获取对应的自定义 Widget
+      SceneItemWidget* w = qobject_cast<SceneItemWidget*>(
+          ui.treeSceneManager->itemWidget(item, 0));
+      if (w) {
+        w->setDeleteButtonVisible(canDelete);
+      }
+    }
+  }
 
   // 3. 处理特殊的样式提示
   switch (m_currentMode) {
@@ -703,175 +610,88 @@ void OSGEarthApp::updateUIByWorkMode() {
   }
 }
 
-void OSGEarthApp::updateTreeWidgetsState() {
-  bool canDelete = (m_currentMode != WorkMode::BrowseMode);
+void OSGEarthApp::initMembers() {
+  // 由于是异步加载，所以此函数不可以直接在构造函数调用
+  m_earthNode->setName("earth");
+  m_earthNode->setNodeMask(MASK_TERRAIN);
+  m_root->addChild(m_earthNode.get());
 
-  // 直接遍历我们维护的 Map
-  QMapIterator<QString, QTreeWidgetItem*> it(m_pathItemMap);
-  while (it.hasNext()) {
-    it.next();
-    QTreeWidgetItem* item = it.value();
-    if (item) {
-      // 获取对应的自定义 Widget
-      SceneItemWidget* w = qobject_cast<SceneItemWidget*>(
-          ui.treeSceneManager->itemWidget(item, 0));
-      if (w) {
-        w->setDeleteButtonVisible(canDelete);
-      }
-    }
-  }
+  m_mapNode = osgEarth::MapNode::findMapNode(m_earthNode.get());
+  m_assetLoader = new AssetLoader(m_mapNode, this);
+  m_geoSRS = m_mapNode->getMapSRS()->getGeographicSRS();
+
+  m_interManager = new InteractionManager(m_viewer.get(), m_dataGroup, this);
+  m_viewer->addEventHandler(m_interManager);
+
+  m_dataGroup->getOrCreateStateSet()->setMode(
+      GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+
+  m_earth_init = true;
 }
-
-
-void OSGEarthApp::onCoordinateChanged(double lon, double lat, double alt,
-                                      bool isOut) {
-  // 容错处理
-  if (!ui.lblCoordinate) return;
-
-  if (isOut) {
-    ui.lblCoordinate->setText(u8"位置: 太空");
-  } else {
-    // 格式化经纬度信息
-    QString info = QString(u8"经度: %1 | 纬度: %2 | 海拔: %3 m")
-                       .arg(lon, 0, 'f', 2)
-                       .arg(lat, 0, 'f', 2)
-                       .arg(alt, 0, 'f', 2);
-
-    ui.lblCoordinate->setText(info);
-  }
-}
-
-// void OSGEarthApp::startCollapseAnimation() {
-//   QVariantAnimation* anim = new QVariantAnimation(this);
-//   anim->setDuration(10000);  // 10秒倒塌
-//   anim->setStartValue(0.0f);
-//   anim->setEndValue(90.0f);
-//
-//   connect(anim, &QVariantAnimation::valueChanged,
-//           [this](const QVariant& value) {
-//             if (m_currentTower) {
-//               // 假设用户选择了 RIGHT 方向
-//               m_currentTower->updateFall(Controller::RIGHT, value.toFloat());
-//             }
-//           });
-//   anim->start();
-// }
 
 /*
-void OSGEarthApp::onSlotLasEle() {
-  if (!m_root) {
-    osg::notify(osg::FATAL) << "[onSlotLasEle] Root node is null!" << std::endl;
-    return;
-  }
+ void OSGEarthApp::startCollapseAnimation() {
+   QVariantAnimation* anim = new QVariantAnimation(this);
+   anim->setDuration(10000);  // 10秒倒塌
+   anim->setStartValue(0.0f);
+   anim->setEndValue(90.0f);
 
-  osg::notify(osg::ALWAYS)
-      << "[onSlotLasEle] Start processing point cloud for elevation coloring..."
-      << std::endl;
+   connect(anim, &QVariantAnimation::valueChanged,
+           [this](const QVariant& value) {
+             if (m_currentTower) {
+               // 假设用户选择了 RIGHT 方向
+               m_currentTower->updateFall(Controller::RIGHT, value.toFloat());
+             }
+           });
+   anim->start();
+ }
 
-  auto getColorByRatio = [](float t) -> osg::Vec4 {
-    // 多段渐变：蓝->青->绿->黄->红
-    if (t < 0.25f) {  // 蓝 -> 青
-      float f = t / 0.25f;
-      return osg::Vec4(0.0f, f, 1.0f, 1.0f);
-    } else if (t < 0.5f) {  // 青 -> 绿
-      float f = (t - 0.25f) / 0.25f;
-      return osg::Vec4(0.0f, 1.0f, 1.0f - f, 1.0f);
-    } else if (t < 0.75f) {  // 绿 -> 黄
-      float f = (t - 0.5f) / 0.25f;
-      return osg::Vec4(f, 1.0f, 0.0f, 1.0f);
-    } else {  // 黄 -> 红
-      float f = (t - 0.75f) / 0.25f;
-      return osg::Vec4(1.0f, 1.0f - f, 0.0f, 1.0f);
-    }
-  };
+ */
 
-  // 遍历 m_root 的所有子节点
-  for (unsigned int i = 0; i < m_root->getNumChildren(); ++i) {
-    osg::PagedLOD* plod = dynamic_cast<osg::PagedLOD*>(m_root->getChild(i));
-    if (!plod) {
-      osg::notify(osg::INFO) << "[onSlotLasEle] Child " << i
-                             << " is not a Geode, skip." << std::endl;
-      continue;
-    }
+/*
+ void OSGEarthApp::enterTowerEditMode(const QString& path) {
+  startCollapseAnimation();
+   1. 获取对应的物体
+   osg::Object* obj = m_pathNodeMap[path].get();
 
-    for (unsigned int k = 0; k < plod->getNumChildren(); ++k)
+// 注意：我们要操作的是 GeoTransform 里面的那个动画/校准节点
+// 这样不会破坏地理坐标，只是在局部做微调
+ osgEarth::GeoTransform* xform = dynamic_cast<osgEarth::GeoTransform*>(obj);
+ if (!xform || xform->getNumChildren() == 0) return;
 
-    {
-      osg::Geode* geode = dynamic_cast<osg::Geode*>(plod->getChild(k));
+// 假设第一个孩子是我们的 TowerController 里的 fallMT
+ osg::MatrixTransform* towerRoot =
+     dynamic_cast<osg::MatrixTransform*>(xform->getChild(0));
 
-      if (!geode) {
-        osg::notify(osg::INFO) << "[onSlotLasEle] Child " << k
-                               << " is not a Geode, skip." << std::endl;
-        continue;
-      }
+ if (towerRoot) {
+   if (!m_towerManip) {
+     m_towerManip = new ManipulatorHelper(m_root.get());
+   }
+   m_towerManip->attach(towerRoot);
+ }
 
-      osg::notify(osg::INFO)
-          << "[onSlotLasEle] Processing Geode " << k
-          << ", drawables: " << geode->getNumDrawables() << std::endl;
-
-      for (unsigned int j = 0; j < geode->getNumDrawables(); ++j) {
-        osg::Geometry* geom =
-            dynamic_cast<osg::Geometry*>(geode->getDrawable(j));
-        if (!geom) {
-          osg::notify(osg::INFO) << "[onSlotLasEle] Drawable " << j
-                                 << " is not Geometry, skip." << std::endl;
-          continue;
-        }
-
-        osg::Vec3Array* vertices =
-            dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
-        osg::Vec4Array* colors =
-            dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
-
-        if (!vertices) {
-          osg::notify(osg::INFO) << "[onSlotLasEle] Geometry " << j
-                                 << " has no vertices, skip." << std::endl;
-          continue;
-        }
-
-        if (!colors) {
-          colors = new osg::Vec4Array();
-          colors->resize(vertices->size());
-          geom->setColorArray(colors);
-          geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-          osg::notify(osg::INFO)
-              << "[onSlotLasEle] Created new color array for Geometry " << j
-              << std::endl;
-        }
-
-        // 找到 Z 的最小值和最大值
-        float zMin = std::numeric_limits<float>::max();
-        float zMax = -std::numeric_limits<float>::max();
-        for (auto& v : *vertices) {
-          if (v.z() < zMin) zMin = v.z();
-          if (v.z() > zMax) zMax = v.z();
-        }
-
-        osg::notify(osg::ALWAYS)
-            << "[onSlotLasEle] Geometry " << j << " zMin=" << zMin
-            << ", zMax=" << zMax << ", points=" << vertices->size()
-            << std::endl;
-
-        // 按高度映射颜色：蓝->红
-        for (size_t k = 0; k < vertices->size(); ++k) {
-          float t = (vertices->at(k).z() - zMin) / (zMax - zMin);
-          (*colors)[k] = getColorByRatio(t);
-        }
-
-        geom->dirtyDisplayList();
-        geom->dirtyBound();
-
-        osg::notify(osg::ALWAYS)
-            << "[onSlotLasEle] Geometry " << j
-            << " color updated based on elevation." << std::endl;
-      }
-    }
-  }
-
-  // 更新场景
-  m_viewer->setSceneData(m_root);
-  osg::notify(osg::ALWAYS)
-      << "[onSlotLasEle] All point clouds processed for elevation."
-      << std::endl;
+// 2. UI 切换
+//ui.simulateControlPanel->show();
+ qDebug() << "Tower Edit Mode Active for: " << path;
 }
 */
+
+/*
+ void OSGEarthApp::onCoordinateChanged(double lon, double lat, double alt,
+                                       bool isOut) {
+   // 容错处理
+   if (!ui.lblCoordinate) return;
+
+   if (isOut) {
+     ui.lblCoordinate->setText(u8"位置: 太空");
+   } else {
+     // 格式化经纬度信息
+     QString info = QString(u8"经度: %1 | 纬度: %2 | 海拔: %3 m")
+                        .arg(lon, 0, 'f', 2)
+                        .arg(lat, 0, 'f', 2)
+                        .arg(alt, 0, 'f', 2);
+
+     ui.lblCoordinate->setText(info);
+   }
+ }
+ */

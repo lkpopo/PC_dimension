@@ -47,6 +47,7 @@
 #include "AssetLoader.h"
 #include "ProjectDAO.h"
 #include "InteractionManager.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -91,6 +92,7 @@ class OSGEarthApp : public QWidget {
   void onSavePro();
   void onLoadScene(QString filePath = QString(), double lon=0.0, double lat=0.0,
                    double alt=0.0);
+  void onMeasure(bool checked);
 
  private:
   void initEnvironment();    // 路径与环境配置
@@ -102,10 +104,10 @@ class OSGEarthApp : public QWidget {
   void initSceneManagerTree();
   void onSlotLocateFile(QString path);
   void onSlotDeleteFile(QString path);
-  void enterTowerEditMode(const QString& path);
-  void resetSceneUI();
-  void updateTreeWidgetsState();
-  void onCoordinateChanged(double lon, double lat, double alt, bool isOut);
+  //void enterTowerEditMode(const QString& path);
+  //void onCoordinateChanged(double lon, double lat, double alt, bool isOut);
+  void initMembers();
+  
   //void startCollapseAnimation();
 
  private:

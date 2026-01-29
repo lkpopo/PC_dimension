@@ -225,3 +225,98 @@ osg::Group* convertLasToPagedTiles(const QString& lasFilePath,
 
   return rootGroup.release();
 }
+
+void updateCameraSensitivity(osgEarth::Util::EarthManipulator* manip) {
+  // 1. 获取当前视角状态
+  osgEarth::Viewpoint vp = manip->getViewpoint();
+
+  // 2. 获取当前相机距离地表的高度 (单位：米)
+  double range = vp.range().get().getValue();
+
+  // 3. 计算灵敏度系数 (这里使用简单的线性插值，也可以用对数曲线)
+  // 设定：在 500m 到 100,000m (100km) 之间动态变化
+  double minRange = 500.0;
+  double maxRange = 100000.0;
+  double minSens = 0.3;  // 近地最小灵敏度
+  double maxSens = 1.2;  // 高空最大灵敏度
+
+  double currentSens;
+  if (range <= minRange) {
+    currentSens = minSens;
+  } else if (range >= maxRange) {
+    currentSens = maxSens;
+  } else {
+    // 线性插值公式
+    double factor = (range - minRange) / (maxRange - minRange);
+    currentSens = minSens + factor * (maxSens - minSens);
+  }
+
+  // 4. 应用设置
+  manip->getSettings()->setScrollSensitivity(currentSens);
+}
+
+void adjustUI(Ui::OSGEarthAppClass* ui, int w, int h) {
+  // 2. 调整全局背景
+  ui->lblBackground->setGeometry(0, 0, w, h);
+  ui->lblBackground->lower();
+
+  // --- 核心布局参数 ---
+  int rightPanelWidth = 320;  // 右侧面板总宽
+  int btnW = 280;  // 内部组件宽度（稍微加宽点，更美观）
+  int btnH = 35;   // 按钮高度
+  int toolbarHeight = 70, subToolbarHeight = 35;  // <--- 新增：工具栏高度
+  int osgMargin = 15;      // OSG 区域距离边缘的间距
+  int spacing = 15;        // 组件间的垂直间距
+  int sideMargin = (rightPanelWidth - btnW) / 2;
+  int panelX = w - rightPanelWidth;
+  int compX = panelX + sideMargin;      // 组件起始 X
+  int currentY = 50;                    // 起始顶部间距
+  int osgW = w - rightPanelWidth - 30;  // 留 30px 间隙
+  int osgH = h - 40;
+
+  // 工具栏的位置
+  ui->toolbarFrame->setGeometry(osgMargin, 20, osgW, toolbarHeight);
+  ui->toolbarFrame->raise();  // 确保在背景之上
+
+  ui->clipSubToolbar->setGeometry(osgMargin + 50, 20 + toolbarHeight, 300,
+                                  subToolbarHeight);
+  ui->clipSubToolbar->setVisible(false);
+
+  // 3. 渲染区域 (左侧 OSG Widget)
+  ui->widgetOSG->setGeometry(osgMargin, 20 + toolbarHeight + subToolbarHeight+spacing,
+                             osgW, osgH);
+
+  // 4. 右侧面板背景
+  ui->lblBtnbackground->setGeometry(panelX, 0, rightPanelWidth, h);
+
+  // 5. [顶部] 项目名称输入框
+  ui->leProjectName->setGeometry(compX, currentY, btnW, btnH);
+  currentY += (btnH + spacing);
+
+  // 6. [顶部] 加载场景按钮
+  ui->btnLoadScene->setGeometry(compX, currentY, btnW, btnH);
+  currentY += (btnH + spacing);
+
+  // --- 计算底部区域高度，以便给 Tree 留出空间 ---
+  int bottomAreaHeight = 120;  // 给 lblText 和 btnSavePro 预留的总高度
+  int treeY = currentY;
+  int treeH = h - treeY - bottomAreaHeight - 20;  // 20 为底部留白
+
+  // 7. [中间核心] 文件树控件 (treeSceneManager)
+  ui->treeSceneManager->setGeometry(compX, treeY, btnW, treeH);
+
+  // 8. [底部] 提示文本 (lblText)
+  int lblTextY = treeY + treeH + 10;
+  ui->lblText->setGeometry(compX, lblTextY, btnW, 40);
+  ui->lblText->setAlignment(Qt::AlignCenter);
+
+  // 9. [底部] 保存按钮 (btnSavePro)
+  ui->btnSavePro->setGeometry(compX, h - 30 - btnH, btnW, btnH);
+
+  // 10. 右上角关闭按钮 (不变)
+  ui->btn_Close->setGeometry(w - 45, 10, 35, 35);
+  ui->btn_Close->raise();
+  ui->btn_Close->setStyleSheet(
+      QString("QPushButton{border-image:url(%1/Resource/common/close.png)};")
+          .arg(QApplication::applicationDirPath()));
+}
