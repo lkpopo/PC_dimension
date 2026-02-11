@@ -17,11 +17,11 @@ osg::ref_ptr<osg::Object> AssetLoader::loadLas(const QString& filePath) {
   // 检查索引树是否存在 ---
   if (QFileInfo::exists(indexFile)) {
     osg::ref_ptr<osgDB::Options> options = new osgDB::Options();
-    options->setDatabasePath(tilesBaseDir.toStdString());
+    options->setDatabasePath(tilesBaseDir.toLocal8Bit().constData());
 
     // 使用 options 加载
     osg::ref_ptr<osg::Node> loadedIndex =
-        osgDB::readNodeFile(indexFile.toStdString(), options.get());
+        osgDB::readNodeFile(indexFile.toLocal8Bit().constData(), options.get());
     if (loadedIndex.valid()) {
       return loadedIndex.get();
     }
@@ -32,7 +32,7 @@ osg::ref_ptr<osg::Object> AssetLoader::loadLas(const QString& filePath) {
   osg::Group* resultNode =
       convertLasToPagedTiles(filePath, tilesBaseDir, m_geoSRS.get());
   if (resultNode) {
-    osgDB::writeNodeFile(*resultNode, indexFile.toStdString());
+    osgDB::writeNodeFile(*resultNode, indexFile.toLocal8Bit().constData());
   }
   return resultNode;
 }
@@ -139,18 +139,23 @@ osg::ref_ptr<osg::Object> AssetLoader::loadShp(const QString& filePath) {
 osg::ref_ptr<osg::Object> AssetLoader::loadObj(const QString& filePath,
                                                double lon, double lat,
                                                double alt) {
-
   std::string pathStr = filePath.toLocal8Bit().constData();
   osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(pathStr);
   if (!model.valid()) {
     return nullptr;
   }
+  // 计算包围盒
+  osg::ComputeBoundsVisitor cbv;
+  model->accept(cbv);
+  osg::BoundingBox bb = cbv.getBoundingBox();
 
-  // 3. 创建地理变换节点
+  // 计算底部偏移：如果原点在中心，bb.zMin() 通常是一个负数
+  // 我们需要把模型向上移动 -bb.zMin() 的距离
+  float offsetZ = -bb.zMin();
+
+  // 创建地理变换节点
   osgEarth::GeoTransform* xform = new osgEarth::GeoTransform();
-
-  // 构建地理坐标点 (注意使用 MapNode 的空间参考 SRS)
-  osgEarth::GeoPoint pos(m_mapNode->getMapSRS(), lon, lat, alt,
+  osgEarth::GeoPoint pos(m_mapNode->getMapSRS(), lon, lat, alt + offsetZ,
                          osgEarth::ALTMODE_RELATIVE);
   xform->setPosition(pos);
   xform->addChild(model.get());
@@ -164,14 +169,12 @@ osg::ref_ptr<osg::Object> AssetLoader::load(const QString& filePath, double lon,
 
   if (suffix == "las") return loadLas(filePath);
   if (suffix == "shp") return loadShp(filePath);
-  if (suffix == "obj")
-    return loadObj(filePath, lon, lat, alt);  // OBJ 默认原点，后续可通过 UI 调整
+  if (suffix == "obj") return loadObj(filePath, lon, lat, alt);
   if (suffix == "tif") {
     return (checkTifType(filePath) == TifType::ELEVATION)
                ? loadElevation(filePath)
                : loadTif(filePath);
   }
-
   return nullptr;
 }
 

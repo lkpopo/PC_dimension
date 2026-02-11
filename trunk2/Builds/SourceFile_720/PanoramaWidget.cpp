@@ -3,7 +3,7 @@
 #include <cmath>
 #include <QtCore/qmath.h>
 #include <QtGlobal>
-
+#include <algorithm>
 #include <QVector>
 #include <QVector2D>
 #include <QOpenGLBuffer>
@@ -92,6 +92,8 @@ PanoramaWidget::PanoramaWidget(QString picPath, bool autoRotate, bool blCompassS
 
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
+
+
 }
 
 PanoramaWidget::~PanoramaWidget()
@@ -106,6 +108,7 @@ PanoramaWidget::~PanoramaWidget()
     if (m_vao) glDeleteVertexArrays(1, &m_vao);
     if (m_vbo) glDeleteBuffers(1, &m_vbo);
     if (m_ebo) glDeleteBuffers(1, &m_ebo);
+
     doneCurrent();
 }
 
@@ -353,6 +356,7 @@ void PanoramaWidget::randerHotspotList()
         m_hotspotProgram->bind();
         m_hotspotVAO.bind();
 
+        //
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
@@ -413,11 +417,12 @@ void PanoramaWidget::randerHotspotList()
             painter.setRenderHint(QPainter::TextAntialiasing);
             // 计算屏幕坐标
             QVector3D sphericalCoo = QVector3D(tmpModel(0, 3), tmpModel(1, 3), tmpModel(2, 3));
-            if (sphericalCoo.z() - m_cutHotPoint.position.z() > 1.0)
-            {
-                painter.end();
-                return;
-            }
+
+            //if (sphericalCoo.z() - m_cutHotPoint.position.z() > 1.0)
+            //{
+            //    painter.end();
+            //    return;
+            //}
             m_cutHpScreenPos = sphereToScreen(sphericalCoo, m_view, m_projection);
             //
             m_mapIconIDUP.insert(std::make_pair(hotspot.iconID, hotspot));
@@ -656,6 +661,7 @@ void PanoramaWidget::paintGL()
 
     // --------渲染全景图片--------
     m_program->bind();
+
     QMatrix4x4 model;
     model.rotate(m_rotation.x(), 1, 0, 0);
     model.rotate(m_rotation.y(), 0, 1, 0);
@@ -674,7 +680,15 @@ void PanoramaWidget::paintGL()
     m_projection.setToIdentity();
     m_projection.perspective(60.0/m_zoom, static_cast<float>(width()) / height(), 0.1f, 100.0f);
     m_program->setUniformValue("projection", m_projection);
+
+    // 传递你的原有矩形裁剪参数（保留，不影响圆形裁剪）
+    m_program->setUniformValue("regionValid", m_MapRegion_LLClip[m_picPath].Region_valid);
+    m_program->setUniformValue("thetaMin", m_MapRegion_LLClip[m_picPath].Region_thetaMin);
+    m_program->setUniformValue("thetaMax", m_MapRegion_LLClip[m_picPath].Region_thetaMax);
+    m_program->setUniformValue("phiMin", m_MapRegion_LLClip[m_picPath].Region_phiMin);
+    m_program->setUniformValue("phiMax", m_MapRegion_LLClip[m_picPath].Region_phiMax);
     //
+
     if (m_isTransitioning && m_nextTexture)
     {
         // 过渡渲染：混合当前纹理和下一张纹理
@@ -707,6 +721,10 @@ void PanoramaWidget::paintGL()
         randerHotspotList();
         randerHotspot_tmp();
     } 
+    // --------渲染标尺 --------
+    {
+ 
+    }  
     // --------指北针-----------
     if (m_blCompassShow == true)
     {
@@ -886,6 +904,13 @@ void PanoramaWidget::UpdateHPToDB()
     {
         qDebug() << QString::fromLocal8Bit("failed!") << query.lastError();
     }
+    //更新修改时间
+    {
+        QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+        QString updata = QString("update project set update_time = '%1' where id = (SELECT project_id FROM hotpoint WHERE id = '%2')").arg(update_time).arg(m_cutHotPoint.iconID);
+        QSqlQuery query;
+        query.exec(updata);
+    }
 }
 
 static bool isMatrixInvertible(const QMatrix4x4& mat) {
@@ -971,41 +996,8 @@ QVector3D PanoramaWidget::screenToSphere(const QPoint& mousePos)
      // 步骤5：应用旋转到球面坐标
      QVector4D rotatedPos = rotMatrix * QVector4D(initialSpherePos, 1.0f);
      QVector3D finalSpherePos = QVector3D(rotatedPos.x(), -rotatedPos.y(), rotatedPos.z()).normalized();
- 
+
      return finalSpherePos;
-}
-
-QPoint PanoramaWidget::sphereToScreen(const QVector3D& spherePos) 
-{
-    // 应用当前视图变换（旋转和缩放）
-    QMatrix4x4 viewMatrix;
-    // 应用旋转
-    viewMatrix.rotate(m_rotation.x(), 1.0f, 0.0f, 0.0f); // 绕X轴旋转
-    viewMatrix.rotate(m_rotation.y(), 0.0f, 1.0f, 0.0f);
-    viewMatrix.rotate(m_rotation.z(), 0.0f, 0.0f, 1.0f); // 绕Z轴旋转
-    // 应用缩放
-    viewMatrix.scale(m_zoom);
-    // 将球面坐标变换到视图空间
-    QVector4D viewPos = viewMatrix * QVector4D(spherePos, 1.0f);
-    // 应用投影变换
-    QVector4D clipPos = m_projection * viewPos;
-
-    // 检查点是否在视锥体内
-    if (clipPos.w() <= 0) 
-    {
-        return QPoint(-1, -1); // 返回无效坐标表示点在视野外
-    }
-    // 透视除法得到NDC坐标
-    QVector3D ndcPos = clipPos.toVector3D() / clipPos.w();
-    // 获取设备像素比
-    float dpiScale = devicePixelRatioF();
-    // 将NDC坐标转换为屏幕坐标
-    int screenX = static_cast<int>((ndcPos.x() + 1.0f) * 0.5f * width() / dpiScale);
-    int screenY = static_cast<int>((1.0f - ndcPos.y()) * 0.5f * height() / dpiScale);
-    // 确保坐标在有效范围内
-    screenX = std::max(0, std::min(width() - 1, screenX));
-    screenY = std::max(0, std::min(height() - 1, screenY));
-    return QPoint(screenX, screenY);
 }
 
 QPoint PanoramaWidget::sphereToScreen(const QVector3D& worldPos, const QMatrix4x4& view, const QMatrix4x4& projection)
@@ -1074,11 +1066,41 @@ void PanoramaWidget::setupShaders()
      // 全景图着色器
     m_program = new QOpenGLShaderProgram(this);
     //
+    //const char* panoramaVShader =
+    //    "#version 330 core\n"
+    //    "layout (location = 0) in vec3 aPos;\n"
+    //    "layout (location = 1) in vec2 aTexCoord;\n"
+    //    "out vec2 TexCoord;\n"
+    //    "uniform mat4 projection;\n"
+    //    "uniform mat4 view;\n"
+    //    "uniform mat4 model;\n"
+    //    "void main()\n"
+    //    "{\n"
+    //    "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
+    //    "    TexCoord = aTexCoord;\n"
+    //    "}\0";
+
+    // //片段着色器 - 支持过渡效果
+    //const char* panoramaFShader =
+    //    "#version 330 core\n"
+    //    "in vec2 TexCoord;\n"
+    //    "out vec4 FragColor;\n"
+    //    "uniform sampler2D texture1;\n"
+    //    "uniform sampler2D texture2;\n"
+    //    "uniform float transitionProgress;\n"
+    //    "void main()\n"
+    //    "{\n"
+    //    "    vec4 color1 = texture(texture1, TexCoord);\n"
+    //    "    vec4 color2 = texture(texture2, TexCoord);\n"
+    //    "    FragColor = mix(color1, color2, transitionProgress);\n"
+    //    "}\n";
+
     const char* panoramaVShader =
         "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
         "layout (location = 1) in vec2 aTexCoord;\n"
         "out vec2 TexCoord;\n"
+        "out vec3 SphereLocalPos; // 新增：传递球体局部笛卡尔坐标到片段着色器\n"
         "uniform mat4 projection;\n"
         "uniform mat4 view;\n"
         "uniform mat4 model;\n"
@@ -1086,26 +1108,56 @@ void PanoramaWidget::setupShaders()
         "{\n"
         "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
         "    TexCoord = aTexCoord;\n"
+        "    SphereLocalPos = aPos; // 球体局部坐标（未经过视图/投影变换，固定不变）\n"
         "}\0";
-     //片段着色器 - 支持过渡效果
+
+    // 片段着色器（保留原有功能 + 新增圆形裁剪逻辑）
     const char* panoramaFShader =
         "#version 330 core\n"
         "in vec2 TexCoord;\n"
+        "in vec3 SphereLocalPos; // 接收球体局部笛卡尔坐标\n"
         "out vec4 FragColor;\n"
         "uniform sampler2D texture1;\n"
         "uniform sampler2D texture2;\n"
         "uniform float transitionProgress;\n"
+        "// 原有：固定球面区域（矩形裁剪）参数\n"
+        "uniform bool regionValid;\n"
+        "uniform float thetaMin;\n"
+        "uniform float thetaMax;\n"
+        "uniform float phiMin;\n"
+        "uniform float phiMax;\n"
+        "\n"
         "void main()\n"
         "{\n"
+        "    // 步骤1：将球体局部笛卡尔坐标转换为球面角度（theta：方位角，phi：极角）\n"
+        "    float theta = atan(SphereLocalPos.z, SphereLocalPos.x) * 180.0 / 3.1415926 + 180.0;\n"
+        "    float phi = acos(clamp(SphereLocalPos.y, -1.0, 1.0)) * 180.0 / 3.1415926;\n"
+        "\n"
+        "    // 步骤2：裁剪判断：仅在固定区域内绘制纹理，否则丢弃片段\n"
+        "    if (regionValid) {\n"
+        "        bool keepFragment = false; // 是否保留当前片段（不丢弃）\n"
+        "        // ========== 矩形裁剪逻辑（备用） ==========\n"
+        "       if (theta >= thetaMin && theta <= thetaMax && phi >= phiMin && phi <= phiMax) {\n"
+        "            keepFragment = true;\n"
+        "        }\n"
+        "\n"
+        "        // 不满足裁剪条件则丢弃片段\n"
+        "        if (!keepFragment) {\n"
+        "            discard; // 丢弃该片段，不绘制任何内容\n"
+        "        }\n"
+        "    }\n"
+        "\n"
+        "    // 步骤3：原有纹理混合逻辑（不变）\n"
         "    vec4 color1 = texture(texture1, TexCoord);\n"
         "    vec4 color2 = texture(texture2, TexCoord);\n"
         "    FragColor = mix(color1, color2, transitionProgress);\n"
         "}\n";
+
     m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, panoramaVShader);
     m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, panoramaFShader);
     m_program->link();
 
-
+    
     // 热点着色器
     m_hotspotProgram = new QOpenGLShaderProgram(this);
     const char* hotspotVShader =
@@ -1135,6 +1187,32 @@ void PanoramaWidget::setupShaders()
     m_hotspotProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, hotspotVShader);
     m_hotspotProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, hotspotFShader);
     m_hotspotProgram->link();
+
+    // 标尺（形状）着色器：绘制纯色圆点和线段
+    m_shapeProgram = new QOpenGLShaderProgram(this);
+    const char* shapeVShader =
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "uniform mat4 projection;\n"
+        "uniform mat4 view;\n"
+        "uniform mat4 model;\n"
+        "void main()\n"
+        "{\n"
+        "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
+        "}\0";
+
+    const char* shapeFShader =
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "uniform vec3 shapeColor;\n"
+        "void main()\n"
+        "{\n"
+        "    FragColor = vec4(shapeColor, 1.0f);\n"
+        "}\0";
+
+    m_shapeProgram->addShaderFromSourceCode(QOpenGLShader::Vertex, shapeVShader);
+    m_shapeProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, shapeFShader);
+    m_shapeProgram->link();
 }
 
 void PanoramaWidget::zoomIn()
@@ -1296,6 +1374,7 @@ void PanoramaWidget::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
         m_lastMousePos = event->pos();
+
         float distance = QVector2D(m_lastMousePos - m_cutHpScreenPos).length();
         if (distance < 20)
         {
@@ -1316,7 +1395,7 @@ void PanoramaWidget::mousePressEvent(QMouseEvent* event)
                 if (m_mapIconIDUP[tmpHp.first].style.contains("picText;") == true)
                 {
                     QStringList textList = m_mapIconIDUP[tmpHp.first].style.split(';');
-                    if (textList.size() == 2)
+                    if (textList.size() == 2 && textList[1] != "")
                     {
                         emit sig_style_picText(tmpHp.first + ";" + textList[1]);
                         break;
@@ -1324,8 +1403,12 @@ void PanoramaWidget::mousePressEvent(QMouseEvent* event)
                 }
                 else if (m_mapIconIDUP[tmpHp.first].style.contains("picChange;") == true)
                 {
-                    emit sig_style_picChange(m_mapIconIDUP[tmpHp.first].style);
-                    break;
+                    QStringList picChangeList = m_mapIconIDUP[tmpHp.first].style.split(';');
+                    if (picChangeList.size() == 2 && picChangeList[1] != "")
+                    {
+                        emit sig_style_picChange(m_mapIconIDUP[tmpHp.first].style);
+                        break;
+                    }                    
                 }
             }   
         }
@@ -1336,9 +1419,10 @@ void PanoramaWidget::mouseMoveEvent(QMouseEvent* event)
 {
     m_autoRotate = false;
     emit sigShowElement(true);
-
+    QPoint delta = event->pos() - m_lastMousePos;
     if (event->buttons() & Qt::LeftButton)
-    {
+    {        
+        //热点
         if (m_isMovingHotspot && m_cutHotPoint.lock == false)
         {
             // 移动热点
@@ -1355,22 +1439,27 @@ void PanoramaWidget::mouseMoveEvent(QMouseEvent* event)
 
             float newX, newY;
           
-            m_H_min = -180;
-            m_H_max = 180;
+            m_H_min = -360;
+            m_H_max = 360;
             m_V_min = -90;
             m_V_max = 90;
-               
-            if (m_mapPicAngle[m_picPath].h_range.split(';').size() == 2 && m_mapPicAngle[m_picPath].v_range.split(';').size() == 2)
+
+            newX = tmp_x;
+            newY = tmp_y;
+                    
+            if (m_GroupStatus == u8"查看")//编辑状态不设定局限
             {
-                m_H_min = m_mapPicAngle[m_picPath].h_range.split(';')[0].toFloat();
-                m_H_max = m_mapPicAngle[m_picPath].h_range.split(';')[1].toFloat();
-                m_V_min = m_mapPicAngle[m_picPath].v_range.split(';')[0].toFloat();
-                m_V_max = m_mapPicAngle[m_picPath].v_range.split(';')[1].toFloat();
-            }
-            newX = qMax(m_V_min, qMin(tmp_x, m_V_max));
-            newY = qMax(m_H_min, qMin(tmp_y, m_H_max));
-            
-           
+                if (m_mapPicAngle[m_picPath].h_range.split(';').size() == 2 && m_mapPicAngle[m_picPath].v_range.split(';').size() == 2)
+                {
+                    m_H_min = m_mapPicAngle[m_picPath].h_range.split(';')[0].toFloat();
+                    m_H_max = m_mapPicAngle[m_picPath].h_range.split(';')[1].toFloat();
+                    m_V_min = m_mapPicAngle[m_picPath].v_range.split(';')[0].toFloat();
+                    m_V_max = m_mapPicAngle[m_picPath].v_range.split(';')[1].toFloat();
+                }
+                newX = qMax(m_V_min, qMin(tmp_x, m_V_max));
+                newY = qMax(m_H_min, qMin(tmp_y, m_H_max));
+            } 
+            //
             m_rotation.setX(newX);
             m_rotation.setY(newY);
 
@@ -1378,6 +1467,49 @@ void PanoramaWidget::mouseMoveEvent(QMouseEvent* event)
             update();
         }
         resetInactivityTimer();
+    }
+}
+
+void PanoramaWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) 
+    {   
+        // 标尺编辑模式核心逻辑
+        if (m_edit_ruler)
+        {
+           
+        }
+
+
+        //热点/场景逻辑
+        QPoint releasePos = event->pos();
+        if (m_cutHotPoint.iconID != 0) return;
+        for (auto tmpHp : m_mapAllHpScreenPos)
+        {
+            float distance = QVector2D(releasePos - tmpHp.second).length();
+            if (distance < 20)
+            {
+                if (m_mapIconIDUP[tmpHp.first].style.contains("picText;") == true)
+                {
+                    QStringList textList = m_mapIconIDUP[tmpHp.first].style.split(';');
+                    if (textList.size() == 2)
+                    {
+                        emit sig_style_picText(tmpHp.first + ";" + textList[1]);
+                        break;
+                    }
+                }
+                else if (m_mapIconIDUP[tmpHp.first].style.contains("picChange;") == true)
+                {
+                    emit sig_style_picChange(m_mapIconIDUP[tmpHp.first].style);
+                    break;
+                }
+            }
+        }
+
+        // 重置拖拽/热点移动状态
+        m_isDragging = false;
+        m_isMovingHotspot = false;
+
     }
 }
 
@@ -1412,3 +1544,4 @@ void PanoramaWidget::setCompassImagePath(const QString& path)
     m_compassN_picpath = path; 
     update();     // 重新加载并显示指北针图片
 }
+////////////////////////////////////////////

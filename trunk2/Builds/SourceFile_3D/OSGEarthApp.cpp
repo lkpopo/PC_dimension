@@ -1,5 +1,6 @@
 ﻿#include "OSGEarthApp.h"
 
+#include "CustomDialog.h"
 #include "SceneItemWidget.h"
 
 OSGEarthApp::OSGEarthApp(QWidget* parent) : QWidget(parent) {
@@ -9,7 +10,6 @@ OSGEarthApp::OSGEarthApp(QWidget* parent) : QWidget(parent) {
   setAttribute(Qt::WA_QuitOnClose, true);
   setAttribute(Qt::WA_DeleteOnClose);
   setWindowTitle("osgEarth Eigen APP");
-
 
   initEnvironment();       // 1. 环境准备
   initOSGViewer();         // 2. 配置相机和渲染窗口
@@ -45,9 +45,13 @@ void OSGEarthApp::initEnvironment() {
   m_root->getOrCreateStateSet()->setMode(GL_DEPTH_TEST,
                                          osg::StateAttribute::ON);
   m_dataGroup = new osg::Group();
+  m_interactionGroup = new osg::Group();
   m_root->addChild(m_dataGroup.get());
+  m_root->addChild(m_interactionGroup.get());
 
   m_noticeToast = new NoticeToast(this);
+  m_modelLibraryWidget = new ModelLibraryWidget(this);
+  m_scenarioDirectorWidget = new ScenarioDirectorWidget(this);
 }
 
 void OSGEarthApp::startAsyncLoad() {
@@ -108,6 +112,8 @@ void OSGEarthApp::initOSGViewer() {
       0.1f, 10000.0f);
   // 4. 配置 Viewer
   m_viewer = new osgViewer::Viewer;
+  m_viewer->setKeyEventSetsDone(
+      0);  // 禁用 ESC 关闭窗口，否则会和测量裁剪的esc冲突
   m_viewer->setCamera(m_camera);
   m_viewer->setSceneData(m_root.get());
   m_viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
@@ -141,20 +147,20 @@ void OSGEarthApp::initOSGViewer() {
 void OSGEarthApp::initUIConnections() {
   connect(ui.btnLoadScene, &QPushButton::clicked, this,
           [this]() { this->onLoadScene(); });
-  connect(ui.btn_Close, &QPushButton::clicked, this, &OSGEarthApp::onSlotClose);
-  connect(ui.btnSavePro, &QPushButton::clicked, this, &OSGEarthApp::onSavePro);
-  connect(ui.btnMeasure, &QPushButton::clicked, this, &OSGEarthApp::onMeasure);
-  
-  connect(ui.btnClipMode, &QPushButton::toggled, this, [this](bool checked) {
-    ui.clipSubToolbar->setVisible(checked);
 
-    // 2. 切换模式
-    if (checked) {
-      m_interManager->setMode(InterMode::CLIP);
-    } else {
-      m_interManager->setMode(InterMode::VIEW);
-    }
-  });
+  connect(m_modelLibraryWidget, &ModelLibraryWidget::signalModelDoubleClicked,
+          [=](const QString& path) {
+            onLoadScene(path, m_objCoordinate.x(), m_objCoordinate.y(),
+                        m_objCoordinate.z());
+          });
+
+  // 处理toolbar的按钮组
+  m_modeButtonGroup = new QButtonGroup(this);
+  m_modeButtonGroup->setExclusive(false);
+  m_modeButtonGroup->addButton(ui.btnClipMode);
+  m_modeButtonGroup->addButton(ui.btnMeasure);
+  connect(m_modeButtonGroup, SIGNAL(buttonClicked(QAbstractButton*)), this,
+          SLOT(onModeButtonClicked(QAbstractButton*)));
 
   // 渲染定时器
   m_frameTimer = new QTimer(this);
@@ -203,7 +209,7 @@ void OSGEarthApp::onLoadScene(QString filePath, double lon, double lat,
   registerLoadedObject(filePath, loadedNode.get());
 }
 
-void OSGEarthApp::onSavePro() {
+void OSGEarthApp::on_btnSavePro_clicked() {
   // 1. 获取名称和时间
   QString pName = ui.leProjectName->text().trimmed();
   // QString currentTime =
@@ -250,7 +256,7 @@ void OSGEarthApp::onSavePro() {
   }
 }
 
-void OSGEarthApp::onSlotClose() {
+void OSGEarthApp::on_btn_Close_clicked() {
   this->hide();
 
   resetScene();
@@ -260,23 +266,70 @@ void OSGEarthApp::onSlotClose() {
   }
 }
 
-void OSGEarthApp::onMeasure(bool checked) {
-  if (!m_interManager) return;
+void OSGEarthApp::onModeButtonClicked(QAbstractButton* button) {
+  // 1. 获取点击后的状态
+  bool isChecked = button->isChecked();
+  ui.stackedWidget->setCurrentIndex(0);
 
-  if (checked) {
-    // --- 进入测量模式 ---
-    m_interManager->clearAll();
-    m_interManager->setMode(InterMode::MEASURE);
-    ui.btnMeasure->setProperty("active", true);
-  } else {
-    // --- 退出测量模式 ---
-    m_interManager->setMode(InterMode::VIEW);
-    m_interManager->clearAll();
-    ui.btnMeasure->setProperty("active", false);
+  if (isChecked) {
+    const QList<QAbstractButton*> buttons = m_modeButtonGroup->buttons();
+    for (QAbstractButton* btn : buttons) {
+      if (btn != button) {
+        btn->setChecked(false);
+      }
+    }
   }
 
-  ui.btnMeasure->style()->unpolish(ui.btnMeasure);
-  ui.btnMeasure->style()->polish(ui.btnMeasure);
+  if (isChecked) {
+    if (button == ui.btnClipMode) {
+      m_interManager->setMode(InterMode::CLIP);
+      ui.stackedWidget->setCurrentIndex(1);
+    } else if (button == ui.btnMeasure) {
+      m_interManager->setMode(InterMode::MEASURE);
+    }
+  } else {
+    m_interManager->setMode(InterMode::VIEW);
+    m_interManager->clearAll();
+  }
+}
+
+void OSGEarthApp::on_btnInsideClip_clicked() {
+  // 1 是裁掉内部，2 是仅保留内部（裁掉外部）
+  m_interManager->updateClipUniforms(m_dataGroup, 1);
+  m_interManager->setMode(InterMode::VIEW);
+}
+
+void OSGEarthApp::on_btnOutsideClip_clicked() {
+  m_interManager->updateClipUniforms(m_dataGroup, 2);
+  m_interManager->setMode(InterMode::VIEW);
+}
+
+void OSGEarthApp::on_btnReset_clicked() {
+  osg::StateSet* ss = m_dataGroup->getStateSet();
+  if (ss) {
+    ss->getOrCreateUniform("u_clipMode", osg::Uniform::INT)->set(0);
+  }
+  m_interManager->setMode(InterMode::CLIP);
+}
+
+void OSGEarthApp::on_btnScenarioManager_clicked() {
+  m_scenarioDirectorWidget->show();
+}
+
+void OSGEarthApp::showRightClickMenu(const osg::Vec3d worldPos) {
+  osgEarth::GeoPoint geoPos;
+  geoPos.fromWorld(m_mapNode->getMapSRS(), worldPos);
+  m_objCoordinate.set(geoPos.x(), geoPos.y(), geoPos.z());
+  QMenu menu(this);
+
+  QAction* addModelAction = menu.addAction(QStringLiteral("添加模型"));
+
+  connect(addModelAction, &QAction::triggered, this, [this]() {
+    m_modelLibraryWidget->show();
+    m_modelLibraryWidget->raise();
+  });
+
+  menu.exec(QCursor::pos());
 }
 
 /*-------------------辅助函数-------------------*/
@@ -363,10 +416,13 @@ void OSGEarthApp::resetScene() {
 
   if (ui.leProjectName) ui.leProjectName->clear();
 
-  // 清楚数据节点
+  // 清除数据节点
   if (m_dataGroup.valid()) {
     m_dataGroup->removeChildren(0, m_dataGroup->getNumChildren());
   }
+
+  // 清除绘制的线段
+  m_interManager->clearAll();
 
   // 清除layer
   if (m_mapNode.valid()) {
@@ -383,7 +439,7 @@ void OSGEarthApp::resetScene() {
     }
   }
 
-  // 清楚场景管理树控件种的item
+  // 清除场景管理树控件种的item
   for (int i = 0; i < ui.treeSceneManager->topLevelItemCount(); ++i) {
     QTreeWidgetItem* root = ui.treeSceneManager->topLevelItem(i);
     qDeleteAll(root->takeChildren());
@@ -448,10 +504,8 @@ void OSGEarthApp::addFileToTree(QString filePath) {
   // 2. 创建树子节点
   QTreeWidgetItem* item = new QTreeWidgetItem(parentNode);
 
-  // --- 关键步骤：设置尺寸 ---
-  int itemW = ui.treeSceneManager->viewport()->width();
+  // 设置尺寸
   int itemH = 40;
-  item->setSizeHint(0, QSize(itemW, itemH));
   item->setData(0, Qt::UserRole, filePath);
 
   // 3. 创建自定义 Widget
@@ -468,7 +522,6 @@ void OSGEarthApp::addFileToTree(QString filePath) {
 
   // 设置 Widget 的固定高度，防止被 Tree 压缩
   widget->setFixedHeight(itemH);
-  widget->setFixedWidth(itemW);
 
   // 4. 将 Widget 插入树节点
   ui.treeSceneManager->setItemWidget(item, 0, widget);
@@ -494,6 +547,9 @@ void OSGEarthApp::onSlotLocateFile(QString path) {
 }
 
 void OSGEarthApp::onSlotDeleteFile(QString path) {
+  CustomDialog dlg(3, QString(u8"确认要删除吗？"), this);
+  if (dlg.exec() == QDialog::Rejected) return;
+
   // 1. 检查文件是否在映射表中
   if (!m_pathNodeMap.contains(path)) return;
 
@@ -620,10 +676,17 @@ void OSGEarthApp::initMembers() {
   m_assetLoader = new AssetLoader(m_mapNode, this);
   m_geoSRS = m_mapNode->getMapSRS()->getGeographicSRS();
 
-  m_interManager = new InteractionManager(m_viewer.get(), m_dataGroup, this);
+  m_interManager = new InteractionManager(m_viewer.get(), m_dataGroup,
+                                          m_interactionGroup, this);
   m_viewer->addEventHandler(m_interManager);
 
+  // 因为需要等待m_interManager初始化完成，所以connect要放在这里
+  connect(m_interManager, &InteractionManager::requestContextMenu, this,
+          &OSGEarthApp::showRightClickMenu);
+
   m_dataGroup->getOrCreateStateSet()->setMode(
+      GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+  m_interactionGroup->getOrCreateStateSet()->setMode(
       GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
 
   m_earth_init = true;

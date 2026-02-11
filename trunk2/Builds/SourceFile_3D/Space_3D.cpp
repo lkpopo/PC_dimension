@@ -219,9 +219,7 @@ void Space_3D::loadProjectCommon(QString pName, OSGEarthApp::WorkMode mode) {
   QList<AssetRecord> assets = ProjectDataManager::getProjectAssets(pName);
 
   for (const auto& asset : assets) {
-    // 直接调用加载逻辑，坐标可以通过参数传给 onLoadScene 或者后续处理
     m_earthWindow->onLoadScene(asset.filePath, asset.lon, asset.lat, asset.alt);
-    // 如果需要恢复 OBJ 的位置，可以在这里通过 asset.lon/lat 调用定位函数
   }
 
   m_earthWindow->updateUIByWorkMode();

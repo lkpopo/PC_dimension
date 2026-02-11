@@ -6,34 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>246</width>
-    <height>580</height>
+    <width>250</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>project_edit_mask</string>
   </property>
-  <widget class="QLabel" name="label_title_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>190</y>
-     <width>121</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(255, 255, 255);</string>
-   </property>
-   <property name="text">
-    <string>指北针样式</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButton_done">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>540</y>
+     <y>330</y>
      <width>231</width>
      <height>30</height>
     </rect>
@@ -44,106 +28,6 @@ background-color: rgb(0, 85, 255);</string>
    </property>
    <property name="text">
     <string>保存设置</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_CtoOtherPic_2">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>210</y>
-     <width>151</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
-   </property>
-   <property name="text">
-    <string>把遮罩应用于...</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_frontCover_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>0</y>
-     <width>230</width>
-     <height>251</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(40, 40, 40);</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_compassN_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>50</y>
-     <width>210</width>
-     <height>115</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(26, 26, 26);
-</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_sky_pic">
-   <property name="geometry">
-    <rect>
-     <x>69</x>
-     <y>50</y>
-     <width>115</width>
-     <height>115</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(26, 26, 26);
-</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_selPic_sky">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>180</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 85, 255);</string>
-   </property>
-   <property name="text">
-    <string>选择图片</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_title">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>10</y>
-     <width>121</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color: rgb(255, 255, 255);</string>
-   </property>
-   <property name="text">
-    <string>天空遮罩</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_bg">
@@ -162,13 +46,162 @@ background-color: rgb(0, 85, 255);</string>
     <string/>
    </property>
   </widget>
-  <widget class="QLabel" name="label_frontCover_3">
+  <widget class="QLabel" name="label_Lat_min">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>290</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Long_min">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>170</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>0</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="MultiPosSlider_Longitude" name="horizontalSlide_Long">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>211</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="MultiPosSlider_Latitude" name="horizontalSlide_Lat">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>240</y>
+     <width>211</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Lat_max">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>290</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>180</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+font: 12pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>遮罩</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_Long_max">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>170</y>
+     <width>31</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(20, 20, 20);
+color: rgb(255, 255, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>360</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>100</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>经度</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_5">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>270</y>
-     <width>230</width>
-     <height>251</height>
+     <y>60</y>
+     <width>231</width>
+     <height>261</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -178,45 +211,11 @@ background-color: rgb(0, 85, 255);</string>
     <string/>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_CtoOtherPic_3">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>480</y>
-     <width>151</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(52, 52, 52);
-color: rgb(255, 255, 255);</string>
-   </property>
-   <property name="text">
-    <string>把遮罩应用于...</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_ground_pic">
-   <property name="geometry">
-    <rect>
-     <x>69</x>
-     <y>320</y>
-     <width>115</width>
-     <height>115</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(26, 26, 26);
-</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_title_3">
+  <widget class="QLabel" name="label_title_5">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>280</y>
+     <y>200</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -225,42 +224,70 @@ color: rgb(255, 255, 255);</string>
     <string notr="true">color: rgb(255, 255, 255);</string>
    </property>
    <property name="text">
-    <string>地面遮罩</string>
+    <string>纬度</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_selPic_ground">
+  <widget class="QLabel" name="label_frontCover_6">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>450</y>
-     <width>71</width>
-     <height>21</height>
+     <x>10</x>
+     <y>-10</y>
+     <width>231</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_6">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>70</y>
+     <width>121</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
     <string notr="true">color: rgb(255, 255, 255);
-background-color: rgb(0, 85, 255);</string>
+font: 12pt &quot;微软雅黑&quot;;</string>
    </property>
    <property name="text">
-    <string>选择图片</string>
+    <string>经纬度裁切</string>
    </property>
   </widget>
   <zorder>label_bg</zorder>
-  <zorder>label_title_2</zorder>
+  <zorder>label_frontCover_6</zorder>
+  <zorder>label_frontCover_5</zorder>
   <zorder>pushButton_done</zorder>
-  <zorder>label_frontCover_2</zorder>
-  <zorder>label_compassN_2</zorder>
-  <zorder>label_sky_pic</zorder>
-  <zorder>pushButton_selPic_sky</zorder>
-  <zorder>label_title</zorder>
-  <zorder>pushButton_CtoOtherPic_2</zorder>
-  <zorder>label_frontCover_3</zorder>
-  <zorder>pushButton_CtoOtherPic_3</zorder>
-  <zorder>label_ground_pic</zorder>
+  <zorder>label_Lat_min</zorder>
+  <zorder>label_Long_min</zorder>
+  <zorder>horizontalSlide_Long</zorder>
+  <zorder>horizontalSlide_Lat</zorder>
+  <zorder>label_Lat_max</zorder>
   <zorder>label_title_3</zorder>
-  <zorder>pushButton_selPic_ground</zorder>
+  <zorder>label_Long_max</zorder>
+  <zorder>label_title_4</zorder>
+  <zorder>label_title_5</zorder>
+  <zorder>label_title_6</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MultiPosSlider_Longitude</class>
+   <extends>QSlider</extends>
+   <header>MultiPosSlider_Longitude.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MultiPosSlider_Latitude</class>
+   <extends>QSlider</extends>
+   <header>MultiPosSlider_Latitude.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

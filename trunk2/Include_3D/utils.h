@@ -65,3 +65,4 @@ osg::Group* convertLasToPagedTiles(const QString& lasFilePath,
 void updateCameraSensitivity(osgEarth::Util::EarthManipulator* manip);
 
 void adjustUI(Ui::OSGEarthAppClass* ui, int w, int h);
+

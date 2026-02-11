@@ -13,169 +13,389 @@
   <property name="windowTitle">
    <string>三维地球</string>
   </property>
-  <widget class="QLabel" name="lblBackground">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1581</width>
-     <height>901</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(26, 26, 26);
-border-color: rgb(40, 40,40);
-border-width: 1px;
-border-style: solid;</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_Close">
-   <property name="geometry">
-    <rect>
-     <x>1540</x>
-     <y>10</y>
-     <width>32</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../Builds/x64/Release/Resource/common/close.png</normaloff>../Builds/x64/Release/Resource/common/close.png</iconset>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btnSavePro">
-   <property name="geometry">
-    <rect>
-     <x>1310</x>
-     <y>730</y>
-     <width>231</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton {
-    /* 基础颜色和文字 */
-    background-color: #3278FF;
-    color: white;
-    
-    
-    /* 字体设置 */
+  <property name="styleSheet">
+   <string notr="true">/* 全局背景和字体 */
+QWidget#OSGEarthAppClass {
+    background-color: #1a1c1f;
     font-family: &quot;Microsoft YaHei&quot;;
-    font-size: 14px;
+}
+
+/* 1. 左侧工具栏 */
+QFrame#toolbarFrame {
+    background-color: #25282d;
+    border-right: 1px solid #3e4248;
+}
+
+#toolbarFrame QPushButton {
+    background-color: transparent;
+    border: none;
+    color: #a0aab4;
+    padding: 15px;
+    icon-size: 32px 32px;
+}
+
+#toolbarFrame QPushButton:hover {
+    background-color: #32363c;
+    color: white;
+}
+
+#toolbarFrame QPushButton:checked {
+    background-color: #0078d4;
+    color: white;
+}
+
+/* 2. 右侧 StackedWidget 面板 */
+QStackedWidget {
+    background-color: rgba(37, 40, 45, 0.95); /* 稍微透明感 */
+    border: 1px solid #3e4248;
+border-radius: 4px;
+}
+QWidget#page {
+    background-color: transparent;
+}
+
+/* 输入框样式 */
+QLineEdit#leProjectName {
+    background-color: #1a1c1f;
+    border: 1px solid #45494f;
+    border-radius: 4px;
+    color: black;
+    padding: 5px;
+}
+
+/* 按钮通用样式 (加载、保存) */
+QPushButton#btnLoadScene, QPushButton#btnSavePro {
+    background-color: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
     font-weight: bold;
-    
-    /* 增加一点内边距，让文字不拥挤 */
-    padding: 6px 12px;
+    height: 35px;
 }
 
-/* 鼠标悬停状态：颜色稍微变浅一点 */
+QPushButton#btnLoadScene:hover { background-color: #2b88d8; }
+QPushButton#btnSavePro:hover { background-color: #2b88d8; }
+
+/* 3. 树形控件样式 */
+QTreeWidget#treeSceneManager {
+    background-color: #1e2125;
+    border: 1px solid #3e4248;
+    color: #d1d1d1;
+    font-size: 13px;
+    outline: none;
+}
+
+QTreeWidget#treeSceneManager::item {
+    height: 30px;
+    border-bottom: 1px solid #2a2e33;
+}
+
+QTreeWidget#treeSceneManager::item:selected {
+    background-color: #3e4248;
+    color: #0078d4;
+}
+
+/* 4. 底部文本提示 */
+QLabel#lblText {
+    color: #888e96;
+    font-size: 12px;
+}
+
+/* page_2 容器背景（可选，确保背景统一） */
+QWidget#page_2 {
+    background-color: transparent;
+}
+
+/* page_2 内按钮的通用样式 */
+#page_2 QPushButton {
+    background-color: #3e4248;
+    color: #e0e0e0;
+    border: 1px solid #45494f;
+    border-radius: 4px;
+    height: 40px;
+    font-size: 14px;
+    margin-bottom: 10px; /* 配合垂直布局的间距 */
+}
+
+/* 悬浮状态：背景变亮，边框变蓝 */
+#page_2 QPushButton:hover {
+    background-color: #4e5258;
+    border: 1px solid #0078d4;
+    color: white;
+}
+
+/* 选中/按下状态：经典的 Windows Blue 背景 */
+#page_2 QPushButton:pressed, #page_2 QPushButton:checked {
+    background-color: #005a9e;
+    border: 1px solid #0078d4;
+    color: white;
+}
+
+
+/* 假设第三个按钮是重置或清除 */
+#btnReset {
+    background-color: #443131; /* 稍微带点暗红，提示这是个清空操作 */
+}
+#btnReset:hover {
+    background-color: #a33b3b;
+}</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
+    <widget class="QFrame" name="toolbarFrame">
+     <property name="styleSheet">
+      <string notr="true">/* 工具栏整体样式 */
+#toolbarFrame {
+    background-color: rgba(45, 45, 48, 200); /* 半透明深灰色，很有科技感 */
+    border: 1px solid #555555;
+    border-radius: 6px;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QPushButton" name="btnClipMode">
+        <property name="styleSheet">
+         <string notr="true">/* 工具栏内按钮的通用样式 */
+QPushButton {
+    color: #F1F1F1;
+    /* 1. 给按钮一个比背景稍微亮一点的灰色 */
+    background-color: #3E3E42; 
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 5px 15px;
+    font-family: &quot;Microsoft YaHei&quot;;
+    font-size: 13px;
+    min-width: 60px;
+}
+
+/* 鼠标悬停：明显提亮 */
 QPushButton:hover {
-    background-color: #5A94FF;
+    background-color: #505055; 
+    border: 1px solid #0078D7; /* 悬停时显示蓝色边框 */
 }
 
-/* 鼠标按下状态：颜色稍微变深一点 */
+/* 按钮选中/按下状态：明显的蓝色背景 */
+QPushButton:checked {
+    background-color: #0078D7; 
+    border: 1px solid #00A0FF;
+    color: white;
+}
+
+/* 按钮按下瞬间 */
 QPushButton:pressed {
-    background-color: #1E5AC8;
+    background-color: #1E1E1E;
+    padding-left: 16px; 
+    padding-top: 6px;
 }</string>
-   </property>
-   <property name="text">
-    <string>保存配置</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lblBtnbackground">
-   <property name="geometry">
-    <rect>
-     <x>1280</x>
-     <y>50</y>
-     <width>281</width>
-     <height>781</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QLabel {
-    /* 基础颜色和文字 */
-    background-color: #282828;
+        </property>
+        <property name="text">
+         <string>裁剪</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnMeasure">
+        <property name="styleSheet">
+         <string notr="true">/* 工具栏内按钮的通用样式 */
+QPushButton {
+    color: #F1F1F1;
+    /* 1. 给按钮一个比背景稍微亮一点的灰色 */
+    background-color: #3E3E42; 
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 5px 15px;
+    font-family: &quot;Microsoft YaHei&quot;;
+    font-size: 13px;
+    min-width: 60px;
+}
+
+/* 鼠标悬停：明显提亮 */
+QPushButton:hover {
+    background-color: #505055; 
+    border: 1px solid #0078D7; /* 悬停时显示蓝色边框 */
+}
+
+/* 按钮选中/按下状态：明显的蓝色背景 */
+QPushButton:checked {
+    background-color: #0078D7; 
+    border: 1px solid #00A0FF;
+    color: white;
+}
+
+/* 按钮按下瞬间 */
+QPushButton:pressed {
+    background-color: #1E1E1E;
+    padding-left: 16px; 
+    padding-top: 6px;
 }</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QWidget" name="widgetOSG" native="true">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>190</y>
-     <width>1231</width>
-     <height>661</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QWidget{
+        </property>
+        <property name="text">
+         <string>测距</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnScenarioManager">
+        <property name="styleSheet">
+         <string notr="true">/* 工具栏内按钮的通用样式 */
+QPushButton {
+    color: #F1F1F1;
+    /* 1. 给按钮一个比背景稍微亮一点的灰色 */
+    background-color: #3E3E42; 
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 5px 15px;
+    font-family: &quot;Microsoft YaHei&quot;;
+    font-size: 13px;
+    min-width: 60px;
+}
+
+/* 鼠标悬停：明显提亮 */
+QPushButton:hover {
+    background-color: #505055; 
+    border: 1px solid #0078D7; /* 悬停时显示蓝色边框 */
+}
+
+/* 按钮选中/按下状态：明显的蓝色背景 */
+QPushButton:checked {
+    background-color: #0078D7; 
+    border: 1px solid #00A0FF;
+    color: white;
+}
+
+/* 按钮按下瞬间 */
+QPushButton:pressed {
+    background-color: #1E1E1E;
+    padding-left: 16px; 
+    padding-top: 6px;
+}</string>
+        </property>
+        <property name="text">
+         <string>场景管理</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="widgetOSG" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>1000</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QWidget{
 background-color: #3278FF;
 }</string>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2"/>
-  </widget>
-  <widget class="QPushButton" name="btnLoadScene">
-   <property name="geometry">
-    <rect>
-     <x>1310</x>
-     <y>130</y>
-     <width>231</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton {
-    /* 基础颜色和文字 */
-    background-color: #3278FF;
-    color: white;
-    
-    
-    /* 字体设置 */
-    font-family: &quot;Microsoft YaHei&quot;;
-    font-size: 14px;
-    font-weight: bold;
-    
-    /* 增加一点内边距，让文字不拥挤 */
-    padding: 6px 12px;
-}
-
-/* 鼠标悬停状态：颜色稍微变浅一点 */
-QPushButton:hover {
-    background-color: #5A94FF;
-}
-
-/* 鼠标按下状态：颜色稍微变深一点 */
-QPushButton:pressed {
-    background-color: #1E5AC8;
-}</string>
-   </property>
-   <property name="text">
-    <string>上传场景</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leProjectName">
-   <property name="geometry">
-    <rect>
-     <x>1310</x>
-     <y>70</y>
-     <width>231</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">/* 1. 输入框的基础样式 */
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="Vlay_right">
+     <property name="spacing">
+      <number>10</number>
+     </property>
+     <property name="leftMargin">
+      <number>10</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Maximum</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>300</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_Close">
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../Builds/x64/Release/Resource/common/close.png</normaloff>../Builds/x64/Release/Resource/common/close.png</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QStackedWidget" name="stackedWidget">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="page">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QLineEdit" name="leProjectName">
+           <property name="styleSheet">
+            <string notr="true">/* 1. 输入框的基础样式 */
 QLineEdit {
     border: 1px solid #CCCCCC;
     border-radius: 4px;
@@ -202,309 +422,151 @@ QLineEdit[readOnly=&quot;true&quot;] {
     color: #888888;            /* 灰色文字 */
     border: 1px solid #DDDDDD; /* 变淡的边框 */
 }</string>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="lblText">
-   <property name="geometry">
-    <rect>
-     <x>1310</x>
-     <y>780</y>
-     <width>231</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">color:white</string>
-   </property>
-   <property name="text">
-    <string>支持模型格式：las,tif,obj,dem,shp</string>
-   </property>
-  </widget>
-  <widget class="QTreeWidget" name="treeSceneManager">
-   <property name="geometry">
-    <rect>
-     <x>1290</x>
-     <y>200</y>
-     <width>256</width>
-     <height>481</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QTreeWidget {
-    background-color: rgba(255, 255, 255, 10);
-    border: 1px solid rgba(255, 255, 255, 50);
-    border-radius: 4px;
-color: white;
-padding: 5px;
-}
-
-/* 一级分类节点（根节点）样式 */
-QTreeWidget::item:branch:has-children {
-    /* 这里可以设置箭头图标 */
-}
-
-/* 场景文件行样式 */
-QTreeWidget::item {
-    padding: 5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-QTreeWidget::item:hover {
-    background-color: rgba(0, 85, 255, 0.2);
-}</string>
-   </property>
-   <property name="columnCount">
-    <number>1</number>
-   </property>
-   <attribute name="headerVisible">
-    <bool>false</bool>
-   </attribute>
-   <column>
-    <property name="text">
-     <string notr="true">1</string>
-    </property>
-   </column>
-  </widget>
-  <widget class="QFrame" name="toolbarFrame">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>0</y>
-     <width>281</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">/* 工具栏整体样式 */
-#toolbarFrame {
-    background-color: rgba(45, 45, 48, 200); /* 半透明深灰色，很有科技感 */
-    border: 1px solid #555555;
-    border-radius: 6px;
-}</string>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QPushButton" name="btnMeasure">
-      <property name="styleSheet">
-       <string notr="true">/* 工具栏内按钮的通用样式 */
-QPushButton {
-    color: #F1F1F1;
-    /* 1. 给按钮一个比背景稍微亮一点的灰色 */
-    background-color: #3E3E42; 
-    border: 1px solid #555555;
-    border-radius: 4px;
-    padding: 5px 15px;
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnLoadScene">
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    /* 基础颜色和文字 */
+    background-color: #3278FF;
+    color: white;
+    
+    
+    /* 字体设置 */
     font-family: &quot;Microsoft YaHei&quot;;
-    font-size: 13px;
-    min-width: 60px;
-}
-
-/* 鼠标悬停：明显提亮 */
-QPushButton:hover {
-    background-color: #505055; 
-    border: 1px solid #0078D7; /* 悬停时显示蓝色边框 */
-}
-
-/* 按钮选中/按下状态：明显的蓝色背景 */
-QPushButton:checked {
-    background-color: #0078D7; 
-    border: 1px solid #00A0FF;
-    color: white;
-}
-
-/* 按钮按下瞬间 */
-QPushButton:pressed {
-    background-color: #1E1E1E;
-    padding-left: 16px; 
-    padding-top: 6px;
-}</string>
-      </property>
-      <property name="text">
-       <string>测距</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="btnClipMode">
-      <property name="styleSheet">
-       <string notr="true">/* 工具栏内按钮的通用样式 */
-QPushButton {
-    color: #F1F1F1;
-    /* 1. 给按钮一个比背景稍微亮一点的灰色 */
-    background-color: #3E3E42; 
-    border: 1px solid #555555;
-    border-radius: 4px;
-    padding: 5px 15px;
-    font-family: &quot;Microsoft YaHei&quot;;
-    font-size: 13px;
-    min-width: 60px;
-}
-
-/* 鼠标悬停：明显提亮 */
-QPushButton:hover {
-    background-color: #505055; 
-    border: 1px solid #0078D7; /* 悬停时显示蓝色边框 */
-}
-
-/* 按钮选中/按下状态：明显的蓝色背景 */
-QPushButton:checked {
-    background-color: #0078D7; 
-    border: 1px solid #00A0FF;
-    color: white;
-}
-
-/* 按钮按下瞬间 */
-QPushButton:pressed {
-    background-color: #1E1E1E;
-    padding-left: 16px; 
-    padding-top: 6px;
-}</string>
-      </property>
-      <property name="text">
-       <string>裁剪</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QFrame" name="clipSubToolbar">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>50</y>
-     <width>201</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">/* 二级工具栏容器：深色半透明，带有悬浮阴影 */
-#clipSubToolbar {
-    background-color: rgba(30, 30, 35, 220); /* 更深一点的半透明 */
-    border: 1px solid rgba(100, 100, 100, 100);
-    border-top: none; /* 与主工具栏无缝连接 */
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    /* 增加投影，让它看起来更“悬浮” */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 150);
-}
-
-/* 子工具栏内的按钮通用样式 */
-#clipSubToolbar QPushButton {
-    color: #CCCCCC;
-    background-color: rgba(60, 60, 65, 150); 
-    border: 1px solid #444;
-    border-radius: 4px;
-    font-size: 11px;
-    min-width: 65px;
-    min-height: 22px;
-}
-
-/* 鼠标悬停时的华丽效果：边缘亮起 */
-#clipSubToolbar QPushButton:hover {
-    background-color: rgba(0, 120, 215, 60); /* 淡淡的蓝色背景 */
-    border: 1px solid #00A0FF; /* 亮蓝色边框 */
-    color: #FFFFFF;
-}
-
-/* 选中状态（内/外裁剪切换）：高亮蓝色 */
-#clipSubToolbar QPushButton:checked {
-    background-color: #0078D7;
-    border: 1px solid #00CCFF;
-    color: white;
+    font-size: 14px;
     font-weight: bold;
+    
+    /* 增加一点内边距，让文字不拥挤 */
+    padding: 6px 12px;
 }
 
-/* 执行裁剪按钮：醒目的橙色系 */
-#clipSubToolbar QPushButton#btnClipExecute {
-    background-color: rgba(180, 90, 0, 180);
-    border: 1px solid #FF8C00;
-    color: #FFF;
+/* 鼠标悬停状态：颜色稍微变浅一点 */
+QPushButton:hover {
+    background-color: #5A94FF;
 }
 
-#clipSubToolbar QPushButton#btnClipExecute:hover {
-    background-color: rgba(220, 110, 0, 255);
-    border: 1px solid #FFA500;
-    /* 悬停时稍微发光 */
-    box-shadow: 0 0 8px rgba(255, 165, 0, 120);
-}
-
-/* 重置按钮：深灰色，悬停变暗红 */
-#clipSubToolbar QPushButton#btnClipClear:hover {
-    background-color: #8E2020;
-    border: 1px solid #FF5050;
-}
-
-/* 按钮按下瞬间的微小位移反馈 */
-#clipSubToolbar QPushButton:pressed {
-    padding-top: 5px;
-    padding-left: 11px;
+/* 鼠标按下状态：颜色稍微变深一点 */
+QPushButton:pressed {
+    background-color: #1E5AC8;
 }</string>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
-    <item>
-     <widget class="QPushButton" name="btnInsideClip">
-      <property name="text">
-       <string>内裁剪</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="btnOutsideClip">
-      <property name="text">
-       <string>外裁剪</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <zorder>lblBackground</zorder>
-  <zorder>lblBtnbackground</zorder>
-  <zorder>btn_Close</zorder>
-  <zorder>btnSavePro</zorder>
-  <zorder>widgetOSG</zorder>
-  <zorder>btnLoadScene</zorder>
-  <zorder>leProjectName</zorder>
-  <zorder>lblText</zorder>
-  <zorder>treeSceneManager</zorder>
-  <zorder>toolbarFrame</zorder>
-  <zorder>clipSubToolbar</zorder>
+           </property>
+           <property name="text">
+            <string>上传场景</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnSavePro">
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+    /* 基础颜色和文字 */
+    background-color: #3278FF;
+    color: white;
+    
+    
+    /* 字体设置 */
+    font-family: &quot;Microsoft YaHei&quot;;
+    font-size: 14px;
+    font-weight: bold;
+    
+    /* 增加一点内边距，让文字不拥挤 */
+    padding: 6px 12px;
+}
+
+/* 鼠标悬停状态：颜色稍微变浅一点 */
+QPushButton:hover {
+    background-color: #5A94FF;
+}
+
+/* 鼠标按下状态：颜色稍微变深一点 */
+QPushButton:pressed {
+    background-color: #1E5AC8;
+}</string>
+           </property>
+           <property name="text">
+            <string>保存配置</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QTreeWidget" name="treeSceneManager">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="columnCount">
+            <number>1</number>
+           </property>
+           <attribute name="headerVisible">
+            <bool>false</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblText">
+           <property name="styleSheet">
+            <string notr="true">color:white</string>
+           </property>
+           <property name="text">
+            <string>支持模型格式：las,tif,obj,dem,shp</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_2">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QPushButton" name="btnOutsideClip">
+           <property name="text">
+            <string>内裁剪</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnInsideClip">
+           <property name="text">
+            <string>外裁剪</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnReset">
+           <property name="text">
+            <string>恢复</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

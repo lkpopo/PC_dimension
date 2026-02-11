@@ -428,6 +428,13 @@ void project_edit_hotpoint_group::slotSetFirstOpen(QString groupID)
             QSqlQuery query;
             query.exec(updata);
         }
+        //更新修改时间
+        {
+            QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+            QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+            QSqlQuery query;
+            query.exec(updata);
+        }
     }
 }
 

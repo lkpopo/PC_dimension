@@ -20,7 +20,7 @@ public slots:
 	void slotSetFrontCover();
 	void slotDone();
 	void slotSelPic();
-
+	void slotDraw();
 	void slotReSeeFrontCover();
 
 signals:
@@ -28,7 +28,7 @@ signals:
 
 
 private:
-
+	QString m_draw;
 	project_edit_globle_frontCover* m_frontCover;
 	QString m_projUUID;
 	QString m_cutPicPath;

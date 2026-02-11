@@ -136,6 +136,19 @@ font: 12pt &quot;微软雅黑&quot;;</string>
     <string>自动旋转</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_draw">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>130</y>
+     <width>160</width>
+     <height>120</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
   <zorder>openGLWidget</zorder>
   <zorder>pushButton_close</zorder>
   <zorder>pushButton_full</zorder>
@@ -145,6 +158,7 @@ font: 12pt &quot;微软雅黑&quot;;</string>
   <zorder>listWidget</zorder>
   <zorder>listWidget_group</zorder>
   <zorder>checkBox_autoRotate</zorder>
+  <zorder>pushButton_draw</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

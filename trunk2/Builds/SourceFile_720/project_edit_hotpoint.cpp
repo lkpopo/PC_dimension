@@ -536,6 +536,13 @@ void project_edit_hotpoint::slot_Operation(QString iconID, QString opera)
 			QString updata = QString("update hotpoint set isIconShow = '0' where id = '%1'").arg(iconID);
 			QSqlQuery query;
 			query.exec(updata);
+			//更新修改时间
+			{
+				QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+				QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+				QSqlQuery query;
+				query.exec(updata);
+			}		
 		}
 		else//显示
 		{
@@ -546,6 +553,13 @@ void project_edit_hotpoint::slot_Operation(QString iconID, QString opera)
 			QString updata = QString("update hotpoint set isIconShow = '1' where id = '%1'").arg(iconID);
 			QSqlQuery query;
 			query.exec(updata);
+			//更新修改时间
+			{
+				QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+				QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+				QSqlQuery query;
+				query.exec(updata);
+			}
 		}
 		
 	}
@@ -560,6 +574,13 @@ void project_edit_hotpoint::slot_Operation(QString iconID, QString opera)
 			QString updata = QString("update hotpoint set isLock = '1' where id = '%1'").arg(iconID);
 			QSqlQuery query;
 			query.exec(updata);
+			//更新修改时间
+			{
+				QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+				QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+				QSqlQuery query;
+				query.exec(updata);
+			}
 		}
 		else //解锁
 		{
@@ -570,6 +591,13 @@ void project_edit_hotpoint::slot_Operation(QString iconID, QString opera)
 			QString updata = QString("update hotpoint set isLock = '0' where id = '%1'").arg(iconID);
 			QSqlQuery query;
 			query.exec(updata);
+			//更新修改时间
+			{
+				QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+				QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+				QSqlQuery query;
+				query.exec(updata);
+			}
 		}
 		
 	}

@@ -21,7 +21,7 @@ public:
         : QSlider(Qt::Horizontal, parent), m_selectedHandle(-1)
     {
         // 初始化3个滑块的默认值（0~100）
-        m_handleValues = { -180, 180 }; // 上/下左/下右
+        m_handleValues = {0, -180, 180 }; // 上/下左/下右
         setRange(-360, 360);
         // 隐藏原生滑块（自定义绘制）
         setStyleSheet("QSlider::handle { background: transparent;}");

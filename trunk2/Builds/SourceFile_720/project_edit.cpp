@@ -100,7 +100,7 @@ project_edit::project_edit(QString projUUID,QString project_name, QStringList li
 	ui.stackedWidget_right->setGeometry(0, 0, 250, scrHeight - 60);
 
 	ui.groupBox_bottom->setGeometry(60, scrHeight - 140, scrWidth - 60 - 250, 140);
-	ui.listWidget->setGeometry(0, 30, scrWidth - 60 - 250 - 2 * 30 - 75 - 20 - 90 - 10, 140);
+	ui.listWidget->setGeometry(0, 10, scrWidth - 60 - 250 - 2 * 30 - 75 - 20 - 90, 120);
 	ui.label_bottomLable->setGeometry(0, 0, scrWidth - 60 - 250, 140);
 	ui.pushButton_reSee->move(scrWidth - 60 - 250 - 90, 20);
 
@@ -169,6 +169,10 @@ project_edit::project_edit(QString projUUID,QString project_name, QStringList li
 		"}"
 	);
 
+	// 2. 核心设置：开启横向排列 + 关闭自动换行
+	ui.listWidget->setFlow(QListView::LeftToRight); // 布局方向：从左到右（横向）
+	ui.listWidget->setWrapping(false); // 关闭自动换行（关键，避免超出宽度后换行）
+
 	ui.listWidget->setViewMode(QListView::IconMode);
 	ui.listWidget->setSpacing(10);
 	ui.listWidget->setMovement(QListView::Static);
@@ -202,6 +206,7 @@ project_edit::project_edit(QString projUUID,QString project_name, QStringList li
 	connect(ui.pushButton_compass, SIGNAL(clicked()), this, SLOT(slotCompass()));
 	connect(ui.pushButton_mask, SIGNAL(clicked()), this, SLOT(slotMask()));
 	connect(ui.pushButton_hotPoint, SIGNAL(clicked()), this, SLOT(slotHotPoint()));
+	connect(ui.pushButton_ruler, SIGNAL(clicked()), this, SLOT(slotRuler()));
 
 	connect(ui.pushButton_FirstAngle, SIGNAL(clicked()), this, SLOT(slotSetFirstAngle_FrontCover()));
 	connect(ui.pushButton_GroupAngle, SIGNAL(clicked()), this, SLOT(slotSetGroupAngle()));
@@ -253,6 +258,7 @@ void project_edit::processNextPicItem()
 	item2->resize(QSize(80, 80));
 	connect(item2, SIGNAL(sig_picpath(QString)), this, SLOT(slotNewPicClick(QString)));
 	ui.listWidget->setItemWidget(item, item2);
+
 	if (m_currentItemIndex == 0)
 	{
 		item2->setFocus();
@@ -424,18 +430,20 @@ void project_edit::initSheet()
 		"QPushButton::hover{background-color: rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
 	ui.pushButton_hotPoint->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/hotpoint_0.png);border-radius:5px;background-color: rgba(255, 255, 255,0);}"
 		"QPushButton::hover{background-color: rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
+	ui.pushButton_ruler->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/ruler_0.png);border-radius:5px;background-color: rgba(255, 255, 255,0);}"
+		"QPushButton::hover{background-color: rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
 
 	ui.pushButton_FirstAngle->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
 		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
 	ui.pushButton_compassN->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
 		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
 
-	ui.pushButton_addPic->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 40, 40);color: rgb(255, 255, 255);}"
-		"QPushButton::hover{background-color: rgb(80, 80, 80);}"));
-	ui.pushButton_delPic->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 40, 40);color: rgb(255, 255, 255);}"
-		"QPushButton::hover{background-color: rgb(80, 80, 80);}"));
-	ui.pushButton_reSee->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 40, 40);color: rgb(255, 255, 255);}"
-		"QPushButton::hover{background-color: rgb(80, 80, 80);}"));
+	ui.pushButton_addPic->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
+		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
+	ui.pushButton_delPic->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
+		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
+	ui.pushButton_reSee->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
+		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
 }
 
 void project_edit::slotDelPic(std::vector<QString> vecPicID)
@@ -534,6 +542,14 @@ void project_edit::SlotSetLevelShow(int status)
 		QSqlQuery query;
 		query.exec(updata);
 	}	
+	//更新修改时间
+	QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+	QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+	QSqlQuery query;
+	if (!query.exec(updata))
+	{
+		//
+	}
 }
 
 void project_edit::slotMsg(QString msg)
@@ -560,6 +576,14 @@ void project_edit::slotSeeAngleSave()
 			isuccessNum++;
 		}
 	}
+	//更新修改时间
+	QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+	QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+	QSqlQuery query;
+	if (!query.exec(updata))
+	{
+		//
+	}
 	if (isuccessNum == m_listPicPath.size())
 		noticeWin.Notice(this, u8"保存成功！", 2000);
 	else
@@ -584,6 +608,14 @@ void project_edit::slotCompassSave()
 		{
 			isuccessNum++;
 		}
+	}
+	//更新修改时间
+	QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+	QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+	QSqlQuery query;
+	if (!query.exec(updata))
+	{
+		//
 	}
 	if (isuccessNum == m_listPicPath.size())
 		noticeWin.Notice(this, u8"保存成功！", 2000);
@@ -633,6 +665,10 @@ void project_edit::slotNewPicClick(const QString& picPath)
 	else if (m_cutPage == "HotPoint")
 	{
 		LoadPic_HotPoint(picPath);
+	}
+	else if (m_cutPage == "Ruler")
+	{
+		LoadPic_Ruler(picPath);
 	}
 }
 
@@ -721,14 +757,18 @@ void project_edit::slotGloble()
 	ui.pushButton_FirstAngle->hide();
 	ui.pushButton_compassN->hide();
 	m_panWidget->setCompassNShow(false);
-
+	//标尺界面可以画标尺
+	//m_panWidget->SetRuler(false);
+	//
 	ui.groupBox_level->hide();
 	ui.listWidget_group->hide();
 	ui.pushButton_GroupAngle->hide();
 
 	ui.pushButton_globle->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/globle_1.png);border-radius:5px;background-color: rgb(40, 110, 250);}"
 		"QPushButton::hover{background-color: rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
-
+	//遮罩
+	UnloadMask();
+	//
 	if (m_globle)
 	{
 		slotclearStackedWidget(m_hotpoint);//删除以前的
@@ -755,13 +795,18 @@ void project_edit::slotSeeAngle()
 	ui.pushButton_FirstAngle->show();
 	ui.pushButton_compassN->hide();
 	m_panWidget->setCompassNShow(false);
-
+	//标尺界面可以画标尺
+	//m_panWidget->SetRuler(false);
+	//
 	ui.groupBox_level->hide();
 	ui.listWidget_group->hide();
 	ui.pushButton_GroupAngle->hide();
 
 	ui.pushButton_seeAngle->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/seeAngle_1.png);border-radius:5px;background-color: rgb(40, 110, 250);}"
 		"QPushButton::hover{background-color: rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
+	//遮罩
+	UnloadMask();
+	//
 	if (m_seeAngle)
 	{
 		slotclearStackedWidget(m_hotpoint);//删除以前的
@@ -800,13 +845,18 @@ void project_edit::slotCompass()
 	ui.pushButton_FirstAngle->hide();
 	ui.pushButton_compassN->show();
 	m_panWidget->setCompassNShow(true);
-
+	//标尺界面可以画标尺
+	//m_panWidget->SetRuler(false);
+	//
 	ui.groupBox_level->hide();
 	ui.listWidget_group->hide();
 	ui.pushButton_GroupAngle->hide();
 
 	ui.pushButton_compass->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/compass_1.png);border-radius:5px;background-color: rgb(40, 110, 250);}"
 		"QPushButton::hover{background-color: rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
+	//遮罩
+	UnloadMask();
+	//
 	if (m_compass)
 	{
 		slotclearStackedWidget(m_hotpoint);//删除以前的
@@ -842,25 +892,33 @@ void project_edit::slotMask()
 	ui.pushButton_FirstAngle->hide();
 	ui.pushButton_compassN->hide();
 	m_panWidget->setCompassNShow(false);
-
+	//标尺界面可以画标尺
+	//m_panWidget->SetRuler(false);
+	//
 	ui.groupBox_level->hide();
 	ui.listWidget_group->hide();
 	ui.pushButton_GroupAngle->hide();
 
 	ui.pushButton_mask->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/mask_1.png);border-radius:5px;background-color: rgb(40, 110, 250);}"
 		"QPushButton::hover{background-color: rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
+	
 	if (m_mask)
 	{
 		slotclearStackedWidget(m_hotpoint);//删除以前的
 		delete m_mask;
 	}
-	m_mask = new project_edit_mask(m_projUUID, this);
+	m_mask = new project_edit_mask(m_projUUID, m_mapPicPathUUid[m_picPath], m_picPath,this);
 	connect(m_mask, SIGNAL(sig_Msg(QString)), this, SLOT(slotMsg(QString)));
 	connect(this, SIGNAL(sig_Pixmap(QPixmap&)), m_mask, SLOT(slotSetPixmap(QPixmap&)));
 	connect(m_mask, SIGNAL(sig_save()), this, SLOT(slotCompassSave()));
+	connect(m_mask, SIGNAL(sig_angle(double, double, double, double)), this, SLOT(slotSetMask(double, double, double, double)));
+
 	ui.stackedWidget_right->addWidget(m_mask);
 	ui.stackedWidget_right->setCurrentWidget(m_mask);
 	slotSetFirstAngle();
+
+	//加载遮罩
+	LoadMask();
 }
 
 void project_edit::slotHotPoint()
@@ -877,13 +935,17 @@ void project_edit::slotHotPoint()
 	ui.pushButton_FirstAngle->hide();
 	ui.pushButton_compassN->hide();
 	m_panWidget->setCompassNShow(false);
-
+	//标尺界面可以画标尺
+	//m_panWidget->SetRuler(false);
+	//
 	ui.groupBox_level->hide();
 	ui.listWidget_group->hide();
 
 	ui.pushButton_hotPoint->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/hotpoint_1.png);border-radius:5px;background-color: rgb(40, 110, 250);}"
 		"QPushButton::hover{background-color:rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
-
+	//遮罩
+	UnloadMask();
+	//
 	if (m_hotpoint)
 	{
 		slotclearStackedWidget(m_hotpoint);//删除以前的
@@ -946,6 +1008,67 @@ void project_edit::slotHotPoint()
 			}
 		}
 	}
+
+}
+
+void project_edit::slotRuler()
+{
+	emit sig_Close();//热点界面多层界面关闭
+	m_cutPage = "Ruler";
+	initSheet();
+	//热点，指北针
+	m_panWidget->setHotspotShow(false);
+	m_panWidget->setCompassShow(false);
+	//
+	ui.label_seeAngle->hide();
+	ui.label_hpLocation->hide();
+	ui.checkBox_blFrontCover->hide();
+	ui.pushButton_FirstAngle->hide();
+	ui.pushButton_compassN->hide();
+	m_panWidget->setCompassNShow(false);
+	//标尺界面可以画标尺
+	//m_panWidget->SetRuler(true);
+	//
+	ui.groupBox_level->hide();
+	ui.listWidget_group->hide();
+
+	ui.pushButton_ruler->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/edit/ruler_1.png);border-radius:5px;background-color: rgb(40, 110, 250);}"
+		"QPushButton::hover{background-color:rgb(40, 110, 250);}").arg(QApplication::applicationDirPath()));
+
+	// 启用标尺绘制
+	m_panWidget->enableRulerDrawing(true);
+
+	//遮罩
+	UnloadMask();
+	//
+	if (m_ruler)
+	{
+		slotclearStackedWidget(m_ruler);//删除以前的
+		delete m_ruler;
+	}
+	m_ruler = new project_edit_ruler(m_projUUID, m_picPath, m_mapPicPathUUid[m_picPath], this);
+
+
+	ui.stackedWidget_right->addWidget(m_ruler);
+	ui.stackedWidget_right->setCurrentWidget(m_ruler);
+
+	slotSetFirstAngle();
+	//模拟点击，添加热点/标尺到场景
+	{
+		for (int i = 0; i < ui.listWidget->count(); ++i)
+		{
+			QListWidgetItem* listItem = ui.listWidget->item(i);
+			QString tmpPic = listItem->data(Qt::UserRole).toString();
+			if (tmpPic != m_picPath) continue;
+			project_see_item* customItem = qobject_cast<project_see_item*>(ui.listWidget->itemWidget(listItem));
+			if (customItem)
+			{
+				customItem->slotPicPath();
+				break;
+			}
+		}
+	}
+
 }
 
 void project_edit::slotSetFirstAngle()
@@ -1012,6 +1135,16 @@ void project_edit::slotSetSelPicFirstAngle(std::vector<QString>& vecPicID)
 			QSqlQuery query;
 			query.exec(updata);
 		}
+		{
+			//更新修改时间
+			QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+			QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+			QSqlQuery query;
+			if (!query.exec(updata))
+			{
+				//
+			}
+		}
 		//场景
 		WindowParameter tmpPam = m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]];
 		tmpPam.start_angle = QString::number(m_rotation.x(), 'f', 1) + ";" + QString::number(m_rotation.y(), 'f', 1) + ";" + QString::number(m_rotation.z(), 'f', 1);
@@ -1032,6 +1165,16 @@ void project_edit::slotSetSelPicFOV(std::vector<QString>& vecPicID, float zoom, 
 			QString updata = QString("update picture set zoom_range = '%1', fov = '%2' where id = '%3'").arg(zoom_range).arg(strFOV).arg(picID);
 			QSqlQuery query;
 			query.exec(updata);
+		}
+		{
+			//更新修改时间
+			QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+			QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+			QSqlQuery query;
+			if (!query.exec(updata))
+			{
+				//
+			}
 		}
 		//场景
 		WindowParameter tmpPam = m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]];
@@ -1054,6 +1197,16 @@ void project_edit::slotSetSelPicHV(std::vector<QString>& vecPicID, int H_min, in
 			QSqlQuery query;
 			query.exec(updata);
 		}
+		{
+			//更新修改时间
+			QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+			QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+			QSqlQuery query;
+			if (!query.exec(updata))
+			{
+				//
+			}
+		}
 		//场景
 		WindowParameter tmpPam = m_panWidget->m_mapPicAngle[m_mapUUidPicPath[picID]];
 		tmpPam.h_range = H_range;
@@ -1074,6 +1227,16 @@ void project_edit::slotSetSelPicCompass(std::vector<QString>& vecPicID, float an
 				.arg(compass_s_angle).arg(path).arg(pos).arg(picID);
 			QSqlQuery query;
 			query.exec(updata);
+		}
+		{
+			//更新修改时间
+			QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+			QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+			QSqlQuery query;
+			if (!query.exec(updata))
+			{
+				//
+			}
 		}
 		//场景
 		CompassParameter tmpPam = m_panWidget->m_mapPicCompass[m_mapUUidPicPath[picID]];
@@ -1617,6 +1780,11 @@ void project_edit::slotStyle_picChange(QString style)
 	}
 }
 
+void project_edit::slotSetMask(double thetaMin, double thetaMax, double phiMin, double phiMax)
+{
+	m_panWidget->setRegion_theta_phi(thetaMin, thetaMax, phiMin, phiMax);
+}
+
 void project_edit::clearListWidgetGroup()
 {
 	// 1. 遍历所有项（从后往前删，避免索引错乱）
@@ -1700,10 +1868,12 @@ void project_edit::LoadPic_Mask(const QString& picPath)
 		slotclearStackedWidget(m_hotpoint);//删除以前的
 		delete m_mask;
 	}
-	m_mask = new project_edit_mask(m_projUUID, this);
+	m_mask = new project_edit_mask(m_projUUID, m_mapPicPathUUid[m_picPath], m_picPath, this);
 	connect(m_mask, SIGNAL(sig_Msg(QString)), this, SLOT(slotMsg(QString)));
 	connect(this, SIGNAL(sig_Pixmap(QPixmap&)), m_mask, SLOT(slotSetPixmap(QPixmap&)));
 	connect(m_mask, SIGNAL(sig_save()), this, SLOT(slotCompassSave()));
+	connect(m_mask, SIGNAL(sig_angle(double, double, double, double)), this, SLOT(slotSetMask(double, double, double, double)));
+
 	ui.stackedWidget_right->addWidget(m_mask);
 	ui.stackedWidget_right->setCurrentWidget(m_mask);
 }
@@ -1894,4 +2064,36 @@ void project_edit::LoadPic_HotPoint(const QString& picPath)
 	emit sig_clearHpList();
 	//
 	QTimer::singleShot(0, this, &project_edit::processNextIconItem);
+}
+
+void project_edit::LoadPic_Ruler(const QString&)
+{
+
+}
+
+void project_edit::LoadMask()
+{
+	m_panWidget->setRegion_valid(true);
+	QString style;
+	QString pamLong = "0;360;0;180";
+	{
+		QString data = QString("select * from mask where pic_id = '%1'").arg(m_mapPicPathUUid[m_picPath]);
+		QSqlQuery query(data);
+		while (query.next())
+		{
+			style = query.value(2).toString();
+			pamLong = query.value(3).toString();
+		}
+	}
+	QStringList range = pamLong.split(";");
+	m_panWidget->setRegion_theta_phi(range[0].toDouble(), range[1].toDouble(), range[2].toDouble(), range[3].toDouble());
+}
+
+void project_edit::UnloadMask()
+{
+	m_panWidget->setRegion_valid(false);
+	QString style;
+	QString pamLong = "0;360;0;180";
+	QStringList range = pamLong.split(";");
+	m_panWidget->setRegion_theta_phi(range[0].toDouble(), range[1].toDouble(), range[2].toDouble(), range[3].toDouble());
 }

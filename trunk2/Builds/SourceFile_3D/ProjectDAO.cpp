@@ -3,8 +3,8 @@
 QString ProjectDataManager::m_lastError = "";
 
 bool ProjectDataManager::initDatabase() {
-
   QSqlQuery query;
+
   // 1. 创建项目主表
   QString createProjectTable =
       "CREATE TABLE IF NOT EXISTS t_project ("
@@ -12,7 +12,7 @@ bool ProjectDataManager::initDatabase() {
       "create_time DATETIME, "
       "modify_time DATETIME)";
 
-  // 2. 创建资源路径表
+  // 2. 创建资源路径表 (存放项目中用到的所有原始资源)
   QString createAssetsTable =
       "CREATE TABLE IF NOT EXISTS t_project_assets ("
       "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -23,10 +23,28 @@ bool ProjectDataManager::initDatabase() {
       "alt REAL DEFAULT 0, "
       "FOREIGN KEY(p_name) REFERENCES t_project(p_name) ON DELETE CASCADE)";
 
-  if (!query.exec(createProjectTable) || !query.exec(createAssetsTable)) {
+  // 3. 补充：创建剧本步骤表 (存放具体的执行逻辑顺序)
+  QString createScenarioTable =
+      "CREATE TABLE IF NOT EXISTS t_scenario_steps ("
+      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+      "scenario_name TEXT, "  /* 剧本的唯一名称 */
+      "step_index INTEGER, "  /* 执行顺序 1, 2, 3... */
+      "file_path TEXT, "      /* 模型文件路径 */
+      "action_type INTEGER, " /* 0-添加(IN), 1-删除(OUT) */
+      "lon REAL DEFAULT 0, "
+      "lat REAL DEFAULT 0, "
+      "alt REAL DEFAULT 0)";
+
+  QString createIndex =
+      "CREATE INDEX IF NOT EXISTS idx_scenario_name ON "
+      "t_scenario_steps(scenario_name)";
+  // 执行创建操作
+  if (!query.exec(createProjectTable) || !query.exec(createAssetsTable) ||
+      !query.exec(createScenarioTable) || !query.exec(createIndex)) {
     m_lastError = query.lastError().text();
     return false;
   }
+
   return true;
 }
 

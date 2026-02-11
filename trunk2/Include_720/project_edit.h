@@ -11,6 +11,7 @@
 #include "project_edit_globle.h"
 #include "project_edit_compass.h"
 #include "project_edit_hotpoint.h"
+#include "project_edit_ruler.h"
 #include "project_edit_mask.h"
 #include "project_edit_seeAngle.h"
 #include "project_see.h"
@@ -39,8 +40,10 @@ public:
 	void LoadPic_Compass(const QString&);
 	void LoadPic_Mask(const QString&);
 	void LoadPic_HotPoint(const QString&);
+	void LoadPic_Ruler(const QString&);
 
-
+	void LoadMask();
+	void UnloadMask();
 
 public slots:
 	void slotClose();
@@ -56,6 +59,7 @@ public slots:
 	void slotCompass();
 	void slotMask();
 	void slotHotPoint();
+	void slotRuler();
 	void slotSetFirstAngle();
 	void slotSetSeeAngle(QString);
 	void slotSetFirstAngle_FrontCover();
@@ -111,6 +115,8 @@ public slots:
 	void slotStyle_picText(QString);
 	void slotStyle_picChange(QString);
 
+	void slotSetMask(double, double, double, double);
+
 signals:
 	void sig_updateSeeAngle(float);
 	void sig_Pixmap(QPixmap&);
@@ -140,6 +146,7 @@ private:
 	project_edit_compass* m_compass;
 	project_edit_mask* m_mask;
 	project_edit_hotpoint* m_hotpoint;
+	project_edit_ruler* m_ruler;
 	project_edit_delPics* m_delPics;
 	project_style_picText* m_picText;
 

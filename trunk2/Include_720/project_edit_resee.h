@@ -7,6 +7,7 @@
 #include <QOpenGLWidget>
 #include "project_edit_group_item.h"
 #include "project_style_picText.h"
+#include "project_edit_resee_draw.h"
 class project_edit_resee : public QWidget
 {
 	Q_OBJECT
@@ -30,7 +31,9 @@ public slots:
 	void SlotShowElement(bool bl);
 	void slotStyle_picText(QString);
 	void slotStyle_picChange(QString);
+	void SlotDraw();
 private:
+	project_edit_resee_draw* m_draw;
 	project_style_picText* m_picText;
 	QString m_projUUID;
 	QStringList m_listPicPath;

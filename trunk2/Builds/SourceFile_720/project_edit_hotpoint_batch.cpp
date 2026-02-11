@@ -332,6 +332,13 @@ void project_edit_hotpoint_batch::slotHide()
         QString updata = QString("update hotpoint set isIconShow = '0' where id = '%1'").arg(iconID);
         QSqlQuery query;
         query.exec(updata);
+        //更新修改时间
+        {
+            QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+            QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+            QSqlQuery query;
+            query.exec(updata);
+        }
     }
     slotOperationHide();
 }
@@ -347,6 +354,13 @@ void project_edit_hotpoint_batch::slotShow()
         QString updata = QString("update hotpoint set isIconShow = '1' where id = '%1'").arg(iconID);
         QSqlQuery query;
         query.exec(updata);
+        //更新修改时间
+        {
+            QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+            QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+            QSqlQuery query;
+            query.exec(updata);
+        }
     }
      slotOperationHide();
 }
@@ -362,6 +376,13 @@ void project_edit_hotpoint_batch::slotLock()
         QString updata = QString("update hotpoint set isLock = '1' where id = '%1'").arg(iconID);
         QSqlQuery query;
         query.exec(updata);
+        //更新修改时间
+        {
+            QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+            QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+            QSqlQuery query;
+            query.exec(updata);
+        }
     }
     slotOperationHide();
 }
@@ -377,6 +398,13 @@ void project_edit_hotpoint_batch::slotUnlock()
         QString updata = QString("update hotpoint set isLock = '0' where id = '%1'").arg(iconID);
         QSqlQuery query;
         query.exec(updata);
+        //更新修改时间
+        {
+            QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+            QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+            QSqlQuery query;
+            query.exec(updata);
+        }
     }
     slotOperationHide();
 }

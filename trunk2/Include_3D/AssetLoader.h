@@ -10,6 +10,7 @@
 #include <osg/Node>
 #include <osg/ref_ptr>
 #include <osgDB/ReadFile>
+#include <osg/ComputeBoundsVisitor>
 #include <osgDB/WriteFile>
 #include <osgEarth/ElevationLayer>
 #include <osgEarth/GeoTransform>
@@ -33,11 +34,7 @@
                        QObject* parent = nullptr);
   virtual ~AssetLoader() = default;
 
-  // --- 统一入口 ---
-  /**
-   * @brief 根据后缀名自动分流加载
-   * @return 返回加载后的 osg::Object (可能是 Node 或 Layer)
-   */
+
   osg::ref_ptr<osg::Object> load(const QString& filePath, double lon,
                                  double lat, double alt);
 
@@ -46,13 +43,6 @@
   osg::ref_ptr<osg::Object> loadTif(const QString& filePath);
   osg::ref_ptr<osg::Object> loadElevation(const QString& filePath);
   osg::ref_ptr<osg::Object> loadShp(const QString& filePath);
-
-  /**
-   * @brief 加载 OBJ 模型
-   * @param lon 经度
-   * @param lat 纬度
-   * @param alt 高度
-   */
   osg::ref_ptr<osg::Object> loadObj(const QString& filePath, double lon,
                                     double lat, double alt = 0.0);
 

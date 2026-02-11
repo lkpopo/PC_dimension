@@ -27,11 +27,12 @@ public:
     void create_project_sqlite();
     void create_picture_sqlite();
     void create_hotpoint_sqlite();
-
+    void create_ruler_sqlite();
     void create_level_sqlite();
     void create_group_sqlite();
     void create_levelshow_sqlite();
     void create_groupshow_sqlite();
+    void create_mask_sqlite();
 public slots:
     void slotClose();
     void slotEdit(QString);

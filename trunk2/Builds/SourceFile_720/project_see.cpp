@@ -18,6 +18,25 @@ project_see::project_see(QString projUUID, QStringList listPicPath,QWidget* pare
 	setAttribute(Qt::WA_TranslucentBackground, true);
 	setAttribute(Qt::WA_QuitOnClose, true);
 
+	ui.pushButton_selPic->hide();
+	ui.pushButton_info->hide();
+	ui.pushButton_draw->hide();
+	//施工图
+	QString dirName = QApplication::applicationDirPath() + "/DataBase/" + projUUID;
+	QString Engineering_Drawings = dirName + "/Engineering_Drawings/Engineering_Drawings.jpg";
+	QFileInfo fileInfo(Engineering_Drawings);
+	if (fileInfo.exists())
+	{
+		ui.pushButton_draw->show();
+		QString styleSheet = QString("QPushButton{"
+			"border-image: url(%1);"  // 背景图片路径
+			"border: none;"  // 去除按钮边框
+			"}").arg(Engineering_Drawings);
+		ui.pushButton_draw->setStyleSheet(styleSheet);
+	}
+	ui.pushButton_draw->move(10, 120);
+	connect(ui.pushButton_draw, SIGNAL(clicked()), this, SLOT(SlotDraw()));
+
 	QScreen* screen = QGuiApplication::primaryScreen();
 	QRect screenRect = screen->geometry();
 	int scrWidth = screenRect.width();
@@ -46,8 +65,18 @@ project_see::project_see(QString projUUID, QStringList listPicPath,QWidget* pare
 
 	connect(ui.checkBox_autoRotate, SIGNAL(stateChanged(int)), this, SLOT(Slot_autoRotate(int)));
 
-	ui.listWidget->setGeometry((scrWidth - (item_size * m_listPicPath.size() + 10 * (m_listPicPath.size() - 1) + 20 * 2)) / 2, scrHeight - 20 - 64 - 30 - 120, (item_size * m_listPicPath.size() + 10 * (m_listPicPath.size() - 1) + 20 * 2), 100);
+	int start = (scrWidth - (item_size * m_listPicPath.size() + 10 * (m_listPicPath.size() - 1) + 20 * 2)) / 2;
+	int lenth = (item_size * m_listPicPath.size() + 10 * (m_listPicPath.size() - 1) + 20 * 2);
+	if (lenth > scrWidth)
+	{
+		lenth = scrWidth;
+		start = 0;
+	}
+	ui.listWidget->setGeometry(start, scrHeight - 20 - 64 - 30 - 120, lenth - 10, 120);
 
+	// 2. 核心设置：开启横向排列 + 关闭自动换行
+	ui.listWidget->setFlow(QListView::LeftToRight); // 布局方向：从左到右（横向）
+	ui.listWidget->setWrapping(false); // 关闭自动换行（关键，避免超出宽度后换行）
 	ui.listWidget->setViewMode(QListView::IconMode);
 	ui.listWidget->setSpacing(10);
 	ui.listWidget->setMovement(QListView::Static);
@@ -97,6 +126,8 @@ project_see::project_see(QString projUUID, QStringList listPicPath,QWidget* pare
 	ui.pushButton_close->raise();
 	ui.pushButton_full->raise();
 	ui.checkBox_autoRotate->raise();
+
+	ui.pushButton_draw->raise();
 
 	ui.pushButton_close->setStyleSheet(QString("QPushButton{image:url(%1/Resource/common/close_255_24.png);border-radius:16px;background-color: rgba(40, 40, 40, 80);}").arg(QApplication::applicationDirPath()));
 	ui.pushButton_full->setStyleSheet(QString("QPushButton{image:url(%1/Resource/common/max_1.png);border-radius:16px;background-color: rgba(40, 40, 40, 80);}").arg(QApplication::applicationDirPath()));
@@ -304,6 +335,23 @@ project_see::project_see(QString projUUID, QStringList listPicPath,QWidget* pare
 		}
 		m_panWidget->setIconShowGroups(mapVecIconID_Group);
 	}
+	//加载遮罩
+	{
+		m_panWidget->setRegion_valid(true);
+		QString style;
+		QString pamLong = "0;360;0;180";
+		{
+			QString data = QString("select * from mask where pic_id = '%1'").arg(m_mapPicPathUUid[m_picPath]);
+			QSqlQuery query(data);
+			while (query.next())
+			{
+				style = query.value(2).toString();
+				pamLong = query.value(3).toString();
+			}
+		}
+		QStringList range = pamLong.split(";");
+		m_panWidget->setRegion_theta_phi(range[0].toDouble(), range[1].toDouble(), range[2].toDouble(), range[3].toDouble());
+	}
 	// 场景
 	QTimer::singleShot(0, this, &project_see::processNextPicItem);
 }
@@ -421,8 +469,9 @@ void project_see::SlotShowElement(bool bl)
 		ui.label_pic_bg->show();
 		ui.pushButton_close->show();
 		ui.pushButton_full->show();
-		ui.pushButton_info->show();
-		ui.pushButton_selPic->show();
+
+		ui.pushButton_info->hide();
+		ui.pushButton_selPic->hide();
 	}
 }
 
@@ -456,6 +505,17 @@ void project_see::slotStyle_picChange(QString style)
 		QString dirName_picPath = dirName_pic + "/" + styleList[1];
 		slotNewPicClick(dirName_picPath);
 	}
+}
+
+void project_see::SlotDraw()
+{
+	if (m_draw)
+	{
+		delete m_draw;
+	}
+	m_draw = new project_edit_resee_draw(m_projUUID);
+	m_draw->setWindowModality(Qt::ApplicationModal);
+	m_draw->showNormal();
 }
 
 void project_see::slotFullScreen()
@@ -659,6 +719,23 @@ void project_see::Reload()
 			ui.listWidget_group->show();
 		}
 		m_panWidget->setIconShowGroups(mapVecIconID_Group);
+	}
+	//加载遮罩
+	{
+		m_panWidget->setRegion_valid(true);
+		QString style;
+		QString pamLong = "0;360;0;180";
+		{
+			QString data = QString("select * from mask where pic_id = '%1'").arg(m_mapPicPathUUid[m_picPath]);
+			QSqlQuery query(data);
+			while (query.next())
+			{
+				style = query.value(2).toString();
+				pamLong = query.value(3).toString();
+			}
+		}
+		QStringList range = pamLong.split(";");
+		m_panWidget->setRegion_theta_phi(range[0].toDouble(), range[1].toDouble(), range[2].toDouble(), range[3].toDouble());
 	}
 	//加载热点
 	m_panWidget->clearCutPicHp();

@@ -162,7 +162,27 @@
     <QtUic Include="..\..\Include_720\project_style_picText.ui">
       <Filter>Form Files\720</Filter>
     </QtUic>
-    <QtUic Include="..\..\Include_3D\SimPanel.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_resee_draw.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_ruler.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_720\project_edit_ruler_set.ui">
+      <Filter>Form Files\720</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\SimPanel.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\ModelLibraryWidget.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\ScenarioDirectorWidget.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
+    <QtUic Include="..\..\Include_3D\ScenarioItemWidget.ui">
+      <Filter>Form Files\3D</Filter>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="MainPage.h">
@@ -300,15 +320,6 @@
     <QtMoc Include="..\..\Include_3D\Space_3D_project_item.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
-    <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="..\..\Include_720\MultiPosSlider_H.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="..\..\Include_720\MultiPosSlider_V.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="..\..\Include_3D\OSGEarthApp.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
@@ -334,6 +345,48 @@
       <Filter>Header Files\3D</Filter>
     </QtMoc>
     <QtMoc Include="..\..\Include_3D\SimPanel.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_resee_draw.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_H.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_V.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_ruler.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\project_edit_ruler_set.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_Latitude.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_Longitude.h">
+      <Filter>Header Files\720</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\ModelLibraryWidget.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\ModelLibraryWidget.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\ScenarioDirectorWidget.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\ScenarioDirectorWidget.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\ScenarioItemWidget.h">
+      <Filter>Header Files\3D</Filter>
+    </QtMoc>
+    <QtMoc Include="..\..\Include_3D\ScenarioItemWidget.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
   </ItemGroup>
@@ -533,6 +586,24 @@
       <Filter>Source Files\3D</Filter>
     </ClCompile>
     <ClCompile Include="..\SourceFile_3D\SimPanel.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_resee_draw.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_ruler.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_720\project_edit_ruler_set.cpp">
+      <Filter>Source Files\720</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\ModelLibraryWidget.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\ScenarioDirectorWidget.cpp">
+      <Filter>Source Files\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SourceFile_3D\ScenarioItemWidget.cpp">
       <Filter>Source Files\3D</Filter>
     </ClCompile>
   </ItemGroup>

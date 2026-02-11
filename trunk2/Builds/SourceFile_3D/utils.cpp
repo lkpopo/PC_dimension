@@ -9,6 +9,8 @@ struct TileTaskResult {
   osg::BoundingBox bb;
 };
 
+std::string _Chinesepath;
+
 // 批量将 Vec3Array 从 EPSG:2383 转换为 osgEarth 世界坐标(ECEF)
 static void ConvertPointCloudToECEF(osg::ref_ptr<osg::Vec3Array>& vertices,
                                     const osgEarth::SpatialReference* geoSRS) {
@@ -102,7 +104,6 @@ static osg::BoundingBox saveTileToDisk(const std::string& filePath,
   // 4. 将该节点序列化到硬盘文件
   osgDB::writeNodeFile(*internalLOD, filePath,
                        new osgDB::Options("WriteImageHint=IncludeData"));
-
   return bb;  // 返回包围盒，用于主程序设置 PagedLOD 的中心和半径
 }
 
@@ -165,8 +166,9 @@ osg::Group* convertLasToPagedTiles(const QString& lasFilePath,
     colors->push_back(col);
 
     if (vertices->size() >= PerTileSize) {
-      std::string fileName = tilesBaseDir.toStdString() + "tile_" +
-                             std::to_string(tileIndex++) + ".osgb";
+      _Chinesepath = tilesBaseDir.toLocal8Bit().constData();
+      std::string fileName =
+          _Chinesepath + "tile_" + std::to_string(tileIndex++) + ".osgb";
 
       dispatchTask(tileIndex, fileName, vertices, colors);
       vertices = new osg::Vec3Array();
@@ -183,7 +185,7 @@ osg::Group* convertLasToPagedTiles(const QString& lasFilePath,
 
   // 处理最后一个瓦片
   if (!vertices->empty()) {
-    std::string fileName = tilesBaseDir.toStdString() + "tile_last.osgb";
+    std::string fileName = _Chinesepath + "tile_last.osgb";
     dispatchTask(-1, fileName, vertices, colors);
   }
 
@@ -198,7 +200,7 @@ osg::Group* convertLasToPagedTiles(const QString& lasFilePath,
   // 构建 PagedLOD 树
   osg::BoundingBox totalBB;
   osg::ref_ptr<osgDB::Options> localOpt = new osgDB::Options();
-  localOpt->setDatabasePath(tilesBaseDir.toStdString());
+  localOpt->setDatabasePath(_Chinesepath);
   for (const auto& res : results) {
     if (!res.bb.valid()) continue;
 
@@ -256,65 +258,13 @@ void updateCameraSensitivity(osgEarth::Util::EarthManipulator* manip) {
 }
 
 void adjustUI(Ui::OSGEarthAppClass* ui, int w, int h) {
-  // 2. 调整全局背景
-  ui->lblBackground->setGeometry(0, 0, w, h);
-  ui->lblBackground->lower();
-
-  // --- 核心布局参数 ---
-  int rightPanelWidth = 320;  // 右侧面板总宽
-  int btnW = 280;  // 内部组件宽度（稍微加宽点，更美观）
-  int btnH = 35;   // 按钮高度
-  int toolbarHeight = 70, subToolbarHeight = 35;  // <--- 新增：工具栏高度
-  int osgMargin = 15;      // OSG 区域距离边缘的间距
-  int spacing = 15;        // 组件间的垂直间距
-  int sideMargin = (rightPanelWidth - btnW) / 2;
-  int panelX = w - rightPanelWidth;
-  int compX = panelX + sideMargin;      // 组件起始 X
-  int currentY = 50;                    // 起始顶部间距
-  int osgW = w - rightPanelWidth - 30;  // 留 30px 间隙
-  int osgH = h - 40;
-
-  // 工具栏的位置
-  ui->toolbarFrame->setGeometry(osgMargin, 20, osgW, toolbarHeight);
-  ui->toolbarFrame->raise();  // 确保在背景之上
-
-  ui->clipSubToolbar->setGeometry(osgMargin + 50, 20 + toolbarHeight, 300,
-                                  subToolbarHeight);
-  ui->clipSubToolbar->setVisible(false);
-
-  // 3. 渲染区域 (左侧 OSG Widget)
-  ui->widgetOSG->setGeometry(osgMargin, 20 + toolbarHeight + subToolbarHeight+spacing,
-                             osgW, osgH);
-
-  // 4. 右侧面板背景
-  ui->lblBtnbackground->setGeometry(panelX, 0, rightPanelWidth, h);
-
-  // 5. [顶部] 项目名称输入框
-  ui->leProjectName->setGeometry(compX, currentY, btnW, btnH);
-  currentY += (btnH + spacing);
-
-  // 6. [顶部] 加载场景按钮
-  ui->btnLoadScene->setGeometry(compX, currentY, btnW, btnH);
-  currentY += (btnH + spacing);
-
-  // --- 计算底部区域高度，以便给 Tree 留出空间 ---
-  int bottomAreaHeight = 120;  // 给 lblText 和 btnSavePro 预留的总高度
-  int treeY = currentY;
-  int treeH = h - treeY - bottomAreaHeight - 20;  // 20 为底部留白
-
-  // 7. [中间核心] 文件树控件 (treeSceneManager)
-  ui->treeSceneManager->setGeometry(compX, treeY, btnW, treeH);
-
-  // 8. [底部] 提示文本 (lblText)
-  int lblTextY = treeY + treeH + 10;
-  ui->lblText->setGeometry(compX, lblTextY, btnW, 40);
-  ui->lblText->setAlignment(Qt::AlignCenter);
-
-  // 9. [底部] 保存按钮 (btnSavePro)
-  ui->btnSavePro->setGeometry(compX, h - 30 - btnH, btnW, btnH);
+  // 设置左侧工具栏固定宽度
+  int toolbarFrame_width = 140, stackedWidget_width = 320;
+  ui->toolbarFrame->setFixedWidth(toolbarFrame_width);
+  ui->stackedWidget->setFixedWidth(stackedWidget_width);
+  ui->widgetOSG->setFixedWidth(w - toolbarFrame_width - stackedWidget_width-50);
 
   // 10. 右上角关闭按钮 (不变)
-  ui->btn_Close->setGeometry(w - 45, 10, 35, 35);
   ui->btn_Close->raise();
   ui->btn_Close->setStyleSheet(
       QString("QPushButton{border-image:url(%1/Resource/common/close.png)};")

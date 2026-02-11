@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ScenarioDirectorWidgetClass</class>
+ <widget class="QWidget" name="ScenarioDirectorWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ScenarioDirectorWidget</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+
+/* 滚动条美化 */
+QScrollBar:vertical {
+    width: 8px;
+    background: transparent;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #dcdfe6;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #c0c4cc;
+}</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
+    <widget class="QFrame" name="frame_top">
+     <property name="styleSheet">
+      <string notr="true">/* 工具栏容器 */
+QFrame#frame_top {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e4e7ed;
+    padding: 5px;
+}
+
+/* 按钮通用基础样式 */
+#frame_top QPushButton {
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: &quot;Segoe UI&quot;, &quot;Microsoft YaHei&quot;;
+    border: 1px solid #dcdfe6;
+    background-color: #ffffff;
+    color: #606266;
+    min-width: 80px;
+    height: 28px;
+}
+
+/* 鼠标悬停通用效果 */
+#frame_top QPushButton:hover {
+    background-color: #f5f7fa;
+    border-color: #c0c4cc;
+    color: #409eff;
+}
+
+/* --- 1. 加载模型 &amp; 加载剧本 (默认样式) --- */
+#frame_top QPushButton#btnLoadModel, 
+#frame_top QPushButton#btnLoadHistory {
+    /* 继承通用样式 */
+}
+
+/* --- 3. 退出按钮 (警告色：浅红) --- */
+#frame_top QPushButton#btnExit {
+    color: #f56c6c;
+    background-color: #fef0f0;
+    border-color: #fbc4c4;
+}
+
+#frame_top QPushButton#btnExit:hover {
+    background-color: #f56c6c;
+    color: #ffffff;
+    border-color: #f56c6c;
+}
+
+#frame_top QPushButton#btnExit:pressed {
+    background-color: #dd6161;
+}
+
+/* 按钮禁用状态 */
+#frame_top QPushButton:disabled {
+    background-color: #f5f7fa;
+    color: #c0c4cc;
+    border-color: #e4e7ed;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QLineEdit" name="lineEdit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>剧本名称</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnAddIn">
+        <property name="text">
+         <string>添加进入</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnAddOut">
+        <property name="text">
+         <string>添加离开</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnSaveScenario">
+        <property name="text">
+         <string>保存剧本</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnLoadHistory">
+        <property name="text">
+         <string>加载剧本</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnExit">
+        <property name="text">
+         <string>退出</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QListWidget" name="listScenario">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="dragEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="currentRow">
+      <number>-1</number>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

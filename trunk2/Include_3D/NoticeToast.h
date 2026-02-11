@@ -5,7 +5,6 @@
 class NoticeToast : public QWidget {
   Q_OBJECT
  public:
-  // ❗注意：不叫 show
   static void popup(QWidget* parent, const QString& text,
                     int durationMs = 2000);
   explicit NoticeToast(QWidget* parent = nullptr);

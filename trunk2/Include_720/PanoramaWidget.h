@@ -21,8 +21,10 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
+#include <memory>
 
 #define M_PI 3.14159265358979323846
+
 
 //初始化窗口
 struct WindowParameter
@@ -59,9 +61,7 @@ struct Hotspot
 
     bool icon_visible;          // 是否可见
     bool title_visible;          // 是否可见
-  
     bool isFollowSysZoom;   //是否跟随系统缩放
-
     bool movable;           // 是否可移动
     bool selected;          // 是否被选中
 
@@ -70,6 +70,50 @@ struct Hotspot
     int title_text_size;      //标题文本大小
 
     QOpenGLTexture* texture;
+
+};
+
+// 端点样式枚举
+enum class RulerEndpointStyle {
+    Circle,    // 圆形端点
+    Square,    // 方形端点
+    Triangle   // 三角形端点
+};
+
+// 标尺数据结构
+struct Ruler
+{
+    QString rulerID;                  // 唯一标识码
+    QVector3D position_start;         // 起点球面坐标
+    QVector3D position_end;           // 终点球面坐标
+    QString name;                     // 名称/标注文本
+
+    QString text_font_style = "微软雅黑";          // 字体样式（如"微软雅黑"）
+    int text_font_size = 12;          // 字号（默认12）
+    QColor text_color = Qt::white;    // 字体颜色
+    QColor text_bg_color = QColor(0, 0, 0, 160); // 背景颜色（半透明）
+    QString text_pos = "middle";      // 文字位置（start/middle/end）
+    bool text_isFollowSysZoom = true; // 跟随画面同步缩放
+    bool text_isCustomAngle = false;  // 自定义文字角度
+    float text_angle = 0.0f;          // 文字角度（度）
+
+    float line_thick = 2.0f;          // 线段粗细（像素）
+    QColor line_color = Qt::red;      // 线段颜色
+    RulerEndpointStyle line_endpoint_style = RulerEndpointStyle::Circle; // 端点样式
+    QColor line_endpoint_color = Qt::yellow; // 端点颜色
+    float line_endpoint_size = 8.0f;  // 端点大小（像素）
+
+    // 辅助变量：缓存屏幕坐标（避免重复计算）
+    QPoint screen_start;
+    QPoint screen_end;
+    QPoint screen_middle;
+};
+
+// 标尺绘制状态
+enum class RulerDrawState {
+    None,       // 未绘制
+    Drawing,    // 绘制中（已选起点，未选终点）
+    Drawn       // 绘制完成
 };
 
 //按层级显示
@@ -218,10 +262,11 @@ signals:
     void sig_cutSeeAngle(QString);
 public:
     // 鼠标事件处理
+    void wheelEvent(QWheelEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
-    void wheelEvent(QWheelEvent* event) override;
-
+    void mouseReleaseEvent(QMouseEvent* event) override;
+ 
 private slots:
     void onAnimationTimer();
 private:
@@ -242,15 +287,12 @@ private:
     // 热点交互检测
     bool getHotspotAtPosition(const QPoint& mousePos);
     bool isPointNearHotspot(const QVector2D& screenPoint, const QVector3D& hotspotPos);
-    //
+    
+    //屏幕坐标转三维坐标
     QVector3D screenToSphere(const QPoint& mousePos);
-    QPoint sphereToScreen(const QVector3D& spherePos);
-    //优化修正
-    QVector3D screenToSphere(const QPoint& screenPos,
-        const QMatrix4x4& view,
-        const QMatrix4x4& projection,
-        const QVector3D& rotation);
+    //三维坐标转屏幕坐标
     QPoint sphereToScreen(const QVector3D& worldPos, const QMatrix4x4& view, const QMatrix4x4& projection);
+    //
     QPoint rotationZoomToPixelOffset(const QVector3D& rotation, float zoom);
     //实时热点默认位置
     QVector3D sphericalToCartesian(double theta, double phi) 
@@ -365,7 +407,7 @@ private:
     QOpenGLShaderProgram* m_program; //全景图
     QOpenGLShaderProgram* m_maskProgram; //遮罩
     QOpenGLShaderProgram* m_hotspotProgram;//热点
-
+    QOpenGLShaderProgram* m_objModelProgram;//模型
 
     QOpenGLVertexArrayObject m_panoramaVAO;
     QOpenGLVertexArrayObject m_hotspotVAO;
@@ -483,6 +525,7 @@ public:
     }
     void updateHotspotPath(QString imagePath)//更新图标
     {
+        makeCurrent();
         QImage img(imagePath);
         if (img.isNull()) return;
         QImage textureImg = img.convertToFormat(QImage::Format_RGBA8888);
@@ -493,6 +536,7 @@ public:
         m_cutHotPoint.texture->setFormat(QOpenGLTexture::RGBA8_UNorm);
         m_cutHotPoint.iconPath = imagePath;
         update();
+        doneCurrent();       
     };
     void Update()//刷新
     {
@@ -761,10 +805,41 @@ public:
             }      
         }
     }
- 
+
     float getCompassN() { return m_compassN; };
     QString getCompass_picPath() { return m_compassN_picpath; };
     QString getCompass_location() { return m_compassN_location; };
+    //
+    GLuint m_circleVAO, m_circleVBO;
+    QOpenGLShaderProgram* m_shapeProgram; // 专门用于绘制3D图形的着色器
+  
+    //经纬度裁切
+    struct LLClip 
+    {
+        bool Region_valid = false;
+        float Region_thetaMin = 0;
+        float Region_thetaMax = 360;
+        float Region_phiMin = 0;
+        float Region_phiMax = 180;
+    };
+    std::map<QString, LLClip> m_MapRegion_LLClip;
+    void setRegion_valid(bool blValid) 
+    {
+        m_MapRegion_LLClip[m_picPath].Region_valid = blValid;
+        update();
+    };
+    void setRegion_theta_phi(double thetaMin, double thetaMax, double phiMin, double phiMax)
+    {
+        m_MapRegion_LLClip[m_picPath].Region_thetaMin = thetaMin;
+        m_MapRegion_LLClip[m_picPath].Region_thetaMax = thetaMax;
+        m_MapRegion_LLClip[m_picPath].Region_phiMin = phiMin;
+        m_MapRegion_LLClip[m_picPath].Region_phiMax = phiMax;
+        update();
+    };
+    /////////////////////////
+    bool m_edit_ruler = false;
+    void enableRulerDrawing(bool bl) { m_edit_ruler = bl; };
+
 
 };
 

@@ -1,52 +1,69 @@
-#include "InteractionManager.h"
-
-#include <osg/Geometry>
-#include <osg/LineWidth>
-#include <osg/Point>
-#include <osg/PolygonOffset>
-#include <osgUtil/LineSegmentIntersector>
+ï»¿#include "InteractionManager.h"
 
 InteractionManager::InteractionManager(osgViewer::Viewer* viewer,
-                                       osg::Group* dataGroup, QObject* parent)
-    : QObject(parent), m_viewer(viewer), m_dataGroup(dataGroup) {
+                                       osg::Group* dataGroup,
+                                       osg::Group* interactionGroup,
+                                       QObject* parent)
+    : QObject(parent), m_viewer(viewer) {
   m_tempGroup = new osg::Group();
-  // ½«ÁÙÊ±»æÍ¼²ã¼ÓÈë³¡¾°£¬È·±£Ëü²»»á±»ÕÚµ²
-  if (m_dataGroup.valid()) {
-    m_dataGroup->addChild(m_tempGroup);
+  if (interactionGroup) {
+    interactionGroup->addChild(m_tempGroup);
   }
   initMeasureGeometry();
   initClipGeometry();
+  setupClipShader(dataGroup);
 }
 
 void InteractionManager::setMode(InterMode mode) {
   m_currentMode = mode;
+  clearAll();
   if (mode == InterMode::VIEW) {
-    clearAll();
-    m_tempGroup->setNodeMask(0);  // ¹Ø¼ü£º0 ±íÊ¾³¹µ×²»äÖÈ¾£¬²»ÂÛ×ø±êÔÚÄÄ
+    m_tempGroup->setNodeMask(0);  // å…³é”®ï¼š0 è¡¨ç¤ºå½»åº•ä¸æ¸²æŸ“ï¼Œä¸è®ºåæ ‡åœ¨å“ª
   } else {
-    m_tempGroup->setNodeMask(0xffffffff);  // »Ö¸´äÖÈ¾
+    m_tempGroup->setNodeMask(0xffffffff);  // æ¢å¤æ¸²æŸ“
   }
-  m_isFirstClick = true;  // ÇĞ»»Ä£Ê½Ê±ÖØÖÃ×´Ì¬
 }
 
 void InteractionManager::clearAll() {
-  // ±£ÁôÇ°Á½¸ö½Úµã£º0ÊÇÏß£¬×îºóÒ»¸ö£¨»òÌØ¶¨µÄ£©ÊÇÎÄ×Ö
-  // ¼òµ¥µÄ×ö·¨ÊÇÖ±½ÓÇå¿ÕÎÄ×Ö
-  if (m_distanceText.valid()) m_distanceText->setText("");
+  if (m_distanceText) m_distanceText->setText("");
 
-  // ÏßÌõ¹éÁã
   if (!m_lineCoords->empty()) {
     m_lineCoords->clear();
-    m_lineGeom->dirtyBound();
-    m_lineGeom->dirtyDisplayList();
+    refreshGeometry(m_lineGeom.get());
   }
   m_isFirstClick = true;
+
+  if (!m_clipCoords->empty()) {
+    m_clipCoords->clear();
+    refreshGeometry(m_clipGeom.get());
+  }
+  m_isClipFinished = false;
 }
 
 bool InteractionManager::handle(const osgGA::GUIEventAdapter& ea,
                                 osgGA::GUIActionAdapter& aa) {
-  if (m_currentMode == InterMode::VIEW) return false;
 
+  if (m_currentMode == InterMode::VIEW) {
+    if (ea.getEventType() == osgGA::GUIEventAdapter::RELEASE &&
+        ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) {
+      osg::Vec3d worldPos;
+      if (pick(ea.getX(), ea.getY(), worldPos)) {
+        emit requestContextMenu(worldPos);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ESCæŒ‰é”®å¤„ç†
+  if (ea.getEventType() == osgGA::GUIEventAdapter::KEYDOWN) {
+    if (ea.getKey() == osgGA::GUIEventAdapter::KEY_Escape) {
+      clearAll();
+      return true;  // äº‹ä»¶å·²å¤„ç†ï¼Œä¸å†å‘ä¸‹ä¼ é€’
+    }
+  }
+
+  // é”å®šç›¸æœº
   if (ea.getEventType() == osgGA::GUIEventAdapter::DRAG ||
       ea.getEventType() == osgGA::GUIEventAdapter::SCROLL) {
     return true;
@@ -68,7 +85,6 @@ bool InteractionManager::pick(float x, float y, osg::Vec3d& out_pos) {
       new osgUtil::PolytopeIntersector(osgUtil::Intersector::WINDOW, x - delta,
                                        y - delta, x + delta, y + delta);
 
-  // ÖØµã£ºÉèÖÃÊ°È¡ÓÅÏÈ¼¶£¬ÈÃËü¾¡¿ÉÄÜÑ°ÕÒµãÔÆÊı¾İ
   intersector->setIntersectionLimit(osgUtil::Intersector::LIMIT_NEAREST);
 
   osgUtil::IntersectionVisitor iv(intersector.get());
@@ -76,18 +92,12 @@ bool InteractionManager::pick(float x, float y, osg::Vec3d& out_pos) {
     iv.setTraversalMask(MASK_TERRAIN);
   else
     iv.setTraversalMask(0xffffffff);
-
   m_viewer->getCamera()->accept(iv);
 
   if (intersector->containsIntersections()) {
     auto& intersections = intersector->getIntersections();
 
-    // ±éÀúËùÓĞ½»µã£¬ÕÒµ½µÚÒ»¸öÊôÓÚµãÔÆµÄ½»µã
     for (auto& intersection : intersections) {
-      // ¹ıÂËµô osgEarth µÄµØĞÎ£¬Ö»ÕÒÄãµÄµãÔÆ½Úµã
-      // ¼ÙÉèÄãµÄµãÔÆ½ÚµãÃû×Ö°üº¬ "Point" »òÊôÓÚÄ³¸öÌØ¶¨ Group
-      // if (intersection.nodePath.empty()) continue;
-
       osg::Vec3 localPoint = intersection.localIntersectionPoint;
       osg::Matrix localToWorld =
           osg::computeLocalToWorld(intersection.nodePath);
@@ -106,35 +116,29 @@ void InteractionManager::updateMeasureLine(const osg::Vec3d& start,
   (*m_lineCoords)[0] = start;
   (*m_lineCoords)[1] = end;
 
-  m_lineCoords->dirty();
-  m_lineGeom->dirtyBound();
-  m_lineGeom->dirtyDisplayList();
+  refreshGeometry(m_lineGeom.get());
 }
 
 void InteractionManager::updateText(const osg::Vec3d& pos, double distance) {
-  if (!m_distanceText.valid()) return;
+  if (!m_distanceText || !m_textAT.valid()) return;
 
-  // ÉèÖÃÄÚÈİ
   QString text = QString("%1 m").arg(distance, 0, 'f', 2);
-  m_distanceText->setText(text.toStdString(), osgText::String::ENCODING_UTF8);
 
-  // ÉèÖÃÎ»ÖÃ£¨ÔÚÊ°È¡µãÉÔÎ¢Æ«ÒÆÒ»µã£¬±ÜÃâ±»Êó±êÖ¸ÕëÕÚµ²£©
-  m_distanceText->setPosition(pos);
+  m_distanceText->setText(text.toUtf8().constData(),
+                          osgText::String::ENCODING_UTF8);
+  m_textAT->setPosition(pos);
 }
 
 void InteractionManager::initClipGeometry() {
   m_clipGeom = new osg::Geometry();
   m_clipCoords = new osg::Vec3Array();
   m_clipGeom->setVertexArray(m_clipCoords);
-
-  // Ê¹ÓÃ GL_LINE_LOOP »á×Ô¶¯½«×îºóÒ»¸öµãÓëµÚÒ»¸öµãÁ¬½Ó£¬ĞÎ³É±ÕºÏ
   m_clipGeom->addPrimitiveSet(
       new osg::DrawArrays(osg::PrimitiveSet::LINE_LOOP, 0, 0));
 
   m_clipGeode = new osg::Geode();
   m_clipGeode->addDrawable(m_clipGeom);
 
-  // ÉèÖÃ²Ã¼ô¿òÑùÊ½£ºÁÁÂÌÉ«£¬´øµã´ÖÏ¸£¬ÇÒÓÀÔ¶ÏÔÊ¾ÔÚ×îÇ°
   osg::StateSet* ss = m_clipGeode->getOrCreateStateSet();
   ss->setMode(GL_DEPTH_TEST,
               osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
@@ -152,48 +156,68 @@ void InteractionManager::initMeasureGeometry() {
   osg::Vec4Array* colors = new osg::Vec4Array();
   colors->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
-  // ³õÊ¼»¯Ïß¼¸ºÎÌå
+  // åˆå§‹åŒ–çº¿å‡ ä½•ä½“
   m_lineGeom = new osg::Geometry();
   m_lineCoords = new osg::Vec3Array();
-  m_lineCoords->push_back(osg::Vec3(0, 0, 0));
-  m_lineCoords->push_back(osg::Vec3(0, 0, 0));
   m_lineGeom->setVertexArray(m_lineCoords);
-  m_lineGeom->addPrimitiveSet(new osg::DrawArrays(GL_LINES, 0, 2));
-  m_lineGeom->setColorArray(colors, osg::Array::BIND_OVERALL);  // ÉèÖÃÏßÌõÑÕÉ«
+  m_lineGeom->addPrimitiveSet(
+      new osg::DrawArrays(osg::PrimitiveSet::LINE_STRIP, 0, 0));
+  m_lineGeom->setColorArray(colors, osg::Array::BIND_OVERALL);  // è®¾ç½®çº¿æ¡é¢œè‰²
 
   osg::Geode* geode = new osg::Geode();
   geode->setName("MeasureLineGeode");
   osg::StateSet* ss = geode->getOrCreateStateSet();
 
-  ss->setAttributeAndModes(new osg::LineWidth(2.0f));  // ÉèÖÃÏßÌõ¿í¶È
+  ss->setAttributeAndModes(new osg::LineWidth(2.0f));  // è®¾ç½®çº¿æ¡å®½åº¦
   osg::ref_ptr<osg::PolygonOffset> polyoffset =
       new osg::PolygonOffset(-1.0f, -1.0f);
   ss->setAttributeAndModes(polyoffset, osg::StateAttribute::ON);
   ss->setRenderBinToInherit();
   geode->addDrawable(m_lineGeom);
+  m_tempGroup->addChild(geode);
 
   m_distanceText = new osgText::Text();
-  m_distanceText->setCharacterSize(5.0f);                       // ×ÖÌå´óĞ¡
-  m_distanceText->setColor(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));  // ºìÉ«
-  // ÉèÖÃ×ÖÌå¶ÔÆë·½Ê½£¨¸úËæÆÁÄ»Ğı×ª£¬Ê¼ÖÕÃæÏòÓÃ»§£©
-  m_distanceText->setAxisAlignment(osgText::Text::SCREEN);
-  // ÉèÖÃ±³¾°£¬·ÀÖ¹ÎÄ×ÖÔÚ¸´ÔÓ±³¾°ÏÂ¿´²»Çå
-  m_distanceText->setBackdropType(osgText::Text::OUTLINE);
+  m_distanceText->setColor(
+      osg::Vec4(1.0f, 1.0f, 0.0f, 1.0f));  // æ–‡å­—é¢œè‰²ï¼šé»„è‰²
+
+  // å±å¹•åƒç´ æ¨¡å¼ï¼Œç¡®ä¿å¤§å°åˆé€‚
+  m_distanceText->setCharacterSizeMode(osgText::Text::OBJECT_COORDS);
+  m_distanceText->setCharacterSize(50.0);  // ä¸–ç•Œå°ºåº¦ä¸‹è°ƒ
+  m_distanceText->setAxisAlignment(osgText::Text::XY_PLANE);
+
+  // å…³é”®ï¼šå»æ‰å¯èƒ½ä¼šäº§ç”Ÿå¤§è‰²å—çš„èƒŒæ™¯è®¾ç½®
+  m_distanceText->setBackdropType(osgText::Text::NONE);
 
   m_textGeode = new osg::Geode();
   m_textGeode->addDrawable(m_distanceText);
-  m_textGeode->getOrCreateStateSet()->setRenderBinDetails(
-      12, "RenderBin");  // ±ÈÏßÌõ²ã¼¶¸ü¸ßÒ»µã
 
-  m_tempGroup->addChild(m_textGeode);  // ¼ÓÈëÁÙÊ±×é
+  ss = m_textGeode->getOrCreateStateSet();
 
-  m_tempGroup->addChild(geode);  // Ä¬ÈÏÊÇµÚ0¸ö×Ó½Úµã
+  // 2. å½»åº•å…³é—­å…‰ç…§å’Œæ·±åº¦æµ‹è¯•
+  ss->setMode(GL_DEPTH_TEST,
+              osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+
+  // 3. éš”ç¦»Shader
+  ss->setAttributeAndModes(new osg::Program(),
+                           osg::StateAttribute::OFF |
+                               osg::StateAttribute::OVERRIDE |
+                               osg::StateAttribute::PROTECTED);
+
+  ss->setRenderBinDetails(1000, "RenderBin");
+
+  // æ·»åŠ AutoTransformèŠ‚ç‚¹ å®ç°æ–‡å­—é“è¿‘ç‚¹äº‘æ—¶ æ‰­æ›²çš„é—®é¢˜
+  m_textAT = new osg::AutoTransform;
+  m_textAT->setAutoRotateMode(osg::AutoTransform::ROTATE_TO_SCREEN);
+  m_textAT->setAutoScaleToScreen(true);
+  m_textAT->setDataVariance(osg::Object::DYNAMIC);
+
+  m_textAT->addChild(m_textGeode);
+  m_tempGroup->addChild(m_textAT);
 }
 
 bool InteractionManager::handleMeasure(const osgGA::GUIEventAdapter& ea,
                                        osgGA::GUIActionAdapter& aa) {
   if (ea.getEventType() == osgGA::GUIEventAdapter::MOVE) {
-    // Ö»ÓĞÔÚÑ¡ÁËµÚÒ»¸öµãÖ®ºó£¬²Å¿ªÊ¼¶¯Ì¬À­Ïß
     if (!m_isFirstClick) {
       osg::Vec3d hitPos;
       if (pick(ea.getX(), ea.getY(), hitPos)) {
@@ -203,28 +227,24 @@ bool InteractionManager::handleMeasure(const osgGA::GUIEventAdapter& ea,
         updateText(m_currentMousePoint, dist);
       }
     }
-    return false;  // ÒÆ¶¯ÊÂ¼ş²»À¹½Ø£¬·ñÔòµØÍ¼Ã»·¨×ªÁË
   }
 
-  // ½öÏìÓ¦Êó±ê×ó¼ü°´ÏÂ
+  // ä»…å“åº”é¼ æ ‡å·¦é”®æŒ‰ä¸‹
   if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
       ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) {
     osg::Vec3d hitPos;
     if (pick(ea.getX(), ea.getY(), hitPos)) {
-      if (m_currentMode == InterMode::MEASURE) {
-        if (m_isFirstClick) {
-          clearAll();
-          m_startPoint = hitPos;
-          m_isFirstClick = false;
-        } else {
-          updateMeasureLine(m_startPoint, hitPos);
-          m_isFirstClick = true;  // ²âÍêÒ»´ÎÖØÖÃ
-        }
+      if (m_isFirstClick) {
+        clearAll();
+        m_startPoint = hitPos;
+        m_isFirstClick = false;
+      } else {
+        updateMeasureLine(m_startPoint, hitPos);
+        m_isFirstClick = true;  // æµ‹å®Œä¸€æ¬¡é‡ç½®
       }
       return true;
     }
   }
-  return false;
 }
 
 bool InteractionManager::handleClip(const osgGA::GUIEventAdapter& ea,
@@ -232,21 +252,19 @@ bool InteractionManager::handleClip(const osgGA::GUIEventAdapter& ea,
   float x = ea.getX();
   float y = ea.getY();
 
-  // --- 1. Êó±êÒÆ¶¯£º¸üĞÂÏğÆ¤½î ---
+  // --- 1. é¼ æ ‡ç§»åŠ¨ï¼šæ›´æ–°æ©¡çš®ç­‹ ---
   if (ea.getEventType() == osgGA::GUIEventAdapter::MOVE) {
     if (m_clipCoords->size() >= 2 && !m_isClipFinished) {
       osg::Vec3d hitPos;
       if (pick(x, y, hitPos)) {
-        if (m_clipCoords->size() >= 2) {
-          m_clipCoords->back() = hitPos;
-          refreshClipGeometry();
-        }
+        m_clipCoords->back() = hitPos;
+        refreshGeometry(m_clipGeom.get());
       }
     }
     return false;
   }
 
-  // --- 2. Êó±ê×ó¼ü£º¹Ì¶¨¶¥µã ---
+  // --- 2. é¼ æ ‡å·¦é”®ï¼šå›ºå®šé¡¶ç‚¹ ---
   if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
       ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) {
     osg::Vec3d hitPos;
@@ -257,24 +275,24 @@ bool InteractionManager::handleClip(const osgGA::GUIEventAdapter& ea,
       }
 
       if (m_clipCoords->empty()) {
-        // µÚÒ»´Îµã»÷£º·ÅÁ½¸öµã£¨Ò»¸ö¹Ì¶¨Æğµã£¬Ò»¸ö¸úËæÊó±êµÄÖÕµã£©
+        // ç¬¬ä¸€æ¬¡ç‚¹å‡»ï¼šæ”¾ä¸¤ä¸ªç‚¹ï¼ˆä¸€ä¸ªå›ºå®šèµ·ç‚¹ï¼Œä¸€ä¸ªè·Ÿéšé¼ æ ‡çš„ç»ˆç‚¹ï¼‰
         m_clipCoords->push_back(hitPos);
         m_clipCoords->push_back(hitPos);
       } else {
         m_clipCoords->push_back(hitPos);
       }
-      refreshClipGeometry();
+      refreshGeometry(m_clipGeom.get());
       return true;
     }
   }
 
-  // --- 3. Êó±êÓÒ¼ü£º±ÕºÏÇøÓò ---
+  // --- 3. é¼ æ ‡å³é”®ï¼šé—­åˆåŒºåŸŸ ---
   if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
       ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) {
-    if (m_clipCoords->size() > 2) {
-      m_clipCoords->pop_back();  // ÒÆ³ı×îºóÄÇ¸ö¸úËæÊó±êµÄÁÙÊ±µã
+    if (m_clipCoords->size() > 2 && !m_isClipFinished) {
+      m_clipCoords->pop_back();  // ç§»é™¤æœ€åé‚£ä¸ªè·Ÿéšé¼ æ ‡çš„ä¸´æ—¶ç‚¹
       m_isClipFinished = true;
-      refreshClipGeometry();
+      refreshGeometry(m_clipGeom.get());
     }
     return true;
   }
@@ -282,34 +300,134 @@ bool InteractionManager::handleClip(const osgGA::GUIEventAdapter& ea,
   return false;
 }
 
-/**
- * Ë¢ĞÂ¼¸ºÎÌå×´Ì¬
- * ×÷ÓÃ£º¸üĞÂ¶¥µã¼ÆÊı£¬²¢Í¨Öª OSG ÖØĞÂäÖÈ¾
- */
-void InteractionManager::refreshClipGeometry() {
-  if (!m_clipGeom.valid() || !m_clipCoords.valid()) return;
+void InteractionManager::refreshGeometry(osg::Geometry* geom) {
+  if (!geom) return;
 
-  // 1. ¸üĞÂ DrawArrays µÄ¶¥µãÊıÁ¿
+  osg::Array* vertices = geom->getVertexArray();
+  if (!vertices) return;
+
   osg::DrawArrays* da =
-      dynamic_cast<osg::DrawArrays*>(m_clipGeom->getPrimitiveSet(0));
+      dynamic_cast<osg::DrawArrays*>(geom->getPrimitiveSet(0));
   if (da) {
-    da->setCount(m_clipCoords->size());
+    da->setCount(vertices->getNumElements());
   }
 
-  // 2. ±ê¼ÇÊı¾İÒÑ¸üĞÂ
-  m_clipGeom->dirtyBound();
-  m_clipGeom->dirtyDisplayList();
+  // 3. æ ‡è®°æ•°æ®è„åŒº
+  vertices->dirty();         // å‘Šè¯‰ OSG é¡¶ç‚¹æ•°æ®å˜äº†
+  geom->dirtyBound();        // é‡æ–°è®¡ç®—åŒ…å›´ç›’
+  geom->dirtyDisplayList();  // åˆ·æ–°æ˜¾å­˜ç¼“å†²åŒº
 }
 
-/**
- * ¸üĞÂÏğÆ¤½îÏß
- * @param hitPos µ±Ç°Êó±êÖ¸ÏòµÄ 3D ÊÀ½ç×ø±ê
- */
-// void InteractionManager::updateClipRubberBand(const osg::Vec3d& hitPos) {
-//   if (m_clipCoords->empty() || m_isClipFinished) return;
-//
-//   if (m_clipCoords->size() >= 2) {
-//     m_clipCoords->back() = hitPos;
-//     refreshClipGeometry();
-//   }
-// }
+void InteractionManager::setupClipShader(osg::Group* dataGroup) {
+  osg::StateSet* ss = dataGroup->getOrCreateStateSet();
+
+  osg::ref_ptr<osg::Program> program = new osg::Program;
+
+  // é¡¶ç‚¹ç€è‰²å™¨ï¼šè®¡ç®—ç‚¹åœ¨â€œè£å‰ªç›¸æœºâ€è§†è§’ä¸‹çš„å±å¹•æŠ•å½±ä½ç½®
+  const char* vertSource =
+      "#version 120\n"
+      "varying vec4 v_clipPos;\n"
+      "uniform mat4 u_clipMVP;\n"
+      "void main() {\n"
+      "    // è®¡ç®—å½“å‰é¡¶ç‚¹åœ¨è£å‰ªé‚£ä¸€åˆ»çš„æŠ•å½±åæ ‡\n"
+      "    v_clipPos = u_clipMVP * gl_Vertex;\n"
+      "    \n"
+      "    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+      "    gl_FrontColor = gl_Color;\n"
+      "    gl_PointSize = 2.0;\n"
+      "}\n";
+
+  // ç‰‡å…ƒç€è‰²å™¨ï¼šåŸºäºå±å¹•å¤šè¾¹å½¢è¿›è¡Œä¸¢å¼ƒåˆ¤å®š
+  const char* fragSource =
+      "#version 120\n"
+      "varying vec4 v_clipPos;\n"
+      "uniform float u_polyX[64];\n"
+      "uniform float u_polyY[64];\n"
+      "uniform int u_polySize;\n"
+      "uniform int u_clipMode;\n"  // 0:æ­£å¸¸, 1:è£æ‰å†…éƒ¨, 2:è£æ‰å¤–éƒ¨
+      "void main() {\n"
+      "    if (u_clipMode == 0 || u_polySize < 3) {\n"
+      "        gl_FragColor = gl_Color;\n"
+      "        return;\n"
+      "    }\n"
+      "    \n"
+      "    // 1. é€è§†é™¤æ³•ï¼šè½¬ä¸º NDC åæ ‡ (-1 åˆ° 1)\n"
+      "    vec3 ndc = v_clipPos.xyz / v_clipPos.w;\n"
+      "    \n"
+      "    // 2. æ˜ å°„åˆ°å±å¹•å½’ä¸€åŒ–åæ ‡ (0 åˆ° 1)ï¼Œå¯¹åº” C++ ä¼ è¿›æ¥çš„ polyX/Y\n"
+      "    vec2 uv = ndc.xy * 0.5 + 0.5;\n"
+      "    \n"
+      "    // 3. å¦‚æœç‚¹åœ¨ç›¸æœºèƒŒé¢ï¼ˆw < 0ï¼‰ï¼Œé€šå¸¸ä¸è¿›è¡Œè§†å£å†…è£å‰ªåˆ¤å®š\n"
+      "    if (v_clipPos.w <= 0.0) {\n"
+      "        gl_FragColor = gl_Color;\n"
+      "        return;\n"
+      "    }\n"
+      "    \n"
+      "    // 4. PNPOLY ç®—æ³•åˆ¤å®š\n"
+      "    bool inside = false;\n"
+      "    for (int i = 0, j = u_polySize - 1; i < u_polySize; j = i++) {\n"
+      "        if (((u_polyY[i] > uv.y) != (u_polyY[j] > uv.y)) &&\n"
+      "            (uv.x < (u_polyX[j] - u_polyX[i]) * (uv.y - u_polyY[i]) / "
+      "(u_polyY[j] - u_polyY[i]) + u_polyX[i])) {\n"
+      "            inside = !inside;\n"
+      "        }\n"
+      "    }\n"
+      "    \n"
+      "    if (u_clipMode == 1 && inside) discard;\n"
+      "    if (u_clipMode == 2 && !inside) discard;\n"
+      "    \n"
+      "    gl_FragColor = gl_Color;\n"
+      "}\n";
+
+  program->addShader(new osg::Shader(osg::Shader::VERTEX, vertSource));
+  program->addShader(new osg::Shader(osg::Shader::FRAGMENT, fragSource));
+  ss->setAttributeAndModes(program, osg::StateAttribute::ON);
+
+  // åˆå§‹åŒ–é»˜è®¤ Uniform
+  ss->getOrCreateUniform("u_clipMode", osg::Uniform::INT)->set(0);
+  ss->getOrCreateUniform("u_polySize", osg::Uniform::INT)->set(0);
+}
+
+void InteractionManager::updateClipUniforms(osg::Group* dataGroup, int mode) {
+  if (m_clipCoords->empty()) return;
+
+  osg::Camera* cam = m_viewer->getCamera();
+  osg::Viewport* vp = cam->getViewport();
+
+  // 1. å†»ç»“å½“å‰çš„ MVP çŸ©é˜µ
+  osg::Matrixf viewMat = cam->getViewMatrix();
+  osg::Matrixf projMat = cam->getProjectionMatrix();
+  osg::Matrixf clipMVP = viewMat * projMat;
+
+  // 2. è½¬æ¢å¤šè¾¹å½¢é¡¶ç‚¹ä¸ºå±å¹• 0-1 åæ ‡
+
+  osg::Matrixf mvpw = clipMVP * vp->computeWindowMatrix();
+  int size = std::min((int)m_clipCoords->size(), 64);
+
+  const int MAX_POLY_POINTS = 64;
+  osg::ref_ptr<osg::FloatArray> polyX = new osg::FloatArray(MAX_POLY_POINTS);
+  osg::ref_ptr<osg::FloatArray> polyY = new osg::FloatArray(MAX_POLY_POINTS);
+
+  for (int i = 0; i < MAX_POLY_POINTS; ++i) {
+    if (i < size) {
+      osg::Vec3 screenPos = m_clipCoords->at(i) * mvpw;
+      (*polyX)[i] = screenPos.x() / (float)vp->width();
+      (*polyY)[i] = screenPos.y() / (float)vp->height();
+    } else {
+      (*polyX)[i] = 0.0f;  // å¡«å……é»˜è®¤å€¼
+      (*polyY)[i] = 0.0f;
+    }
+  }
+
+  // 3. æäº¤åˆ° StateSet
+  osg::StateSet* ss = dataGroup->getOrCreateStateSet();
+  ss->getOrCreateUniform("u_clipMVP", osg::Uniform::FLOAT_MAT4)->set(clipMVP);
+
+  ss->getOrCreateUniform("u_polyX", osg::Uniform::FLOAT, MAX_POLY_POINTS)
+      ->setArray(polyX.get());
+  ss->getOrCreateUniform("u_polyY", osg::Uniform::FLOAT, MAX_POLY_POINTS)
+      ->setArray(polyY.get());
+
+  ss->getOrCreateUniform("u_polySize", osg::Uniform::INT)->set(size);
+  ss->getOrCreateUniform("u_clipMode", osg::Uniform::INT)->set(mode);
+}

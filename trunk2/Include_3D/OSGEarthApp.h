@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include <QFuture>
 #include <QInputDialog>
+#include <QMenu>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QSqlError>
@@ -21,6 +22,7 @@
 #include <osg/PositionAttitudeTransform>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
+#include <osgDB/Registry>
 #include <osgEarth/ImageLayer>
 #include <osgEarth/MapNode>
 #include <osgEarth/ModelLayer>
@@ -48,6 +50,8 @@
 #include "ProjectDAO.h"
 #include "InteractionManager.h"
 #include "utils.h"
+#include "ModelLibraryWidget.h"
+#include "ScenarioDirectorWidget.h"
 
 using namespace std;
 
@@ -87,12 +91,15 @@ class OSGEarthApp : public QWidget {
   void projectSavedSuccess();
 
  public slots:
-
-  void onSlotClose();
-  void onSavePro();
+  void on_btnScenarioManager_clicked();
+  void on_btn_Close_clicked();
+  void on_btnSavePro_clicked();
   void onLoadScene(QString filePath = QString(), double lon=0.0, double lat=0.0,
                    double alt=0.0);
-  void onMeasure(bool checked);
+  void onModeButtonClicked(QAbstractButton* button);
+  void on_btnInsideClip_clicked();
+  void on_btnReset_clicked();
+  void on_btnOutsideClip_clicked();
 
  private:
   void initEnvironment();    // 路径与环境配置
@@ -104,9 +111,8 @@ class OSGEarthApp : public QWidget {
   void initSceneManagerTree();
   void onSlotLocateFile(QString path);
   void onSlotDeleteFile(QString path);
-  //void enterTowerEditMode(const QString& path);
-  //void onCoordinateChanged(double lon, double lat, double alt, bool isOut);
   void initMembers();
+  void showRightClickMenu(const osg::Vec3d worldPos);
   
   //void startCollapseAnimation();
 
@@ -116,7 +122,7 @@ class OSGEarthApp : public QWidget {
   QButtonGroup* m_cameraGroup = nullptr;
   QWidget* m_glWidget;
   QString m_lastOpenPath;
-  double m_lon, m_lat, m_alt = 0.0;
+  osg::Vec3d m_objCoordinate;
 
   // TreeWidget 的分类根节点映射（如 "影像", "点云"）
   QMap<QString, QTreeWidgetItem*> m_categoryNodes;
@@ -126,9 +132,6 @@ class OSGEarthApp : public QWidget {
 
   // 文件路径与 TreeWidget 列表项的映射（用于同步 UI 删除）
   QMap<QString, QTreeWidgetItem*> m_pathItemMap;
-
-  // 文件后缀名与加载函数指针的映射表（优雅的分流器）
-  //std::map<QString, SceneLoaderFunc> m_sceneFuncMap;
 
   // 当前项目内存数据（记录已加载的文件列表等信息）
   ProjectMemoryData m_currentData;
@@ -146,6 +149,9 @@ class OSGEarthApp : public QWidget {
   ManipulatorHelper* m_towerManip;
   AssetLoader* m_assetLoader;
   InteractionManager* m_interManager;
+  QButtonGroup* m_modeButtonGroup;
+  ModelLibraryWidget* m_modelLibraryWidget;
+  ScenarioDirectorWidget* m_scenarioDirectorWidget;
 
   // OSG
   osg::ref_ptr<osgViewer::Viewer> m_viewer;
@@ -160,4 +166,8 @@ class OSGEarthApp : public QWidget {
 
   // 数据节点分组，专门用于挂载 OBJ、LAS 等非图层类模型
   osg::ref_ptr<osg::Group> m_dataGroup;
+
+  // 放置测量线条与裁剪几何的临时节点
+  osg::ref_ptr<osg::Group> m_interactionGroup;
+
 };

@@ -56,10 +56,12 @@ PanoramicImageReader::PanoramicImageReader(QWidget *parent)
 	create_project_sqlite();
 	create_picture_sqlite();
 	create_hotpoint_sqlite();
+	create_ruler_sqlite();
 	create_level_sqlite();
 	create_group_sqlite();
 	create_levelshow_sqlite();
 	create_groupshow_sqlite();
+	create_mask_sqlite();
 
 	// 窗口显示后延迟初始化列表
 	QString data = QString("select * from project order by create_time desc");
@@ -447,6 +449,7 @@ void PanoramicImageReader::slotDelProj(QString projUUID)
 	UpdateList();
 }
 
+
 void PanoramicImageReader::initWindows()
 {
 	QScreen* screen = QGuiApplication::primaryScreen();
@@ -629,6 +632,35 @@ void PanoramicImageReader::create_hotpoint_sqlite()
 	}
 }
 
+void PanoramicImageReader::create_ruler_sqlite()
+{
+	QString sql = QString(
+		"CREATE TABLE IF NOT EXISTS `ruler` \
+		( \
+		`id` varchar(64)  NOT NULL, \
+		`ruler_name` varchar(128)  NULL DEFAULT NULL, \
+		`picture_id` varchar(64)  NULL DEFAULT NULL, \
+		`position` varchar(16) NULL DEFAULT NULL, \
+		`text_font_style` varchar(16) NULL DEFAULT NULL, \
+		`text_font_size` varchar(16) NULL DEFAULT NULL, \
+		`text_color` varchar(16) NULL DEFAULT NULL, \
+		`text_bg_color` varchar(16) NULL DEFAULT NULL, \
+		`text_pos` varchar(16) NULL DEFAULT NULL, \
+		`text_isFollowSysZoom` varchar(16) NULL DEFAULT NULL, \
+		`text_isCustomAngle` varchar(8) NULL DEFAULT NULL, \
+		`text_angle` varchar(8) NULL DEFAULT NULL, \
+		`line_thick` varchar(8) NULL DEFAULT NULL, \
+		`line_color` varchar(8) NULL DEFAULT NULL, \
+		`line_endpoint_style` varchar(8) NULL DEFAULT NULL, \
+		`line_endpoint_color` varchar(8) NULL DEFAULT NULL, \
+		PRIMARY KEY(`id`));");
+	QSqlQuery query;
+	if (!query.exec(sql))
+	{
+		qDebug() << QString::fromLocal8Bit("failed!") << query.lastError();
+	}
+}
+
 void PanoramicImageReader::create_level_sqlite()
 {
 	QString sql = QString(
@@ -696,6 +728,25 @@ void PanoramicImageReader::create_groupshow_sqlite()
 		( \
 		`icon_id` varchar(64)  NOT NULL, \
 		`GroupID` varchar(64) NULL DEFAULT NULL,\
+		`pic_id` varchar(64) NULL DEFAULT NULL,\
+		`more1` varchar(32)  NULL DEFAULT NULL, \
+		`more2` varchar(64)  NULL DEFAULT NULL);");
+	QSqlQuery query;
+	if (!query.exec(sql))
+	{
+		qDebug() << QString::fromLocal8Bit("failed!") << query.lastError();
+	}
+}
+
+void PanoramicImageReader::create_mask_sqlite()
+{
+	QString sql = QString(
+		"CREATE TABLE IF NOT EXISTS `mask` \
+		( \
+		`pic_id` varchar(64)  NOT NULL, \
+		`pic_path` varchar(64)  NOT NULL, \
+		`style` varchar(8) NULL DEFAULT NULL,\
+		`area` varchar(8) NULL DEFAULT NULL,\
 		`more1` varchar(32)  NULL DEFAULT NULL, \
 		`more2` varchar(64)  NULL DEFAULT NULL);");
 	QSqlQuery query;

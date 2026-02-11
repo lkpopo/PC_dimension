@@ -3,7 +3,7 @@
 #include "CommonTool.h"
 #include "styleSheet.h"
 #include <QSqlQuery>
-
+#include <QFileDialog>
 
 project_edit_globle::project_edit_globle(QString projUUID, QString cutPicPath, QWidget *parent)
 	: m_projUUID(projUUID), m_cutPicPath(cutPicPath), QWidget(parent)
@@ -12,6 +12,8 @@ project_edit_globle::project_edit_globle(QString projUUID, QString cutPicPath, Q
 	setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinimizeButtonHint);
 	setAttribute(Qt::WA_TranslucentBackground, true);
 	setAttribute(Qt::WA_QuitOnClose, true);
+
+	m_draw = "";
 
 	QScreen* screen = QGuiApplication::primaryScreen();
 	QRect screenRect = screen->geometry();
@@ -48,18 +50,29 @@ project_edit_globle::project_edit_globle(QString projUUID, QString cutPicPath, Q
 		updateCharCount(ui.textEdit_keyword, ui.label_keyCount, 100);
 		updateCharCount(ui.textEdit_introduction, ui.label_itdCount, 500);
 	}
-
-
-
+	//施工图
+	{
+		QString dirName = QApplication::applicationDirPath() + "/DataBase/" + projUUID;
+		QString Engineering_Drawings = dirName + "/Engineering_Drawings/Engineering_Drawings.jpg";
+		QFileInfo fileInfo(Engineering_Drawings);
+		if (fileInfo.exists())
+		{
+			QPixmap pixmap(Engineering_Drawings);
+			QPixmap fitpixmap = pixmap.scaled(211, 91, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+			ui.label_draw->setPixmap(fitpixmap);
+		}
+	}
 	//connect
 	connect(ui.pushButton_setcover, SIGNAL(clicked()), this, SLOT(slotSetFrontCover()));
+	connect(ui.pushButton_draw, SIGNAL(clicked()), this, SLOT(slotDraw()));
 	connect(ui.pushButton_done, SIGNAL(clicked()), this, SLOT(slotDone()));
 
 	ui.pushButton_setcover->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
 		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
+	ui.pushButton_draw->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
+		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
 	ui.pushButton_done->setStyleSheet(QString("QPushButton{border-radius:5px;background-color: rgb(40, 110, 250);color: rgb(255, 255, 255);}"
 		"QPushButton::hover{background-color: rgb(0, 85, 255);}"));
-
 	
 	connect(ui.textEdit_tilte, &QTextEdit::textChanged, this, [this]() {
 		updateCharCount(ui.textEdit_tilte, ui.label_titleCount, 100);
@@ -144,6 +157,11 @@ void project_edit_globle::slotDone()
 		bool bl1 = QFile::remove(frontcover);
 	}
 	bool bl2 = QFile::rename(frontcover_tmp,frontcover);
+	//更新施工图
+	{
+		QString newPicPath = dirName + "/Engineering_Drawings/Engineering_Drawings.jpg";
+		CopyFile(m_draw, newPicPath, true);
+	}
 	//更新数据库
 	QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 	QString updata = QString("update project set project_name = '%1', keyword = '%2',introduction = '%3', update_time = '%4' where id = '%5'").arg(title).arg(keyword).arg(introduction).arg(update_time).arg(m_projUUID);
@@ -156,10 +174,27 @@ void project_edit_globle::slotDone()
 	{
 		emit sig_Msg(u8"保存成功！");
 	}
+	//更新修改时间
+	{
+		QString update_time = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+		QString updata = QString("update project set update_time = '%1' where id = '%2'").arg(update_time).arg(m_projUUID);
+		QSqlQuery query;
+		query.exec(updata);
+	}
 }
 
 void project_edit_globle::slotSelPic()
 {
+}
+
+void project_edit_globle::slotDraw()
+{
+	QString filePath = QFileDialog::getOpenFileName(this, tr(u8"选择图片"), tr(""), tr(u8"图片文件(*.jpg *.jpeg *.png);所有文件（*.*);"));
+	if (filePath == "") return;
+	m_draw = filePath;
+	QPixmap pixmap(filePath);
+	QPixmap fitpixmap = pixmap.scaled(256, 91, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	ui.label_draw->setPixmap(fitpixmap);
 }
 
 void project_edit_globle::slotReSeeFrontCover()

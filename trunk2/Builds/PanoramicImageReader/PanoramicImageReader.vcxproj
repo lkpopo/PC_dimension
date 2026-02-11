@@ -109,7 +109,10 @@
     <QtRcc Include="..\..\Resource\PanoramicImageReader.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="..\..\Include_3D\ModelLibraryWidget.ui" />
     <QtUic Include="..\..\Include_3D\OSGEarthApp.ui" />
+    <QtUic Include="..\..\Include_3D\ScenarioDirectorWidget.ui" />
+    <QtUic Include="..\..\Include_3D\ScenarioItemWidget.ui" />
     <QtUic Include="..\..\Include_3D\SceneItemWidget.ui" />
     <QtUic Include="..\..\Include_3D\SimPanel.ui" />
     <QtUic Include="..\..\Include_3D\Space_3D.ui" />
@@ -138,6 +141,9 @@
     <QtUic Include="..\..\Include_720\project_edit_hotpoint_set.ui" />
     <QtUic Include="..\..\Include_720\project_edit_mask.ui" />
     <QtUic Include="..\..\Include_720\project_edit_resee.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_resee_draw.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_ruler.ui" />
+    <QtUic Include="..\..\Include_720\project_edit_ruler_set.ui" />
     <QtUic Include="..\..\Include_720\project_edit_seeAngle.ui" />
     <QtUic Include="..\..\Include_720\project_hotpoint_icon.ui" />
     <QtUic Include="..\..\Include_720\project_item.ui" />
@@ -169,7 +175,18 @@
     <QtMoc Include="..\..\Include_3D\SimPanel.h" />
     <QtMoc Include="..\..\Include_3D\AssetLoader.h" />
     <QtMoc Include="..\..\Include_3D\InteractionManager.h" />
+    <QtMoc Include="..\..\Include_3D\ModelLibraryWidget.h" />
     <ClInclude Include="..\..\Include_3D\ProjectDAO.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_resee_draw.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_H.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_V.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_ruler.h" />
+    <QtMoc Include="..\..\Include_720\project_edit_ruler_set.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_Latitude.h" />
+    <QtMoc Include="..\..\Include_720\MultiPosSlider_Longitude.h" />
+    <QtMoc Include="..\..\Include_3D\ScenarioDirectorWidget.h" />
+    <QtMoc Include="..\..\Include_3D\ScenarioItemWidget.h" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="..\..\Include_3D\OSGEarthApp.h" />
     <QtMoc Include="..\..\Include_3D\Space_3D.h" />
@@ -182,9 +199,6 @@
     <ClInclude Include="..\..\Include_3D\ManipulatorHelper.h" />
     <ClInclude Include="..\..\Include_3D\utils.h" />
     <ClInclude Include="..\..\Include_720\md5.h" />
-    <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h" />
-    <QtMoc Include="..\..\Include_720\MultiPosSlider_H.h" />
-    <QtMoc Include="..\..\Include_720\MultiPosSlider_V.h" />
     <ClInclude Include="..\..\Include_720\OpeateDB.h" />
     <QtMoc Include="..\..\Include_720\project_edit_delPics.h" />
     <QtMoc Include="..\..\Include_720\project_edit_delPics_item.h" />
@@ -234,9 +248,12 @@
     <ClCompile Include="..\SourceFile_3D\CustomDialog.cpp" />
     <ClCompile Include="..\SourceFile_3D\InteractionManager.cpp" />
     <ClCompile Include="..\SourceFile_3D\ManipulatorHelper.cpp" />
+    <ClCompile Include="..\SourceFile_3D\ModelLibraryWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\NoticeToast.cpp" />
     <ClCompile Include="..\SourceFile_3D\OSGEarthApp.cpp" />
     <ClCompile Include="..\SourceFile_3D\ProjectDAO.cpp" />
+    <ClCompile Include="..\SourceFile_3D\ScenarioDirectorWidget.cpp" />
+    <ClCompile Include="..\SourceFile_3D\ScenarioItemWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\SceneItemWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\SimPanel.cpp" />
     <ClCompile Include="..\SourceFile_3D\Space_3D.cpp" />
@@ -273,6 +290,9 @@
     <ClCompile Include="..\SourceFile_720\project_edit_hotpoint_set.cpp" />
     <ClCompile Include="..\SourceFile_720\project_edit_mask.cpp" />
     <ClCompile Include="..\SourceFile_720\project_edit_resee.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_resee_draw.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_ruler.cpp" />
+    <ClCompile Include="..\SourceFile_720\project_edit_ruler_set.cpp" />
     <ClCompile Include="..\SourceFile_720\project_edit_seeAngle.cpp" />
     <ClCompile Include="..\SourceFile_720\project_hotpoint_icon.cpp" />
     <ClCompile Include="..\SourceFile_720\project_item.cpp" />

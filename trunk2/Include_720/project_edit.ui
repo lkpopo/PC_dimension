@@ -163,12 +163,31 @@ color: rgb(0, 0, 0);
      <string/>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButton_ruler">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>400</y>
+      <width>41</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255,255);
+color: rgb(0, 0, 0);
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>label_leftLable</zorder>
    <zorder>pushButton_globle</zorder>
    <zorder>pushButton_seeAngle</zorder>
    <zorder>pushButton_hotPoint</zorder>
    <zorder>pushButton_compass</zorder>
    <zorder>pushButton_mask</zorder>
+   <zorder>pushButton_ruler</zorder>
   </widget>
   <widget class="QGroupBox" name="groupBox_bottom">
    <property name="geometry">
@@ -189,7 +208,7 @@ color: rgb(0, 0, 0);
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>30</y>
+      <y>20</y>
       <width>1381</width>
       <height>81</height>
      </rect>
@@ -207,6 +226,11 @@ border:0px;</string>
       <width>75</width>
       <height>51</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
     </property>
     <property name="text">
      <string>添加场景</string>
@@ -237,6 +261,11 @@ border:0px;</string>
       <height>31</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
+    </property>
     <property name="text">
      <string>删除场景</string>
     </property>
@@ -251,9 +280,10 @@ border:0px;</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(40, 110, 250);
-color: rgb(255, 255, 255);
-font: 14pt &quot;微软雅黑&quot;;</string>
+     <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;
+</string>
     </property>
     <property name="text">
      <string>预览</string>

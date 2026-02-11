@@ -30,7 +30,7 @@ public slots:
 	void slotEditTitleCount();
 	void slotEditIntCount();
 	void slotEditKeyCount();
-
+	void slotDraw();
 
 signals:
 	void sig_Update();
@@ -53,6 +53,7 @@ private:
 	project_new_todo* m_todoWin;
 
 	QString m_Project_UUID;
+	QString m_draw;
 
 	int m_currentItemIndex;
 	QStringList m_tmpPathList;

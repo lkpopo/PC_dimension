@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ScenarioItemWidgetClass</class>
+ <widget class="QWidget" name="ScenarioItemWidgetClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>638</width>
+    <height>71</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>45</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>ScenarioItemWidget</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* 1. 整个条目的容器背景 */
+QWidget#ScenarioItemWidgetClass {
+    background-color: #ffffff; /* 改回纯白，悬停时再变色更显眼 */
+    border: 1px solid #f0f0f0;
+}
+
+/* 2. 悬停状态 (Hover) */
+QWidget#ScenarioItemWidgetClass:hover {
+    background-color: #f5f7fa; /* 建议使用淡蓝灰色，比黄色更专业 */
+}
+
+/* 3. 选中状态 (Selected) 
+   注意：这需要你在代码中当 item 被选中时，给 widget 设置 setProperty(&quot;selected&quot;, true)
+   或者如果是通过 QListWidget 样式控制，可以写成如下：
+*/
+QWidget#ScenarioItemWidgetClass[selected=&quot;true&quot;] {
+    background-color: #ecf5ff;      /* 选中的淡蓝色背景 */
+    border: 4px solid #409eff; /* 左侧蓝色指示条 */
+}
+
+/* 2. 内部控件通用限制：确保所有元素在垂直方向的逻辑高度一致 */
+#ScenarioItemWidgetClass QLabel, 
+#ScenarioItemWidgetClass QPushButton {
+    /* 容器36px，控件24px，剩余12px将由布局自动平分为上下各6px的边距 */
+    margin: 0px; 
+    padding: 0px 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: &quot;Segoe UI&quot;, &quot;Microsoft YaHei&quot;;
+    border: 1px solid transparent;
+}
+
+/* 3. 文件名文本 */
+QLabel#lblText {
+    color: #333333;
+    font-weight: 500;
+}
+QLabel#lblIndex {
+    color: #909399;
+    background-color: #f0f2f5;
+    border-radius: 9px;
+    alignment: center;
+    font-size: 10px;
+}
+
+/* 4. [添加/进入] 按钮 - Checkable 风格 */
+QPushButton#btnIn {
+    color: #52c41a;
+    background-color: #f6ffed;
+    border-color: #b7eb8f;
+}
+
+
+/* 5. [删除/离开] 按钮 - Checkable 风格 */
+QPushButton#btnOut {
+    color: #ff4d4f;
+    background-color: #fff1f0;
+    border-color: #ffa39e;
+}
+
+/* 6. [演示] 按钮 */
+QPushButton#btnPlay {
+    color: #1890ff;
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+}
+
+/* 7. [彻底删除条目] 按钮 */
+QPushButton#btnDel {
+    color: #bfbfbf;
+    background-color: transparent;
+    border: none;
+    font-size: 14px;
+}
+QPushButton#btnDel:hover {
+    color: #ff4d4f;
+    background-color: #fff1f0;
+}
+
+/* 禁用状态 */
+QPushButton:disabled {
+    background-color: #f5f5f5;
+    color: #d9d9d9;
+    border-color: #d9d9d9;
+}</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QLabel" name="lblIndex">
+     <property name="text">
+      <string>1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lblText">
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnIn">
+     <property name="text">
+      <string>进入</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnOut">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>离开</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnPlay">
+     <property name="text">
+      <string>演示</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnDel">
+     <property name="text">
+      <string>删除</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

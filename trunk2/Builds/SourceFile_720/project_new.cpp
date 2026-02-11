@@ -17,6 +17,7 @@ project_new::project_new(QWidget *parent)
 	setAttribute(Qt::WA_QuitOnClose, true);
 
 	m_msgBox = nullptr;
+	m_draw = "";
 
 	QScreen* screen = QGuiApplication::primaryScreen();
 	QRect screenRect = screen->geometry();
@@ -40,8 +41,8 @@ project_new::project_new(QWidget *parent)
 
 	ui.groupBox_topright->move(scrWidth - 10 - 300, 70);
 
-	ui.groupBox_right->setGeometry(scrWidth - 10 - 300, 160, 300, 721);
-	ui.label_right_bg->setGeometry(0, 0, 300, 721);
+	ui.groupBox_right->setGeometry(scrWidth - 10 - 300, 160, 300, 870);
+	ui.label_right_bg->setGeometry(0, 0, 300, 870);
 
 	ui.listWidget->setViewMode(QListView::IconMode);
 	ui.listWidget->setSpacing(11);
@@ -74,6 +75,8 @@ project_new::project_new(QWidget *parent)
 	connect(ui.textEdit_tilte, SIGNAL(textChanged()), this, SLOT(slotEditTitleCount()));  //标题字数统计
 	connect(ui.textEdit_introduction, SIGNAL(textChanged()), this, SLOT(slotEditIntCount())); //简介字数统计
 	connect(ui.textEdit_keyword, SIGNAL(textChanged()), this, SLOT(slotEditKeyCount())); //关键词字数统计
+
+	connect(ui.pushButton_draw, SIGNAL(clicked()), this, SLOT(slotDraw()));
 
 	ui.pushButton_close->setStyleSheet(QString("QPushButton{border-image:url(%1/Resource/common/close.png)};").arg(QApplication::applicationDirPath()));
 
@@ -309,6 +312,7 @@ void project_new::slotCreate()
 	QString dirName_hp = dirName + "/HotPoints";
 	QString dirName_pic_thumb = dirName + "/Pictures_Thumb";
 	QString dirName_pic_thumb_tmp = dirName + "/Pictures_Thumb_tmp";
+	QString dirName_Engineering_Drawings = dirName + "/Engineering_Drawings";
 	QDir dir(dirName);
 	if (!dir.exists())
 	{
@@ -333,6 +337,17 @@ void project_new::slotCreate()
 	if (!dir4.exists())
 	{
 		dir4.mkdir(dirName_pic_thumb_tmp);
+	}
+	QDir dir5(dirName_Engineering_Drawings);
+	if (!dir5.exists())
+	{
+		dir5.mkdir(dirName_Engineering_Drawings);
+	}
+	//复制施工图
+	if (m_draw != "")
+	{
+		QString newPicPath = dirName + "/Engineering_Drawings/Engineering_Drawings.jpg";
+		CopyFile(m_draw, newPicPath, true);
 	}
 	//插入数据库
 	QString lineName = ui.textEdit_lineName->toPlainText();
@@ -480,7 +495,15 @@ void project_new::slotEditKeyCount()
 	ui.label_KeyCount->setText(QString::number(len) + "/64");
 }
 
-
+void project_new::slotDraw()
+{
+	QString filePath = QFileDialog::getOpenFileName(this, tr(u8"选择图片"), tr(""), tr(u8"图片文件(*.jpg *.jpeg *.png);所有文件（*.*);"));
+	if (filePath == "") return;
+	m_draw = filePath;
+	QPixmap pixmap(filePath);
+	QPixmap fitpixmap = pixmap.scaled(256, 91, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	ui.label_draw->setPixmap(fitpixmap);
+}
 
 void project_new::slotSelChanged(int index)
 {

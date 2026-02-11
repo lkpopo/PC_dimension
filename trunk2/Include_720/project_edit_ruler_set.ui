@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>project_edit_ruler_setClass</class>
+ <widget class="QWidget" name="project_edit_ruler_setClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>246</width>
+    <height>1024</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>project_edit_ruler_set</string>
+  </property>
+  <widget class="QPushButton" name="pushButton_close">
+   <property name="geometry">
+    <rect>
+     <x>205</x>
+     <y>0</y>
+     <width>32</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgba(255, 255, 255,0);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_tilte">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>325</y>
+     <width>211</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string/>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);
+color: rgb(255, 255, 255);
+border:0px;</string>
+   </property>
+   <property name="placeholderText">
+    <string>请输入热点标题</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_bg">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>250</width>
+     <height>1021</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_done">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>980</y>
+     <width>231</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 85, 255);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string>保存设置</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>0</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;
+background-color: rgba(255, 255, 255,0);</string>
+   </property>
+   <property name="text">
+    <string>添加标尺</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_ruler_name">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>211</width>
+     <height>64</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(26, 26, 26);
+border-radius:5px;
+color: rgb(255, 255, 255);
+</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>230</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>标尺文字</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>170</y>
+     <width>230</width>
+     <height>461</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>170</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>文字样式</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_5">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>200</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>字体样式</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_font_style">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>230</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 85, 255);
+color: rgb(255, 255, 255);
+font: 10pt &quot;微软雅黑&quot;;
+border-width:0;
+border-style:outset;
+QComboBox::item:hover{background-color:rgba(34,64,96,220)};
+QComboBox::item:selected{background-color:rgba(34,64,96,220)};</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_font_size">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>290</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 85, 255);
+color: rgb(255, 255, 255);
+font: 10pt &quot;微软雅黑&quot;;
+border-width:0;
+border-style:outset;
+QComboBox::item:hover{background-color:rgba(34,64,96,220)};
+QComboBox::item:selected{background-color:rgba(34,64,96,220)};</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_6">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>260</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>字号</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_7">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>320</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>字体颜色</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_text_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>350</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_bg_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>410</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_8">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>380</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>背景颜色</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_9">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>440</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>文字位置</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_text_pos">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>470</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 85, 255);
+color: rgb(255, 255, 255);
+font: 10pt &quot;微软雅黑&quot;;
+border-width:0;
+border-style:outset;
+QComboBox::item:hover{background-color:rgba(34,64,96,220)};
+QComboBox::item:selected{background-color:rgba(34,64,96,220)};</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_text_isFollowSysZoom">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>510</y>
+     <width>191</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>跟随画面同步缩放</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_text_isCustomAngle">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>550</y>
+     <width>191</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>自定义设置文字角度</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="horizontalSlider_text_angle">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>590</y>
+     <width>201</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_frontCover_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>640</y>
+     <width>230</width>
+     <height>281</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(40, 40, 40);
+border-radius:5px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_10">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>670</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>线段粗细</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_11">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>640</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>线段样式</string>
+   </property>
+  </widget>
+  <widget class="QSlider" name="horizontalSlider_line_thick">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>710</y>
+     <width>201</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_line_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>760</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_12">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>730</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>线段颜色</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_13">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>790</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>线段端点</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_endpoint_style">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>820</y>
+     <width>211</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(0, 85, 255);
+color: rgb(255, 255, 255);
+font: 10pt &quot;微软雅黑&quot;;
+border-width:0;
+border-style:outset;
+QComboBox::item:hover{background-color:rgba(34,64,96,220)};
+QComboBox::item:selected{background-color:rgba(34,64,96,220)};</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_title_14">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>850</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>端点颜色</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_endpoint_color">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>880</y>
+     <width>211</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>textEdit_tilte</zorder>
+  <zorder>label_bg</zorder>
+  <zorder>pushButton_done</zorder>
+  <zorder>label_title_2</zorder>
+  <zorder>pushButton_close</zorder>
+  <zorder>label_frontCover_2</zorder>
+  <zorder>label_title_3</zorder>
+  <zorder>textEdit_ruler_name</zorder>
+  <zorder>label_frontCover_3</zorder>
+  <zorder>label_title_4</zorder>
+  <zorder>label_title_5</zorder>
+  <zorder>comboBox_font_style</zorder>
+  <zorder>comboBox_font_size</zorder>
+  <zorder>label_title_6</zorder>
+  <zorder>label_title_7</zorder>
+  <zorder>pushButton_text_color</zorder>
+  <zorder>pushButton_bg_color</zorder>
+  <zorder>label_title_8</zorder>
+  <zorder>label_title_9</zorder>
+  <zorder>comboBox_text_pos</zorder>
+  <zorder>radioButton_text_isFollowSysZoom</zorder>
+  <zorder>radioButton_text_isCustomAngle</zorder>
+  <zorder>horizontalSlider_text_angle</zorder>
+  <zorder>label_frontCover_4</zorder>
+  <zorder>label_title_10</zorder>
+  <zorder>label_title_11</zorder>
+  <zorder>horizontalSlider_line_thick</zorder>
+  <zorder>pushButton_line_color</zorder>
+  <zorder>label_title_12</zorder>
+  <zorder>label_title_13</zorder>
+  <zorder>comboBox_endpoint_style</zorder>
+  <zorder>label_title_14</zorder>
+  <zorder>pushButton_endpoint_color</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
