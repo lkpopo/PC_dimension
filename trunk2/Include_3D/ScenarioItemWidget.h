@@ -11,7 +11,7 @@ class ScenarioItemWidget : public QWidget {
   Q_OBJECT
 
  public:
-  enum Mode { MODE_IN, MODE_OUT, PLAY };
+  enum Mode { MODE_IN, MODE_OUT, PLAY, MODE_HISTORY };
 
   ScenarioItemWidget(int index, QString name, Mode mode, QWidget *parent = nullptr);
   ~ScenarioItemWidget();

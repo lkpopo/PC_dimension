@@ -1,5 +1,7 @@
 ﻿#include "InteractionManager.h"
 
+#include <QDateTime>
+
 InteractionManager::InteractionManager(osgViewer::Viewer* viewer,
                                        osg::Group* dataGroup,
                                        osg::Group* interactionGroup,
@@ -9,40 +11,20 @@ InteractionManager::InteractionManager(osgViewer::Viewer* viewer,
   if (interactionGroup) {
     interactionGroup->addChild(m_tempGroup);
   }
+  osg::StateSet* ss = dataGroup->getOrCreateStateSet();
+
+  // 1. 强行关闭颜色追踪材质。这是防止模型被“染色”最有效的方法。
+  // 它告诉模型：只准用你自己的 Material 属性，不准用 OpenGL 全局色。
+  ss->setMode(GL_COLOR_MATERIAL,
+              osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+
   initMeasureGeometry();
   initClipGeometry();
   setupClipShader(dataGroup);
 }
 
-void InteractionManager::setMode(InterMode mode) {
-  m_currentMode = mode;
-  clearAll();
-  if (mode == InterMode::VIEW) {
-    m_tempGroup->setNodeMask(0);  // 关键：0 表示彻底不渲染，不论坐标在哪
-  } else {
-    m_tempGroup->setNodeMask(0xffffffff);  // 恢复渲染
-  }
-}
-
-void InteractionManager::clearAll() {
-  if (m_distanceText) m_distanceText->setText("");
-
-  if (!m_lineCoords->empty()) {
-    m_lineCoords->clear();
-    refreshGeometry(m_lineGeom.get());
-  }
-  m_isFirstClick = true;
-
-  if (!m_clipCoords->empty()) {
-    m_clipCoords->clear();
-    refreshGeometry(m_clipGeom.get());
-  }
-  m_isClipFinished = false;
-}
-
 bool InteractionManager::handle(const osgGA::GUIEventAdapter& ea,
                                 osgGA::GUIActionAdapter& aa) {
-
   if (m_currentMode == InterMode::VIEW) {
     if (ea.getEventType() == osgGA::GUIEventAdapter::RELEASE &&
         ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) {
@@ -74,9 +56,168 @@ bool InteractionManager::handle(const osgGA::GUIEventAdapter& ea,
       return handleMeasure(ea, aa);
     case InterMode::CLIP:
       return handleClip(ea, aa);
+    case InterMode::LINE_WIRE:
+      return handleLineWire(ea, aa);
     default:
       return false;
   }
+}
+
+// 具体实现
+bool InteractionManager::handleLineWire(const osgGA::GUIEventAdapter& ea,
+                                        osgGA::GUIActionAdapter& aa) {
+  if (ea.getEventType() == osgGA::GUIEventAdapter::MOVE && !m_isFirstClick) {
+    osg::Vec3d hitPos;
+    // if (pick(ea.getX(), ea.getY(), hitPos)) {
+    //   // 这里可以复用测量线做预览，或者实时生成弧线预览
+    //   updateMeasureLine(m_startPoint, hitPos);
+    // }
+  }
+
+  if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
+      ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) {
+    osg::Vec3d hitPos;
+    if (pick(ea.getX(), ea.getY(), hitPos)) {
+      if (m_isFirstClick) {
+        m_startPoint = hitPos;
+        m_isFirstClick = false;
+      } else {
+        osg::Node* wireNode = createSagLine(m_startPoint, hitPos);
+
+        static int wireIndex = 1;
+        // 发出信号给 OSGEarthApp
+        QString wireId = QString("Line_%1.line").arg(wireIndex++);
+        emit wireCreated(wireId, wireNode);
+
+        m_isFirstClick = true;
+        clearAll();
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+// 创建悬垂导线
+osg::Node* InteractionManager::createSagLine(const osg::Vec3d& start,
+                                             const osg::Vec3d& end) {
+  osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+  osg::ref_ptr<osg::Geometry> geom = new osg::Geometry();
+  osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array();
+
+  // 直接给两个点即可
+  vertices->push_back(start);
+  vertices->push_back(end);
+
+  geom->setVertexArray(vertices);
+
+  // 设置红色
+  osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
+  colors->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  geom->setColorArray(colors, osg::Array::BIND_OVERALL);
+
+  geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, 2));
+
+  geode->setUserValue("start_x", start.x());
+  geode->setUserValue("start_y", start.y());
+  geode->setUserValue("start_z", start.z());
+  geode->setUserValue("end_x", end.x());
+  geode->setUserValue("end_y", end.y());
+  geode->setUserValue("end_z", end.z());
+
+  osg::StateSet* ss = geode->getOrCreateStateSet();
+  ss->setAttributeAndModes(new osg::LineWidth(3.0f), osg::StateAttribute::ON);
+  ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+  geode->addDrawable(geom);
+  return geode.release();
+}
+
+// 处理测量
+bool InteractionManager::handleMeasure(const osgGA::GUIEventAdapter& ea,
+                                       osgGA::GUIActionAdapter& aa) {
+  if (ea.getEventType() == osgGA::GUIEventAdapter::MOVE) {
+    if (!m_isFirstClick) {
+      osg::Vec3d hitPos;
+      if (pick(ea.getX(), ea.getY(), hitPos)) {
+        m_currentMousePoint = hitPos;
+        updateMeasureLine(m_startPoint, m_currentMousePoint);
+        double dist = (m_currentMousePoint - m_startPoint).length();
+        updateText(m_currentMousePoint, dist);
+      }
+    }
+  }
+
+  // 仅响应鼠标左键按下
+  if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
+      ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) {
+    osg::Vec3d hitPos;
+    if (pick(ea.getX(), ea.getY(), hitPos)) {
+      if (m_isFirstClick) {
+        clearAll();
+        m_startPoint = hitPos;
+        m_isFirstClick = false;
+      } else {
+        updateMeasureLine(m_startPoint, hitPos);
+        m_isFirstClick = true;  // 测完一次重置
+      }
+      return true;
+    }
+  }
+}
+
+// 处理裁剪
+bool InteractionManager::handleClip(const osgGA::GUIEventAdapter& ea,
+                                    osgGA::GUIActionAdapter& aa) {
+  float x = ea.getX();
+  float y = ea.getY();
+
+  // --- 1. 鼠标移动：更新橡皮筋 ---
+  if (ea.getEventType() == osgGA::GUIEventAdapter::MOVE) {
+    if (m_clipCoords->size() >= 2 && !m_isClipFinished) {
+      osg::Vec3d hitPos;
+      if (pick(x, y, hitPos)) {
+        m_clipCoords->back() = hitPos;
+        refreshGeometry(m_clipGeom.get());
+      }
+    }
+    return false;
+  }
+
+  // --- 2. 鼠标左键：固定顶点 ---
+  if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
+      ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) {
+    osg::Vec3d hitPos;
+    if (pick(x, y, hitPos)) {
+      if (m_isClipFinished) {
+        m_clipCoords->clear();
+        m_isClipFinished = false;
+      }
+
+      if (m_clipCoords->empty()) {
+        // 第一次点击：放两个点（一个固定起点，一个跟随鼠标的终点）
+        m_clipCoords->push_back(hitPos);
+        m_clipCoords->push_back(hitPos);
+      } else {
+        m_clipCoords->push_back(hitPos);
+      }
+      refreshGeometry(m_clipGeom.get());
+      return true;
+    }
+  }
+
+  // --- 3. 鼠标右键：闭合区域 ---
+  if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
+      ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) {
+    if (m_clipCoords->size() > 2 && !m_isClipFinished) {
+      m_clipCoords->pop_back();  // 移除最后那个跟随鼠标的临时点
+      m_isClipFinished = true;
+      refreshGeometry(m_clipGeom.get());
+    }
+    return true;
+  }
+
+  return false;
 }
 
 bool InteractionManager::pick(float x, float y, osg::Vec3d& out_pos) {
@@ -108,6 +249,34 @@ bool InteractionManager::pick(float x, float y, osg::Vec3d& out_pos) {
   return false;
 }
 
+void InteractionManager::setMode(InterMode mode) {
+  m_currentMode = mode;
+  clearAll();
+
+  if (mode == InterMode::VIEW) {
+    m_tempGroup->setNodeMask(0);  // 关键：0 表示彻底不渲染，不论坐标在哪
+  } else {
+    m_tempGroup->setNodeMask(0xffffffff);  // 恢复渲染
+  }
+}
+
+void InteractionManager::clearAll() {
+  if (m_distanceText) m_distanceText->setText("");
+
+  if (!m_lineCoords->empty()) {
+    m_lineCoords->clear();
+    refreshGeometry(m_lineGeom.get());
+  }
+  m_isFirstClick = true;
+
+  if (!m_clipCoords->empty()) {
+    m_clipCoords->clear();
+    refreshGeometry(m_clipGeom.get());
+  }
+  m_isClipFinished = false;
+}
+
+// 更新测距线的顶点数据并刷新几何体显示
 void InteractionManager::updateMeasureLine(const osg::Vec3d& start,
                                            const osg::Vec3d& end) {
   if (m_lineCoords->size() < 2) {
@@ -119,6 +288,7 @@ void InteractionManager::updateMeasureLine(const osg::Vec3d& start,
   refreshGeometry(m_lineGeom.get());
 }
 
+// 更新测距文本内容和位置
 void InteractionManager::updateText(const osg::Vec3d& pos, double distance) {
   if (!m_distanceText || !m_textAT.valid()) return;
 
@@ -129,6 +299,7 @@ void InteractionManager::updateText(const osg::Vec3d& pos, double distance) {
   m_textAT->setPosition(pos);
 }
 
+// 初始化裁剪相关的几何体和状态设置
 void InteractionManager::initClipGeometry() {
   m_clipGeom = new osg::Geometry();
   m_clipCoords = new osg::Vec3Array();
@@ -152,6 +323,7 @@ void InteractionManager::initClipGeometry() {
   m_tempGroup->addChild(m_clipGeode);
 }
 
+// 初始化测距相关的几何体和文本显示
 void InteractionManager::initMeasureGeometry() {
   osg::Vec4Array* colors = new osg::Vec4Array();
   colors->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -215,91 +387,7 @@ void InteractionManager::initMeasureGeometry() {
   m_tempGroup->addChild(m_textAT);
 }
 
-bool InteractionManager::handleMeasure(const osgGA::GUIEventAdapter& ea,
-                                       osgGA::GUIActionAdapter& aa) {
-  if (ea.getEventType() == osgGA::GUIEventAdapter::MOVE) {
-    if (!m_isFirstClick) {
-      osg::Vec3d hitPos;
-      if (pick(ea.getX(), ea.getY(), hitPos)) {
-        m_currentMousePoint = hitPos;
-        updateMeasureLine(m_startPoint, m_currentMousePoint);
-        double dist = (m_currentMousePoint - m_startPoint).length();
-        updateText(m_currentMousePoint, dist);
-      }
-    }
-  }
-
-  // 仅响应鼠标左键按下
-  if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
-      ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) {
-    osg::Vec3d hitPos;
-    if (pick(ea.getX(), ea.getY(), hitPos)) {
-      if (m_isFirstClick) {
-        clearAll();
-        m_startPoint = hitPos;
-        m_isFirstClick = false;
-      } else {
-        updateMeasureLine(m_startPoint, hitPos);
-        m_isFirstClick = true;  // 测完一次重置
-      }
-      return true;
-    }
-  }
-}
-
-bool InteractionManager::handleClip(const osgGA::GUIEventAdapter& ea,
-                                    osgGA::GUIActionAdapter& aa) {
-  float x = ea.getX();
-  float y = ea.getY();
-
-  // --- 1. 鼠标移动：更新橡皮筋 ---
-  if (ea.getEventType() == osgGA::GUIEventAdapter::MOVE) {
-    if (m_clipCoords->size() >= 2 && !m_isClipFinished) {
-      osg::Vec3d hitPos;
-      if (pick(x, y, hitPos)) {
-        m_clipCoords->back() = hitPos;
-        refreshGeometry(m_clipGeom.get());
-      }
-    }
-    return false;
-  }
-
-  // --- 2. 鼠标左键：固定顶点 ---
-  if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
-      ea.getButton() == osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) {
-    osg::Vec3d hitPos;
-    if (pick(x, y, hitPos)) {
-      if (m_isClipFinished) {
-        m_clipCoords->clear();
-        m_isClipFinished = false;
-      }
-
-      if (m_clipCoords->empty()) {
-        // 第一次点击：放两个点（一个固定起点，一个跟随鼠标的终点）
-        m_clipCoords->push_back(hitPos);
-        m_clipCoords->push_back(hitPos);
-      } else {
-        m_clipCoords->push_back(hitPos);
-      }
-      refreshGeometry(m_clipGeom.get());
-      return true;
-    }
-  }
-
-  // --- 3. 鼠标右键：闭合区域 ---
-  if (ea.getEventType() == osgGA::GUIEventAdapter::PUSH &&
-      ea.getButton() == osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) {
-    if (m_clipCoords->size() > 2 && !m_isClipFinished) {
-      m_clipCoords->pop_back();  // 移除最后那个跟随鼠标的临时点
-      m_isClipFinished = true;
-      refreshGeometry(m_clipGeom.get());
-    }
-    return true;
-  }
-
-  return false;
-}
-
+// 刷新几何体顶点数据并更新相关状态
 void InteractionManager::refreshGeometry(osg::Geometry* geom) {
   if (!geom) return;
 
@@ -318,6 +406,7 @@ void InteractionManager::refreshGeometry(osg::Geometry* geom) {
   geom->dirtyDisplayList();  // 刷新显存缓冲区
 }
 
+// 设置裁剪着色器，注入裁剪多边形数据的 Uniform
 void InteractionManager::setupClipShader(osg::Group* dataGroup) {
   osg::StateSet* ss = dataGroup->getOrCreateStateSet();
 
@@ -329,23 +418,25 @@ void InteractionManager::setupClipShader(osg::Group* dataGroup) {
       "varying vec4 v_clipPos;\n"
       "uniform mat4 u_clipMVP;\n"
       "void main() {\n"
-      "    // 计算当前顶点在裁剪那一刻的投影坐标\n"
       "    v_clipPos = u_clipMVP * gl_Vertex;\n"
-      "    \n"
-      "    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-      "    gl_FrontColor = gl_Color;\n"
-      "    gl_PointSize = 2.0;\n"
+      "    gl_Position = ftransform(); // 使用标准变换，保持兼容性\n"
+      "    gl_TexCoord[0] = gl_MultiTexCoord0; // 传递纹理坐标\n"
+      "    gl_FrontColor = gl_Color; // 默认颜色\n"
       "}\n";
 
   // 片元着色器：基于屏幕多边形进行丢弃判定
   const char* fragSource =
       "#version 120\n"
       "varying vec4 v_clipPos;\n"
+      "uniform sampler2D u_tex; // 增加纹理槽\n"
       "uniform float u_polyX[64];\n"
       "uniform float u_polyY[64];\n"
       "uniform int u_polySize;\n"
       "uniform int u_clipMode;\n"  // 0:正常, 1:裁掉内部, 2:裁掉外部
-      "void main() {\n"
+      "void main() {"
+      "    vec4 texColor = texture2D(u_tex, gl_TexCoord[0].st);\n"
+      "    vec4 finalColor = texColor * gl_Color;\n"
+      "    \n"
       "    if (u_clipMode == 0 || u_polySize < 3) {\n"
       "        gl_FragColor = gl_Color;\n"
       "        return;\n"
@@ -376,7 +467,7 @@ void InteractionManager::setupClipShader(osg::Group* dataGroup) {
       "    if (u_clipMode == 1 && inside) discard;\n"
       "    if (u_clipMode == 2 && !inside) discard;\n"
       "    \n"
-      "    gl_FragColor = gl_Color;\n"
+      "    gl_FragColor = finalColor;\n"
       "}\n";
 
   program->addShader(new osg::Shader(osg::Shader::VERTEX, vertSource));
@@ -388,6 +479,7 @@ void InteractionManager::setupClipShader(osg::Group* dataGroup) {
   ss->getOrCreateUniform("u_polySize", osg::Uniform::INT)->set(0);
 }
 
+// 更新裁剪相关的 Uniform 数据：MVP 矩阵和多边形顶点坐标
 void InteractionManager::updateClipUniforms(osg::Group* dataGroup, int mode) {
   if (m_clipCoords->empty()) return;
 

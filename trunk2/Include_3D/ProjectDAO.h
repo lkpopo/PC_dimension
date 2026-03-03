@@ -13,6 +13,12 @@ struct AssetRecord {
   double lon = 0.0;
   double lat = 0.0;
   double alt = 0.0;
+  double start_x = 0.0;
+  double start_y = 0.0;
+  double start_z = 0.0;
+  double end_x = 0.0;
+  double end_y = 0.0;
+  double end_z = 0.0;
 };
 
 // 项目主信息结构

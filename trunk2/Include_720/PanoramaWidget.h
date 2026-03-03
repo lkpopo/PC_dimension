@@ -56,6 +56,7 @@ struct Hotspot
     QString style;          //类型
     float scale_x;           // 热点缩放比例 X
     float scale_y;           // 热点缩放比例 Y
+    float rotation_angle = 0.0f;           // 热点旋转角度
     
     bool lock = false;
 
@@ -315,6 +316,7 @@ private:
         m_cutHotPoint.style = "normal;";
         m_cutHotPoint.scale_x = 0.0;
         m_cutHotPoint.scale_y = 0.0;
+        m_cutHotPoint.rotation_angle = 0.0;
         m_cutHotPoint.lock = false;
         m_cutHotPoint.icon_visible = true;
         m_cutHotPoint.title_visible = true;
@@ -345,6 +347,7 @@ private:
         dst.style = src.style;
         dst.scale_x = src.scale_x;
         dst.scale_y = src.scale_y;  
+        dst.rotation_angle = src.rotation_angle;
         dst.lock = src.lock;
         dst.icon_visible = src.icon_visible;
         dst.title_visible = src.title_visible;
@@ -550,6 +553,11 @@ public:
     void setScale_Y(float scale_y) //设置图标缩放Y
     {
         m_cutHotPoint.scale_y = scale_y;
+        update();
+    };
+    void setRotation_Angle(float angle) //设置图标旋转角度
+    {
+        m_cutHotPoint.rotation_angle = angle;
         update();
     };
     void setIconName(QString text) //设置图标文本

@@ -60,9 +60,36 @@ void ManipulatorHelper::attach(osg::MatrixTransform* target) {
 }
 
 void ManipulatorHelper::detach() {
-  if (_mainDragger.valid() && _mainDragger->getParent(0)) {
-    _mainDragger->getParent(0)->removeChild(_mainDragger.get());
+  // 1. 彻底移除旧的 XYZ 轴 (这是消失的关键)
+  if (_activeDraggerGroup.valid()) {
+    // 遍历所有父节点并移除自己
+    osg::Node::ParentList parents = _activeDraggerGroup->getParents();
+    for (osg::Group* parent : parents) {
+      parent->removeChild(_activeDraggerGroup.get());
+    }
+    _activeDraggerGroup = nullptr;  // 释放引用
   }
-  // 注意：实际项目中这里需要处理 Selection 的节点还原逻辑，即把 target
-  // 重新挂回原父节点
+
+  // 2. 还原模型层级 (防止模型留在 Selection 节点里)
+  if (_selection.valid() && _selection->getNumChildren() > 0) {
+    osg::ref_ptr<osg::Node> target = _selection->getChild(0);
+    osg::Group* selectionParent = _selection->getParent(0);
+
+    if (selectionParent && target) {
+      // 获取 Selection 的当前矩阵，补偿给模型 (防止跳回原位)
+      osg::MatrixTransform* mt =
+          dynamic_cast<osg::MatrixTransform*>(target.get());
+      if (mt) {
+        mt->setMatrix(mt->getMatrix() * _selection->getMatrix());
+      }
+
+      // 物理还原子节点
+      selectionParent->replaceChild(_selection.get(), target.get());
+    }
+    _selection->removeChild(target.get());
+  }
+
+  // 3. 彻底重置管理器 (断开信号槽连接)
+  _manager = new osgManipulator::CommandManager();
+  _selection = new osgManipulator::Selection();
 }

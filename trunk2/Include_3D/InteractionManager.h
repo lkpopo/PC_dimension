@@ -13,6 +13,7 @@
 #include <osgText/Text>
 #include <osgUtil/LineSegmentIntersector>
 #include <osgViewer/Viewer>
+#include <osg/ValueObject>  // 必须包含这个头文件
 
 #include "utils.h"
 
@@ -20,7 +21,8 @@
 enum class InterMode {
   VIEW,     // 普通查看模式
   MEASURE,  // 测距模式
-  CLIP      // 剖切模式
+  CLIP,     // 剖切模式
+  LINE_WIRE
 };
 
 class InteractionManager : public QObject, public osgGA::GUIEventHandler {
@@ -43,12 +45,17 @@ class InteractionManager : public QObject, public osgGA::GUIEventHandler {
 
  signals:
   void requestContextMenu(osg::Vec3d worldPos);
+  void wireCreated(QString wireId, osg::Node* wireNode);
 
  private:
   bool handleMeasure(const osgGA::GUIEventAdapter& ea,
                      osgGA::GUIActionAdapter& aa);
   bool handleClip(const osgGA::GUIEventAdapter& ea,
                   osgGA::GUIActionAdapter& aa);
+  bool handleLineWire(const osgGA::GUIEventAdapter& ea,
+                      osgGA::GUIActionAdapter& aa);
+  osg::Node* createSagLine(const osg::Vec3d& start, const osg::Vec3d& end);
+
   void refreshGeometry(osg::Geometry* geom);
 
   bool pick(float x, float y, osg::Vec3d& out_pos);

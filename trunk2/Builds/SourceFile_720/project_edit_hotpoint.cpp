@@ -296,6 +296,7 @@ void project_edit_hotpoint::slotAddHotPoint()
 	connect(m_hpSet, SIGNAL(sig_updateIconSet(QString)), this, SIGNAL(sig_updateIcon(QString)));
 	connect(m_hpSet, SIGNAL(sig_setScaleX(float)), this, SIGNAL(sig_scale_x(float)));
 	connect(m_hpSet, SIGNAL(sig_setScaleY(float)), this, SIGNAL(sig_scale_y(float)));
+	connect(m_hpSet, SIGNAL(sig_setRotation_angle(float)), this, SIGNAL(sig_rotation_angle(float)));
 	connect(m_hpSet, SIGNAL(sig_setIconName(QString)), this, SIGNAL(sig_name(QString)));
 	connect(m_hpSet, SIGNAL(sig_IconNameShow(bool)), this, SIGNAL(sig_name_show(bool)));
 	connect(m_hpSet, SIGNAL(sig_AddIconEnd()), this, SIGNAL(sig_add_icon_end()));
@@ -431,6 +432,7 @@ void project_edit_hotpoint::slot_edit_icon(QString iconID)
 	connect(m_hpSet, SIGNAL(sig_updateIconSet(QString)), this, SIGNAL(sig_updateIcon(QString)));
 	connect(m_hpSet, SIGNAL(sig_setScaleX(float)), this, SIGNAL(sig_scale_x(float)));
 	connect(m_hpSet, SIGNAL(sig_setScaleY(float)), this, SIGNAL(sig_scale_y(float)));
+	connect(m_hpSet, SIGNAL(sig_setRotation_angle(float)), this, SIGNAL(sig_rotation_angle(float)));
 	connect(m_hpSet, SIGNAL(sig_setIconName(QString)), this, SIGNAL(sig_name(QString)));
 	connect(m_hpSet, SIGNAL(sig_IconNameShow(bool)), this, SIGNAL(sig_name_show(bool)));
 	connect(m_hpSet, SIGNAL(sig_AddIconEnd()), this, SIGNAL(sig_add_icon_end()));

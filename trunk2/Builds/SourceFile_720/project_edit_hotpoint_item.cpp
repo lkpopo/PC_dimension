@@ -16,7 +16,7 @@ project_edit_hotpoint_item::project_edit_hotpoint_item(Hotspot& hp, QWidget *par
 	m_iconUUID = hp.iconID;
 	m_iconPath = hp.iconPath;
 
-	if (hp.style == "nornmal;")
+	if (hp.style == "normal;")
 		ui.pushButton_changPic->setText(u8"一般热点");
 	else if (hp.style.contains("picText;") == true)
 		ui.pushButton_changPic->setText(u8"图文展示");
@@ -92,7 +92,7 @@ void project_edit_hotpoint_item::updateItem(Hotspot& hp)
 	QPixmap fitpixmap = pixmap.scaled(20, 20, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	ui.label_icon->setPixmap(fitpixmap);
 	ui.pushButton_title->setText(hp.name);
-	if (hp.style == "nornmal;")	
+	if (hp.style == "normal;")	
 		ui.pushButton_changPic->setText(u8"一般热点");
 	else if (hp.style == "picText;")
 		ui.pushButton_changPic->setText(u8"图文展示");

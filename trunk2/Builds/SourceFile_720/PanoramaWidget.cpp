@@ -395,6 +395,9 @@ void PanoramaWidget::randerHotspotList()
         billboardMatrix.setRow(3, QVector4D(0, 0, 0, 1));
         // 应用朝向
         tmpModel *= billboardMatrix;
+        //热点旋转
+        tmpModel.rotate(-hotspot.rotation_angle, 0, 0, 1); // 绕Z轴旋转（热点自身中心）
+        //
         // ========== 步骤4：缩放 ==========
         tmpModel.scale(hotspot.scale_x , hotspot.scale_y);
         m_hotspotProgram->setUniformValue("model", tmpModel);
@@ -507,6 +510,9 @@ void PanoramaWidget::randerHotspot_tmp()
         billboardMatrix.setRow(3, QVector4D(0, 0, 0, 1));
         // 应用朝向
         tmpModel *= billboardMatrix;
+        //热点旋转
+        tmpModel.rotate(-hotspot.rotation_angle, 0, 0, 1); // 绕Z轴旋转（热点自身中心）
+        //
         // ========== 步骤4：缩放 ==========
         tmpModel.scale(hotspot.scale_x , hotspot.scale_y);
         m_hotspotProgram->setUniformValue("model", tmpModel);
@@ -810,7 +816,8 @@ void PanoramaWidget::InsertHPToDB()
                 project_id,\
                 title_bg_color,\
                 title_text_color,\
-                title_text_size\
+                title_text_size,\
+                rotation_angle\
 			) VALUES (\
 				'%1',\
 				'%2', \
@@ -827,7 +834,8 @@ void PanoramaWidget::InsertHPToDB()
 				'%13', \
                 '%14', \
                 '%15', \
-                '%16' \
+                '%16', \
+                '%17' \
 			); ")
         .arg(m_cutHotPoint.iconID)
         .arg(m_cutHotPoint.name)
@@ -844,7 +852,8 @@ void PanoramaWidget::InsertHPToDB()
         .arg(ProjectInfo::Ins().m_projUUID)
         .arg(title_bg_color)
         .arg(title_text_color)
-        .arg(title_text_size);
+        .arg(title_text_size)
+        .arg(m_cutHotPoint.rotation_angle);
     //执行语句
     QSqlQuery query;
     if (!query.exec(sql))
@@ -882,8 +891,9 @@ void PanoramaWidget::UpdateHPToDB()
 				        isFollowSysZoom = '%10',\
                         title_bg_color = '%11',\
                         title_text_color = '%12',\
-                        title_text_size = '%13' \
-                        where id = '%14'")
+                        title_text_size = '%13', \
+                        rotation_angle = '%14' \
+                        where id = '%15'")
                         .arg(m_cutHotPoint.name)
                         .arg(m_cutHotPoint.iconPath)
                         .arg(m_cutHotPoint.style)
@@ -897,6 +907,7 @@ void PanoramaWidget::UpdateHPToDB()
                         .arg(title_bg_color)
                         .arg(title_text_color)
                         .arg(title_text_size)
+                        .arg(m_cutHotPoint.rotation_angle)
                         .arg(m_cutHotPoint.iconID);
     //执行语句
     QSqlQuery query;
@@ -1065,36 +1076,6 @@ void PanoramaWidget::setupShaders()
 {
      // 全景图着色器
     m_program = new QOpenGLShaderProgram(this);
-    //
-    //const char* panoramaVShader =
-    //    "#version 330 core\n"
-    //    "layout (location = 0) in vec3 aPos;\n"
-    //    "layout (location = 1) in vec2 aTexCoord;\n"
-    //    "out vec2 TexCoord;\n"
-    //    "uniform mat4 projection;\n"
-    //    "uniform mat4 view;\n"
-    //    "uniform mat4 model;\n"
-    //    "void main()\n"
-    //    "{\n"
-    //    "    gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
-    //    "    TexCoord = aTexCoord;\n"
-    //    "}\0";
-
-    // //片段着色器 - 支持过渡效果
-    //const char* panoramaFShader =
-    //    "#version 330 core\n"
-    //    "in vec2 TexCoord;\n"
-    //    "out vec4 FragColor;\n"
-    //    "uniform sampler2D texture1;\n"
-    //    "uniform sampler2D texture2;\n"
-    //    "uniform float transitionProgress;\n"
-    //    "void main()\n"
-    //    "{\n"
-    //    "    vec4 color1 = texture(texture1, TexCoord);\n"
-    //    "    vec4 color2 = texture(texture2, TexCoord);\n"
-    //    "    FragColor = mix(color1, color2, transitionProgress);\n"
-    //    "}\n";
-
     const char* panoramaVShader =
         "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
@@ -1258,6 +1239,7 @@ void PanoramaWidget::addHotspot(Hotspot hp)
     m_cutHotPoint.style = hp.style;
     m_cutHotPoint.scale_x = hp.scale_x;
     m_cutHotPoint.scale_y = hp.scale_y;
+    m_cutHotPoint.rotation_angle = hp.rotation_angle;
     m_cutHotPoint.lock = hp.lock;
     m_cutHotPoint.icon_visible = hp.icon_visible;
     m_cutHotPoint.title_visible = hp.title_visible;

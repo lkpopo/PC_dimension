@@ -137,11 +137,11 @@ osg::ref_ptr<osg::Object> AssetLoader::loadShp(const QString& filePath) {
 }
 
 osg::ref_ptr<osg::Object> AssetLoader::loadObj(const QString& filePath,
-                                               double lon, double lat,
-                                               double alt) {
+                                               AssetRecord* asset) {
   std::string pathStr = filePath.toLocal8Bit().constData();
   osg::ref_ptr<osg::Node> model = osgDB::readNodeFile(pathStr);
   if (!model.valid()) {
+    std::cout << "无法加载模型: " << pathStr << std::endl;
     return nullptr;
   }
   // 计算包围盒
@@ -153,28 +153,74 @@ osg::ref_ptr<osg::Object> AssetLoader::loadObj(const QString& filePath,
   // 我们需要把模型向上移动 -bb.zMin() 的距离
   float offsetZ = -bb.zMin();
 
+  m_currentTower = new Controller(model.get());
+
   // 创建地理变换节点
   osgEarth::GeoTransform* xform = new osgEarth::GeoTransform();
-  osgEarth::GeoPoint pos(m_mapNode->getMapSRS(), lon, lat, alt + offsetZ,
-                         osgEarth::ALTMODE_RELATIVE);
+  osgEarth::GeoPoint pos(m_mapNode->getMapSRS(), asset->lon, asset->lat,
+                         asset->alt + offsetZ, osgEarth::ALTMODE_RELATIVE);
   xform->setPosition(pos);
-  xform->addChild(model.get());
+  xform->addChild(m_currentTower->getAnimationNode());
   return xform;
 }
 
-osg::ref_ptr<osg::Object> AssetLoader::load(const QString& filePath, double lon,
-                                            double lat, double alt) {
+osg::ref_ptr<osg::Object> AssetLoader::loadLine(const QString& filePath,
+                                                AssetRecord* asset) {
+  if (!asset) return nullptr;
+
+  // 1. 提取坐标
+  osg::Vec3d start(asset->start_x, asset->start_y, asset->start_z);
+  osg::Vec3d end(asset->end_x, asset->end_y, asset->end_z);
+
+  // 2. 绘制直线 (这里直接实现绘线逻辑，确保不依赖 InteractionManager)
+  osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+  osg::ref_ptr<osg::Geometry> geom = new osg::Geometry();
+  osg::ref_ptr<osg::Vec3Array> vertices = new osg::Vec3Array();
+
+  vertices->push_back(start);
+  vertices->push_back(end);
+  geom->setVertexArray(vertices);
+
+  // 设置红色
+  osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
+  colors->push_back(osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  geom->setColorArray(colors, osg::Array::BIND_OVERALL);
+  geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, 2));
+
+  // 3. 重新绑定 UserValue (关键：为了下次保存时还能解析出坐标)
+  geode->setUserValue("start_x", start.x());
+  geode->setUserValue("start_y", start.y());
+  geode->setUserValue("start_z", start.z());
+  geode->setUserValue("end_x", end.x());
+  geode->setUserValue("end_y", end.y());
+  geode->setUserValue("end_z", end.z());
+
+  // 4. 设置渲染状态 (粗细、关闭光照)
+  osg::StateSet* ss = geode->getOrCreateStateSet();
+  ss->setAttributeAndModes(new osg::LineWidth(3.0f), osg::StateAttribute::ON);
+  ss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+  geode->addDrawable(geom);
+
+  // 返回时转为 osg::Object
+  return geode.release();
+}
+
+osg::ref_ptr<osg::Object> AssetLoader::load(const QString& filePath,
+                                            AssetRecord* asset) {
   QFileInfo fileInfo(filePath);
   QString suffix = fileInfo.suffix().toLower();
 
   if (suffix == "las") return loadLas(filePath);
   if (suffix == "shp") return loadShp(filePath);
-  if (suffix == "obj") return loadObj(filePath, lon, lat, alt);
+  if (suffix == "obj") return loadObj(filePath, asset);
   if (suffix == "tif") {
     return (checkTifType(filePath) == TifType::ELEVATION)
                ? loadElevation(filePath)
                : loadTif(filePath);
   }
+  if (suffix == "line") return loadLine(filePath, asset);
+
   return nullptr;
 }
 

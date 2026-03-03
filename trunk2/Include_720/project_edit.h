@@ -81,6 +81,7 @@ public slots:
 	void slotUpdateIcon(QString);//更新热点
 	void slotSetScaleX(float);//设置缩放X
 	void slotSetScaleY(float);//设置缩放Y
+	void slotSetRotation_Angle(float);//旋转角度
 	void slotSetName(QString);//设置图标名称
 	void slotNameShow(bool);//是否显示标题
 	void slotSetStyle(QString);//类型

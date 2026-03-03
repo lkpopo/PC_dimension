@@ -22,12 +22,16 @@ class SceneItemWidget : public QWidget {
  signals:
   void signalLocate(QString path);
   void signalDelete(QString path);
-  void signalSimulate(QString path);
+  void signalSimulateStarted(QString path);
+  void signalSimulateFinished(QString path);
+  void signalClassRGB(QString path);
 
  private slots:
   void on_btnLocate_clicked() { emit signalLocate(filePath); }
   void on_btnDelete_clicked() { emit signalDelete(filePath); }
-  void on_btnSimulate_clicked() { emit signalSimulate(filePath); }
+  
+  void on_btnClassRGB_clicked() { emit signalClassRGB(filePath); }
+  void on_btnSimulate_clicked();
 
  private:
   Ui::SceneItemWidgetClass ui;

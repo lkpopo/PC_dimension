@@ -958,6 +958,7 @@ void project_edit::slotHotPoint()
 	connect(m_hotpoint, SIGNAL(sig_updateIcon(QString)), this, SLOT(slotUpdateIcon(QString)));
 	connect(m_hotpoint, SIGNAL(sig_scale_x(float)), this, SLOT(slotSetScaleX(float)));
 	connect(m_hotpoint, SIGNAL(sig_scale_y(float)), this, SLOT(slotSetScaleY(float)));
+	connect(m_hotpoint, SIGNAL(sig_rotation_angle(float)), this, SLOT(slotSetRotation_Angle(float)));
 	connect(m_hotpoint, SIGNAL(sig_name(QString)), this, SLOT(slotSetName(QString)));
 	connect(m_hotpoint, SIGNAL(sig_name_show(bool)), this, SLOT(slotNameShow(bool)));
 	connect(m_hotpoint, SIGNAL(sig_add_icon_end()), this, SLOT(slotAddIconEnd()));
@@ -1403,6 +1404,11 @@ void project_edit::slotSetScaleX( float scaleX)
 void project_edit::slotSetScaleY( float scaleY)
 {
 	m_panWidget->setScale_Y(scaleY);
+}
+
+void project_edit::slotSetRotation_Angle(float angle)
+{
+	m_panWidget->setRotation_Angle(angle);
 }
 
 void project_edit::slotSetName( QString name)
@@ -1893,6 +1899,7 @@ void project_edit::LoadPic_HotPoint(const QString& picPath)
 	connect(m_hotpoint, SIGNAL(sig_updateIcon(QString)), this, SLOT(slotUpdateIcon(QString)));
 	connect(m_hotpoint, SIGNAL(sig_scale_x(float)), this, SLOT(slotSetScaleX(float)));
 	connect(m_hotpoint, SIGNAL(sig_scale_y(float)), this, SLOT(slotSetScaleY(float)));
+	connect(m_hotpoint, SIGNAL(sig_rotation_angle(float)), this, SLOT(slotSetRotation_Angle(float)));
 	connect(m_hotpoint, SIGNAL(sig_name(QString)), this, SLOT(slotSetName(QString)));
 	connect(m_hotpoint, SIGNAL(sig_name_show(bool)), this, SLOT(slotNameShow(bool)));
 	connect(m_hotpoint, SIGNAL(sig_add_icon_end()), this, SLOT(slotAddIconEnd()));
@@ -1947,6 +1954,7 @@ void project_edit::LoadPic_HotPoint(const QString& picPath)
 		hp.style = query.value(4).toString();
 		hp.scale_x = query.value(6).toFloat();
 		hp.scale_y = query.value(7).toFloat();
+		hp.rotation_angle = query.value(16).toFloat();
 		hp.lock = query.value(8).toBool();
 		hp.icon_visible = query.value(9).toBool();
 		hp.title_visible = query.value(10).toBool();

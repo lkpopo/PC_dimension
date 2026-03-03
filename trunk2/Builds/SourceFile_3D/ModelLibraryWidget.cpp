@@ -16,6 +16,7 @@ ModelLibraryWidget::ModelLibraryWidget(QWidget* parent)
                  Qt::CustomizeWindowHint);
   centerOnScreen();
 
+  m_path = u8"F:\\workspace\\PC_三维\\trunk\\测试数据\\OBJ";
   // 1. 自动执行扫描加载
   scanDirectory();
 

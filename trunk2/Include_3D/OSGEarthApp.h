@@ -7,8 +7,8 @@
 #include <QElapsedTimer>
 #include <QFuture>
 #include <QInputDialog>
-#include <QMenu>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMessageBox>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -21,8 +21,8 @@
 #include <osg/Node>
 #include <osg/PositionAttitudeTransform>
 #include <osgDB/ReadFile>
-#include <osgDB/WriteFile>
 #include <osgDB/Registry>
+#include <osgDB/WriteFile>
 #include <osgEarth/ImageLayer>
 #include <osgEarth/MapNode>
 #include <osgEarth/ModelLayer>
@@ -41,17 +41,17 @@
 #include <osgViewer/ViewerEventHandlers>
 #include <vector>
 
-#include "Controller.h"
-#include "CoordinateHandler.h"
-#include "NoticeToast.h"
-#include "ui_OSGEarthApp.h"
-#include "ManipulatorHelper.h"
 #include "AssetLoader.h"
-#include "ProjectDAO.h"
+
+#include "CoordinateHandler.h"
 #include "InteractionManager.h"
-#include "utils.h"
+#include "ManipulatorHelper.h"
 #include "ModelLibraryWidget.h"
-#include "ScenarioDirectorWidget.h"
+#include "NoticeToast.h"
+#include "ProjectDAO.h"
+#include "DirectorWidget.h"
+#include "ui_OSGEarthApp.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -94,8 +94,7 @@ class OSGEarthApp : public QWidget {
   void on_btnScenarioManager_clicked();
   void on_btn_Close_clicked();
   void on_btnSavePro_clicked();
-  void onLoadScene(QString filePath = QString(), double lon=0.0, double lat=0.0,
-                   double alt=0.0);
+  void onLoadScene(QString filePath = QString(), AssetRecord *asset=nullptr);
   void onModeButtonClicked(QAbstractButton* button);
   void on_btnInsideClip_clicked();
   void on_btnReset_clicked();
@@ -111,10 +110,13 @@ class OSGEarthApp : public QWidget {
   void initSceneManagerTree();
   void onSlotLocateFile(QString path);
   void onSlotDeleteFile(QString path);
+  void onSlotClassifyPointCloud(QString path);
   void initMembers();
   void showRightClickMenu(const osg::Vec3d worldPos);
-  
-  //void startCollapseAnimation();
+
+  void startCollapseAnimation();
+  void enterTowerEditMode(const QString& path);
+  void exitTowerEditMode(const QString& filePath);
 
  private:
   Ui::OSGEarthAppClass ui;
@@ -145,13 +147,13 @@ class OSGEarthApp : public QWidget {
   // 自定义的浮动提示通知框（Toast 效果）
   NoticeToast* m_noticeToast;
 
-  Controller* m_currentTower;
-  ManipulatorHelper* m_towerManip;
+  /*Controller* m_currentTower;*/
+  ManipulatorHelper* m_manipulatorHelper;
   AssetLoader* m_assetLoader;
   InteractionManager* m_interManager;
   QButtonGroup* m_modeButtonGroup;
   ModelLibraryWidget* m_modelLibraryWidget;
-  ScenarioDirectorWidget* m_scenarioDirectorWidget;
+  DirectorWidget* m_DirectorWidget;
 
   // OSG
   osg::ref_ptr<osgViewer::Viewer> m_viewer;
@@ -169,5 +171,4 @@ class OSGEarthApp : public QWidget {
 
   // 放置测量线条与裁剪几何的临时节点
   osg::ref_ptr<osg::Group> m_interactionGroup;
-
 };

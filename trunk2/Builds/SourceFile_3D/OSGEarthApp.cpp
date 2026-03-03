@@ -1,6 +1,7 @@
 ﻿#include "OSGEarthApp.h"
 
 #include "CustomDialog.h"
+#include "ManipulatorHelper.h"
 #include "SceneItemWidget.h"
 
 OSGEarthApp::OSGEarthApp(QWidget* parent) : QWidget(parent) {
@@ -51,7 +52,8 @@ void OSGEarthApp::initEnvironment() {
 
   m_noticeToast = new NoticeToast(this);
   m_modelLibraryWidget = new ModelLibraryWidget(this);
-  m_scenarioDirectorWidget = new ScenarioDirectorWidget(this);
+  m_DirectorWidget = new DirectorWidget(this);
+  m_manipulatorHelper = new ManipulatorHelper(m_dataGroup);
 }
 
 void OSGEarthApp::startAsyncLoad() {
@@ -150,8 +152,11 @@ void OSGEarthApp::initUIConnections() {
 
   connect(m_modelLibraryWidget, &ModelLibraryWidget::signalModelDoubleClicked,
           [=](const QString& path) {
-            onLoadScene(path, m_objCoordinate.x(), m_objCoordinate.y(),
-                        m_objCoordinate.z());
+            AssetRecord asset;
+            asset.lat = m_objCoordinate.y();
+            asset.lon = m_objCoordinate.x();
+            asset.alt = m_objCoordinate.z();
+            onLoadScene(path, &asset);
           });
 
   // 处理toolbar的按钮组
@@ -159,6 +164,7 @@ void OSGEarthApp::initUIConnections() {
   m_modeButtonGroup->setExclusive(false);
   m_modeButtonGroup->addButton(ui.btnClipMode);
   m_modeButtonGroup->addButton(ui.btnMeasure);
+  m_modeButtonGroup->addButton(ui.btnLineWire);
   connect(m_modeButtonGroup, SIGNAL(buttonClicked(QAbstractButton*)), this,
           SLOT(onModeButtonClicked(QAbstractButton*)));
 
@@ -175,11 +181,11 @@ void OSGEarthApp::initUIConnections() {
 
 /*-------------------加载场景-------------------*/
 
-void OSGEarthApp::onLoadScene(QString filePath, double lon, double lat,
-                              double alt) {
+void OSGEarthApp::onLoadScene(QString filePath, AssetRecord* asset) {
   // 如果是添加新文件，则弹出选择对话框
   if (filePath.isEmpty()) {
-    QString filter = "All Supported Files (*.las *.tif *.img *.shp *.obj);;...";
+    QString filter =
+        "All Supported Files (*.las *.tif *.img *.shp *.obj *.fbx);;...";
     filePath = QFileDialog::getOpenFileName(
         this, QStringLiteral("选择要加载的文件"), m_lastOpenPath, filter);
     if (filePath.isEmpty()) return;
@@ -193,8 +199,7 @@ void OSGEarthApp::onLoadScene(QString filePath, double lon, double lat,
 
   // 更新最后一次打开的路径
   m_lastOpenPath = QFileInfo(filePath).absolutePath();
-  osg::ref_ptr<osg::Object> loadedNode =
-      m_assetLoader->load(filePath, lon, lat, alt);
+  osg::ref_ptr<osg::Object> loadedNode = m_assetLoader->load(filePath, asset);
   if (loadedNode.valid()) {
     osg::Node* node = dynamic_cast<osg::Node*>(loadedNode.get());
     if (node) {
@@ -239,12 +244,24 @@ void OSGEarthApp::on_btnSavePro_clicked() {
     it.next();
     AssetRecord rec;
     rec.filePath = it.key();
-    if (auto xform = dynamic_cast<osgEarth::GeoTransform*>(it.value().get())) {
+
+    osg::Node* node = dynamic_cast<osg::Node*>(it.value().get());
+    double sx, sy, sz, ex, ey, ez;
+    if (it.key().endsWith(".line") && node->getUserValue("start_x", sx)) {
+      rec.start_x = sx;
+      node->getUserValue("start_y", rec.start_y);
+      node->getUserValue("start_z", rec.start_z);
+      node->getUserValue("end_x", rec.end_x);
+      node->getUserValue("end_y", rec.end_y);
+      node->getUserValue("end_z", rec.end_z);
+    } else if (auto xform =
+                   dynamic_cast<osgEarth::GeoTransform*>(it.value().get())) {
       osgEarth::GeoPoint pos = xform->getPosition();
       rec.lon = pos.x();
       rec.lat = pos.y();
       rec.alt = pos.z();
     }
+
     assetList.append(rec);
   }
 
@@ -286,6 +303,8 @@ void OSGEarthApp::onModeButtonClicked(QAbstractButton* button) {
       ui.stackedWidget->setCurrentIndex(1);
     } else if (button == ui.btnMeasure) {
       m_interManager->setMode(InterMode::MEASURE);
+    } else if (button == ui.btnLineWire) {
+      m_interManager->setMode(InterMode::LINE_WIRE);
     }
   } else {
     m_interManager->setMode(InterMode::VIEW);
@@ -313,7 +332,8 @@ void OSGEarthApp::on_btnReset_clicked() {
 }
 
 void OSGEarthApp::on_btnScenarioManager_clicked() {
-  m_scenarioDirectorWidget->show();
+  m_DirectorWidget->refreshAssetList(m_pathNodeMap);
+  m_DirectorWidget->show();
 }
 
 void OSGEarthApp::showRightClickMenu(const osg::Vec3d worldPos) {
@@ -336,31 +356,42 @@ void OSGEarthApp::showRightClickMenu(const osg::Vec3d worldPos) {
 void OSGEarthApp::flyToNode(osg::Node* node) {
   if (!node || !m_mapNode || !m_earthManipulator) return;
 
-  // 1. 获取节点的包围球（包含中心点 center 和半径 radius）
   osg::BoundingSphere bs = node->getBound();
-
-  // 如果包围球无效（比如节点还没完全加载），可以尝试强制更新
   if (!bs.valid()) {
     node->dirtyBound();
     bs = node->getBound();
   }
 
   if (bs.valid()) {
-    // 2. 将世界坐标 (ECEF) 转换为地理坐标 (经纬度)
+    // 1. 获取包围球中心的世界坐标 (ECEF)
+    osg::Vec3d worldCenter = bs.center();
+
+    // 2. 将世界坐标转为地理坐标，关键点：必须使用 ABSOLUTE 模式
     osgEarth::GeoPoint geo;
-    geo.fromWorld(m_geoSRS, bs.center());
+    geo.fromWorld(m_geoSRS, worldCenter);
 
-    // 3. 计算观察范围 (Range)
-    // 通常设为半径的 2 到 3 倍，这样能看清全貌又不会太远
-    double range = bs.radius() * 2.5;
-    if (range < 500.0) range = 500.0;  // 防止半径太小时镜头贴太近
+    // 强制确保高度参考是准确的，避免相机看地表而模型在空中
+    osgEarth::GeoPoint targetPos(m_geoSRS, geo.x(), geo.y(), geo.z(),
+                                 osgEarth::ALTMODE_ABSOLUTE);
 
-    // 4. 创建视角对象
-    // 参数依次为：名称、经度、纬度、高度(相对海拔)、航向角(0为北)、俯仰角(-90为垂直向下)、距离
-    osgEarth::Viewpoint vp("Point Cloud Target", geo.x(), geo.y(), 2000, 0.0,
-                           -90.0, range);
+    // 3. 动态计算距离 (Range)
+    // 如果物体在上方，说明 Range 太小或者 Pitch 太陡。
+    // 我们增加 Range 比例，并调平 Pitch。
+    double radius = bs.radius();
+    double range = radius * 4.5;  // 稍微拉远一点，增加视野包容度
 
-    // 5. 使用操作器执行平滑飞行（第二个参数是动画持续时间，单位：秒）
+    if (range < 200.0) range = 200.0;
+
+    // 4. 视角微调
+    double heading = 0.0;  // 正北
+    double pitch = -30.0;  // 减小俯仰角（从 -45 调到 -30），让相机抬起头看模型
+
+    // 5. 创建视角
+    // 注意：将高度直接写在 GeoPoint 里，Viewpoint 的高度填 0
+    osgEarth::Viewpoint vp("FocusedTarget", targetPos.x(), targetPos.y(),
+                           targetPos.z(), heading, pitch, range);
+
+    // 6. 执行飞行
     m_earthManipulator->setViewpoint(vp, 2.0);
   }
 }
@@ -456,7 +487,8 @@ void OSGEarthApp::applyFullLayout(int w, int h) {
 void OSGEarthApp::initSceneManagerTree() {
   QStringList categories = {
       QStringLiteral("点云数据 (LAS)"), QStringLiteral("三维模型 (OBJ)"),
-      QStringLiteral("影像/地形 (TIF)"), QStringLiteral("矢量数据 (SHP)")};
+      QStringLiteral("影像/地形 (TIF)"), QStringLiteral("矢量数据 (SHP)"),
+      QStringLiteral("导线（LINE）")};
 
   ui.treeSceneManager->header()->setStretchLastSection(true);
   ui.treeSceneManager->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -481,6 +513,8 @@ void OSGEarthApp::initSceneManagerTree() {
       m_categoryNodes["tif"] = root;
     else if (cat.contains("SHP"))
       m_categoryNodes["shp"] = root;
+    else if (cat.contains("LINE"))
+      m_categoryNodes["line"] = root;
   }
 }
 
@@ -498,6 +532,8 @@ void OSGEarthApp::addFileToTree(QString filePath) {
     parentNode = m_categoryNodes["tif"];
   else if (suffix == "shp")
     parentNode = m_categoryNodes["shp"];
+  else if (suffix == "line")
+    parentNode = m_categoryNodes["line"];
 
   if (!parentNode) return;
 
@@ -517,8 +553,12 @@ void OSGEarthApp::addFileToTree(QString filePath) {
           &OSGEarthApp::onSlotLocateFile);
   connect(widget, &SceneItemWidget::signalDelete, this,
           &OSGEarthApp::onSlotDeleteFile);
-  // connect(widget, &SceneItemWidget::signalSimulate, this,
-  //         &OSGEarthApp::enterTowerEditMode);
+  connect(widget, &SceneItemWidget::signalClassRGB, this,
+          &OSGEarthApp::onSlotClassifyPointCloud);
+  connect(widget, &SceneItemWidget::signalSimulateStarted, this,
+          &OSGEarthApp::enterTowerEditMode);
+  connect(widget, &SceneItemWidget::signalSimulateFinished, this,
+          &OSGEarthApp::exitTowerEditMode);
 
   // 设置 Widget 的固定高度，防止被 Tree 压缩
   widget->setFixedHeight(itemH);
@@ -589,6 +629,61 @@ void OSGEarthApp::onSlotDeleteFile(QString path) {
   // 6. 状态提示
   ui.lblText->setText(
       QStringLiteral("已移除资源：%1").arg(QFileInfo(path).fileName()));
+}
+
+void OSGEarthApp::onSlotClassifyPointCloud(QString path) {
+  if (!m_pathNodeMap.contains(path)) return;
+  osg::Object* obj = m_pathNodeMap[path].get();
+  if (auto* node = dynamic_cast<osg::Node*>(obj)) {
+    osg::StateSet* ss = node->getOrCreateStateSet();
+    osg::Uniform* u = ss->getUniform("u_colorMode");
+    if (u) {
+      int currentMode;
+      u->get(currentMode);
+      int nextMode = (currentMode == 0) ? 1 : 0;  // 切换 0 和 1
+      u->set(nextMode);
+    }
+  }
+}
+
+void OSGEarthApp::enterTowerEditMode(const QString& filePath) {
+  // startCollapseAnimation();
+  if (m_pathNodeMap.contains(filePath)) {
+    osg::Object* obj = m_pathNodeMap[filePath].get();
+
+    // 核心：寻找可以进行矩阵变换的节点
+    // osgEarth 的模型通常挂在 GeoTransform 下，它继承自 MatrixTransform
+    osg::MatrixTransform* mt = dynamic_cast<osg::MatrixTransform*>(obj);
+
+    if (mt) {
+      // 3. 调用你的助手工具
+      // 假设你在主类里实例化了 ManipulatorHelper* m_manipulatorHelper;
+      m_manipulatorHelper->attach(mt);
+
+      // 4. 视角对准模型，方便操作
+      //flyToNode(mt);
+
+      NoticeToast::popup(
+          this, u8"已开启拖拽模式，请使用鼠标操作红蓝绿轴线进行旋转和平移。",
+          2000);
+    } else {
+      NoticeToast::popup(this, u8"该节点不支持矩阵变换。", 1000);
+    }
+  }
+}
+
+void OSGEarthApp::exitTowerEditMode(const QString& filePath) {
+  if (m_pathNodeMap.contains(filePath)) {
+
+    osg::MatrixTransform* mt =
+        dynamic_cast<osg::MatrixTransform*>(m_pathNodeMap[filePath].get());
+
+    if (mt) {
+      m_manipulatorHelper->detach();
+
+      NoticeToast::popup(this, u8"模型姿态已更新", 1000);
+    }
+  }
 }
 
 void OSGEarthApp::registerLoadedObject(const QString& filePath,
@@ -683,6 +778,13 @@ void OSGEarthApp::initMembers() {
   // 因为需要等待m_interManager初始化完成，所以connect要放在这里
   connect(m_interManager, &InteractionManager::requestContextMenu, this,
           &OSGEarthApp::showRightClickMenu);
+  connect(m_interManager, &InteractionManager::wireCreated, this,
+          [this](QString id, osg::Node* node) {
+            // 1. 添加到场景中显示（建议添加到专门的 layer 组）
+            m_dataGroup->addChild(node);
+            m_pathNodeMap[id] = node;
+            registerLoadedObject(id, node);
+          });
 
   m_dataGroup->getOrCreateStateSet()->setMode(
       GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
@@ -692,52 +794,27 @@ void OSGEarthApp::initMembers() {
   m_earth_init = true;
 }
 
-/*
- void OSGEarthApp::startCollapseAnimation() {
-   QVariantAnimation* anim = new QVariantAnimation(this);
-   anim->setDuration(10000);  // 10秒倒塌
-   anim->setStartValue(0.0f);
-   anim->setEndValue(90.0f);
+void OSGEarthApp::startCollapseAnimation() {
+  std::cout << " 开始倒塌动画" << std::endl;
+  QVariantAnimation* anim = new QVariantAnimation(this);
+  anim->setDuration(10000);  // 10秒倒塌
+  anim->setStartValue(0.0f);
+  anim->setEndValue(90.0f);
 
-   connect(anim, &QVariantAnimation::valueChanged,
-           [this](const QVariant& value) {
-             if (m_currentTower) {
-               // 假设用户选择了 RIGHT 方向
-               m_currentTower->updateFall(Controller::RIGHT, value.toFloat());
-             }
-           });
-   anim->start();
- }
-
- */
-
-/*
- void OSGEarthApp::enterTowerEditMode(const QString& path) {
-  startCollapseAnimation();
-   1. 获取对应的物体
-   osg::Object* obj = m_pathNodeMap[path].get();
-
-// 注意：我们要操作的是 GeoTransform 里面的那个动画/校准节点
-// 这样不会破坏地理坐标，只是在局部做微调
- osgEarth::GeoTransform* xform = dynamic_cast<osgEarth::GeoTransform*>(obj);
- if (!xform || xform->getNumChildren() == 0) return;
-
-// 假设第一个孩子是我们的 TowerController 里的 fallMT
- osg::MatrixTransform* towerRoot =
-     dynamic_cast<osg::MatrixTransform*>(xform->getChild(0));
-
- if (towerRoot) {
-   if (!m_towerManip) {
-     m_towerManip = new ManipulatorHelper(m_root.get());
-   }
-   m_towerManip->attach(towerRoot);
- }
-
-// 2. UI 切换
-//ui.simulateControlPanel->show();
- qDebug() << "Tower Edit Mode Active for: " << path;
+  connect(anim, &QVariantAnimation::valueChanged,
+          [this](const QVariant& value) {
+            if (m_assetLoader->m_currentTower) {
+              // 假设用户选择了 RIGHT 方向
+              m_assetLoader->m_currentTower->updateFall(Controller::RIGHT,
+                                                        value.toFloat());
+              if (m_viewer.valid()) {
+                m_viewer->requestRedraw();
+              }
+              this->update();
+            }
+          });
+  anim->start();
 }
-*/
 
 /*
  void OSGEarthApp::onCoordinateChanged(double lon, double lat, double alt,

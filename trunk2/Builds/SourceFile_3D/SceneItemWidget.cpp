@@ -10,8 +10,24 @@ SceneItemWidget::SceneItemWidget(QString name, QString path, QWidget *parent)
     ui.btnSimulate->setVisible(false);
   }
 
+  if (info.suffix().toLower() == "las") {
+    ui.btnClassRGB->setVisible(true);
+  } else {
+    ui.btnClassRGB->setVisible(false);
+  }
+
   ui.lblName->setText(name);
   filePath = path;
 }
 
 SceneItemWidget::~SceneItemWidget() {}
+
+void SceneItemWidget::on_btnSimulate_clicked() {
+  if (ui.btnSimulate->text() == u8"调整") {
+    ui.btnSimulate->setText(u8"完成");
+    emit signalSimulateStarted(filePath);  // 发送开始信号
+  } else {
+    ui.btnSimulate->setText(u8"调整");
+    emit signalSimulateFinished(filePath);  // 发送结束信号
+  }
+}

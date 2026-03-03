@@ -109,10 +109,9 @@
     <QtRcc Include="..\..\Resource\PanoramicImageReader.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="..\..\Include_3D\DirectorWidget.ui" />
     <QtUic Include="..\..\Include_3D\ModelLibraryWidget.ui" />
     <QtUic Include="..\..\Include_3D\OSGEarthApp.ui" />
-    <QtUic Include="..\..\Include_3D\ScenarioDirectorWidget.ui" />
-    <QtUic Include="..\..\Include_3D\ScenarioItemWidget.ui" />
     <QtUic Include="..\..\Include_3D\SceneItemWidget.ui" />
     <QtUic Include="..\..\Include_3D\SimPanel.ui" />
     <QtUic Include="..\..\Include_3D\Space_3D.ui" />
@@ -176,6 +175,7 @@
     <QtMoc Include="..\..\Include_3D\AssetLoader.h" />
     <QtMoc Include="..\..\Include_3D\InteractionManager.h" />
     <QtMoc Include="..\..\Include_3D\ModelLibraryWidget.h" />
+    <QtMoc Include="..\..\Include_3D\DirectorWidget.h" />
     <ClInclude Include="..\..\Include_3D\ProjectDAO.h" />
     <QtMoc Include="..\..\Include_720\project_edit_resee_draw.h" />
     <QtMoc Include="..\..\Include_720\MultiPosSlider_FOV.h" />
@@ -185,8 +185,6 @@
     <QtMoc Include="..\..\Include_720\project_edit_ruler_set.h" />
     <QtMoc Include="..\..\Include_720\MultiPosSlider_Latitude.h" />
     <QtMoc Include="..\..\Include_720\MultiPosSlider_Longitude.h" />
-    <QtMoc Include="..\..\Include_3D\ScenarioDirectorWidget.h" />
-    <QtMoc Include="..\..\Include_3D\ScenarioItemWidget.h" />
     <ClInclude Include="resource1.h" />
     <QtMoc Include="..\..\Include_3D\OSGEarthApp.h" />
     <QtMoc Include="..\..\Include_3D\Space_3D.h" />
@@ -246,14 +244,13 @@
     <ClCompile Include="..\SourceFile_3D\Controller.cpp" />
     <ClCompile Include="..\SourceFile_3D\CoordinateHandler.cpp" />
     <ClCompile Include="..\SourceFile_3D\CustomDialog.cpp" />
+    <ClCompile Include="..\SourceFile_3D\DirectorWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\InteractionManager.cpp" />
     <ClCompile Include="..\SourceFile_3D\ManipulatorHelper.cpp" />
     <ClCompile Include="..\SourceFile_3D\ModelLibraryWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\NoticeToast.cpp" />
     <ClCompile Include="..\SourceFile_3D\OSGEarthApp.cpp" />
     <ClCompile Include="..\SourceFile_3D\ProjectDAO.cpp" />
-    <ClCompile Include="..\SourceFile_3D\ScenarioDirectorWidget.cpp" />
-    <ClCompile Include="..\SourceFile_3D\ScenarioItemWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\SceneItemWidget.cpp" />
     <ClCompile Include="..\SourceFile_3D\SimPanel.cpp" />
     <ClCompile Include="..\SourceFile_3D\Space_3D.cpp" />

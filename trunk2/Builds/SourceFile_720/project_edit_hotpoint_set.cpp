@@ -40,8 +40,14 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString projUUID, QString p
     ui.horizontalSlider_h->setMaximum(200);
     ui.horizontalSlider_h->setTickInterval(1);
 
+    ui.horizontalSlider_rotation_angle->setMinimum(0);
+    ui.horizontalSlider_rotation_angle->setMaximum(360);
+    ui.horizontalSlider_rotation_angle->setTickInterval(1);
+
     connect(ui.horizontalSlider_w, SIGNAL(valueChanged(int)), SLOT(setHorValueW(int)));
     connect(ui.horizontalSlider_h, SIGNAL(valueChanged(int)), SLOT(setHorValueH(int)));
+    connect(ui.horizontalSlider_rotation_angle, SIGNAL(valueChanged(int)), SLOT(setHorValueRotation_Angle(int)));
+
     connect(ui.checkBox_zoom, SIGNAL(stateChanged(int)), SLOT(setHorValueHW(int)));
     connect(ui.textEdit_tilte, SIGNAL(textChanged()), SLOT(setIconName()));
     connect(ui.checkBox_ShowTitle, SIGNAL(stateChanged(int)), SLOT(setShowTitle(int)));
@@ -97,6 +103,7 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString projUUID, QString p
         QString strWzoom;
         QString strHzoom;
         bool blTitleShow;
+        QString strRotation_angle;
 
         QString data = QString("select * from hotpoint where id = '%1' LIMIT 1").arg(iconID);
         QSqlQuery query(data);//查询表的内容
@@ -120,6 +127,8 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString projUUID, QString p
                 m_titleTextColor = QColor(textColorList[0].toInt(), textColorList[1].toInt(), textColorList[2].toInt());
          
             m_titleTextSize = size;
+
+            strRotation_angle = query.value(16).toString();
         }
 
         QPixmap pixmap(iconPath);
@@ -134,6 +143,7 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString projUUID, QString p
 
         ui.horizontalSlider_w->setValue(strWzoom.toFloat() * 100.0);
         ui.horizontalSlider_h->setValue(strHzoom.toFloat() * 100.0);
+        ui.horizontalSlider_rotation_angle->setValue(strRotation_angle.toFloat());
 
         ui.textEdit_tilte->setPlainText(iconName);
 
@@ -150,6 +160,7 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString projUUID, QString p
             m_oldHpPam.iconPath = iconPath;
             m_oldHpPam.scale_x = strWzoom.toFloat();
             m_oldHpPam.scale_y = strHzoom.toFloat();
+            m_oldHpPam.rotation_angle = strRotation_angle.toFloat();
             m_oldHpPam.name = iconName;
             m_oldHpPam.title_bg_color = m_titleBgColor;
             m_oldHpPam.title_text_color = m_titleTextColor;
@@ -163,6 +174,11 @@ project_edit_hotpoint_set::project_edit_hotpoint_set(QString projUUID, QString p
         else if (iconStyle.contains("picText;") == true)
         {
             ui.comboBox_style->setCurrentIndex(1);
+            QStringList changeList = iconStyle.split(';');
+            if (changeList.size() == 2)
+            {
+                ui.lineEdit_picsTitle->setText(changeList[1]);
+            }           
             //搜索图册  
             QString dirName = QApplication::applicationDirPath() + "/DataBase/" + m_projUUID;
             QString dirName_hp = dirName + "/HotPoints";
@@ -317,6 +333,7 @@ void project_edit_hotpoint_set::slotSetIcon(QString iconPath)
     hpIcon.description = "";
     hpIcon.scale_x = ui.horizontalSlider_w->value() / 100.0;
     hpIcon.scale_y = ui.horizontalSlider_h->value() / 100.0;
+    hpIcon.rotation_angle = ui.horizontalSlider_rotation_angle->value() / 100.0;
     hpIcon.icon_visible = true;
     hpIcon.title_visible = ui.checkBox_ShowTitle->checkState();
     hpIcon.movable = true;
@@ -379,6 +396,12 @@ void project_edit_hotpoint_set::setHorValueH(int value)
     {
         emit sig_setScaleY(ui.horizontalSlider_h->value() / 100.0);
     }
+}
+
+void project_edit_hotpoint_set::setHorValueRotation_Angle(int value)
+{
+    ui.lineEdit_rotation_angle->setText(QString::number(ui.horizontalSlider_rotation_angle->value()));
+    emit sig_setRotation_angle(ui.horizontalSlider_rotation_angle->value());
 }
 
 void project_edit_hotpoint_set::setHorValueHW(int va)
@@ -552,7 +575,7 @@ void project_edit_hotpoint_set::slotDone()
 
     if (ui.comboBox_style->currentIndex() == 0)
     {
-        hpIcon.style = "nornmal;";
+        hpIcon.style = "normal;";
       
     }
     else if (ui.comboBox_style->currentIndex() == 1)

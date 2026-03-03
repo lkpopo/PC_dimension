@@ -51,6 +51,7 @@ signals:
 	void sig_Msg(QString);
 	void sig_scale_x(float);
 	void sig_scale_y(float);
+	void sig_rotation_angle(float);
 	void sig_name(QString);
 	void sig_name_show(bool);
 	void sig_add_icon_end();

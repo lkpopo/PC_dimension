@@ -20,7 +20,7 @@ project_edit_hotpoint_level_set_item::project_edit_hotpoint_level_set_item(Hotsp
 	ui.label_icon->setPixmap(fitpixmap);
 	ui.pushButton_title->setText(hp.name);
 
-	if (hp.style == "nornmal;")
+	if (hp.style == "normal;")
 		ui.pushButton_changPic->setText(u8"一般热点");
 	else if (hp.style.contains("picText;") == true)
 		ui.pushButton_changPic->setText(u8"图文展示");

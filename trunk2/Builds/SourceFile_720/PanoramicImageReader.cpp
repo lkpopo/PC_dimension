@@ -516,31 +516,6 @@ void PanoramicImageReader::create_linename_sqlite()
 	}
 }
 
-//void PanoramicImageReader::create_project_sqlite()
-//{
-//	QString sql = QString(
-//		"CREATE TABLE IF NOT EXISTS `project` \
-//		( \
-//		`id` varchar(64)  NOT NULL, \
-//		`project_name` varchar(128)  NULL DEFAULT NULL, \
-//		`line_name` varchar(128)  NULL DEFAULT NULL, \
-//		`keyword` varchar(64) NULL DEFAULT NULL, \
-//		`introduction` varchar(256) NULL DEFAULT NULL, \
-//		`picture_count` int(8)  DEFAULT '0', \
-//		`front_cover` varchar(128) NULL DEFAULT NULL, \
-//		`create_time` varchar(64)  NULL DEFAULT NULL , \
-//		`update_time` varchar(64)  NULL DEFAULT NULL , \
-//		`more1` varchar(32) NULL DEFAULT NULL, \
-//		`more2` varchar(64) NULL DEFAULT NULL, \
-//		`more3` varchar(128) NULL DEFAULT NULL, \
-//		PRIMARY KEY(`id`));");
-//	QSqlQuery query;
-//	if (!query.exec(sql))
-//	{
-//		qDebug() << QString::fromLocal8Bit("failed!") << query.lastError();
-//	}
-//}
-
 void PanoramicImageReader::create_project_sqlite()
 {
 	QString sql = QString(
@@ -592,6 +567,8 @@ void PanoramicImageReader::create_picture_sqlite()
 		`isLevelShow` varchar(16) NULL DEFAULT NULL, \
 		`more1` varchar(32) NULL DEFAULT NULL, \
 		`more2` varchar(64) NULL DEFAULT NULL, \
+		`more3` varchar(32) NULL DEFAULT NULL, \
+		`more4` varchar(64) NULL DEFAULT NULL, \
 		PRIMARY KEY(`id`));");
 	QSqlQuery query;
 	if (!query.exec(sql))
@@ -610,7 +587,7 @@ void PanoramicImageReader::create_hotpoint_sqlite()
 		`hotpoint_name` varchar(128)  NULL DEFAULT NULL, \
 		`picture_id` varchar(64)  NULL DEFAULT NULL, \
 		`hotpoint_path` varchar(128)  NULL DEFAULT NULL, \
-		`style` varchar(16) NULL DEFAULT NULL, \
+		`style` varchar(64) NULL DEFAULT NULL, \
 		`position` varchar(16) NULL DEFAULT NULL, \
 		`w_zoom` varchar(16) NULL DEFAULT NULL, \
 		`h_zoom` varchar(16) NULL DEFAULT NULL, \
@@ -622,8 +599,11 @@ void PanoramicImageReader::create_hotpoint_sqlite()
 		`title_bg_color` varchar(16) NULL DEFAULT NULL, \
 		`title_text_color` varchar(16) NULL DEFAULT NULL, \
 		`title_text_size` varchar(4) NULL DEFAULT NULL, \
+		`rotation_angle` varchar(16) NULL DEFAULT NULL, \
 		`more1` varchar(32) NULL DEFAULT NULL, \
 		`more2` varchar(64) NULL DEFAULT NULL, \
+		`more3` varchar(32) NULL DEFAULT NULL, \
+		`more4` varchar(64) NULL DEFAULT NULL, \
 		PRIMARY KEY(`id`));");
 	QSqlQuery query;
 	if (!query.exec(sql))
@@ -653,6 +633,10 @@ void PanoramicImageReader::create_ruler_sqlite()
 		`line_color` varchar(8) NULL DEFAULT NULL, \
 		`line_endpoint_style` varchar(8) NULL DEFAULT NULL, \
 		`line_endpoint_color` varchar(8) NULL DEFAULT NULL, \
+		`more1` varchar(32) NULL DEFAULT NULL, \
+		`more2` varchar(64) NULL DEFAULT NULL, \
+		`more3` varchar(32) NULL DEFAULT NULL, \
+		`more4` varchar(64) NULL DEFAULT NULL, \
 		PRIMARY KEY(`id`));");
 	QSqlQuery query;
 	if (!query.exec(sql))
@@ -671,7 +655,9 @@ void PanoramicImageReader::create_level_sqlite()
 		`max_zoom` varchar(16) NULL DEFAULT NULL, \
 		`level_id` varchar(64) NULL DEFAULT NULL,\
 		`more1` varchar(32)  NULL DEFAULT NULL, \
-		`more2` varchar(64)  NULL DEFAULT NULL);");
+		`more2` varchar(64)  NULL DEFAULT NULL, \
+		`more3` varchar(32)  NULL DEFAULT NULL, \
+		`more4` varchar(64)  NULL DEFAULT NULL);");
 	QSqlQuery query;
 	if (!query.exec(sql))
 	{
@@ -713,7 +699,9 @@ void PanoramicImageReader::create_group_sqlite()
 		`isIncludeAll` varchar(4) NULL DEFAULT NULL, \
 		`GroupID` varchar(64) NULL DEFAULT NULL, \
 		`more1` varchar(32)  NULL DEFAULT NULL, \
-		`more2` varchar(64)  NULL DEFAULT NULL);");
+		`more2` varchar(64)  NULL DEFAULT NULL, \
+		`more3` varchar(32)  NULL DEFAULT NULL, \
+		`more4` varchar(64)  NULL DEFAULT NULL);");
 	QSqlQuery query;
 	if (!query.exec(sql))
 	{

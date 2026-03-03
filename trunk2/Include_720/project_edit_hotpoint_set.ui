@@ -35,7 +35,7 @@
      <x>10</x>
      <y>0</y>
      <width>230</width>
-     <height>281</height>
+     <height>341</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -137,9 +137,9 @@ border-radius:5px;
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>295</y>
+     <y>355</y>
      <width>231</width>
-     <height>291</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -154,9 +154,9 @@ border-radius:5px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>330</y>
+     <y>390</y>
      <width>211</width>
-     <height>61</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -175,7 +175,7 @@ border:0px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>300</y>
+     <y>360</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -191,7 +191,7 @@ border:0px;</string>
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>300</y>
+     <y>360</y>
      <width>81</width>
      <height>31</height>
     </rect>
@@ -213,7 +213,7 @@ font: 10pt &quot;微软雅黑&quot;;</string>
      <x>30</x>
      <y>130</y>
      <width>161</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -231,9 +231,9 @@ font: 10pt &quot;微软雅黑&quot;;</string>
    <property name="geometry">
     <rect>
      <x>29</x>
-     <y>190</y>
+     <y>185</y>
      <width>181</width>
-     <height>20</height>
+     <height>15</height>
     </rect>
    </property>
    <property name="orientation">
@@ -246,7 +246,7 @@ font: 10pt &quot;微软雅黑&quot;;</string>
      <x>30</x>
      <y>160</y>
      <width>71</width>
-     <height>31</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -263,7 +263,7 @@ font: 10pt &quot;微软雅黑&quot;;</string>
      <x>30</x>
      <y>250</y>
      <width>181</width>
-     <height>20</height>
+     <height>15</height>
     </rect>
    </property>
    <property name="orientation">
@@ -276,7 +276,7 @@ font: 10pt &quot;微软雅黑&quot;;</string>
      <x>31</x>
      <y>220</y>
      <width>71</width>
-     <height>31</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -309,7 +309,7 @@ font: 10pt &quot;微软雅黑&quot;;</string>
      <x>100</x>
      <y>160</y>
      <width>113</width>
-     <height>31</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -328,7 +328,7 @@ border: 0px;</string>
      <x>100</x>
      <y>220</y>
      <width>113</width>
-     <height>31</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -345,7 +345,7 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>390</y>
+     <y>440</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -361,7 +361,7 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>420</y>
+     <y>470</y>
      <width>211</width>
      <height>31</height>
     </rect>
@@ -374,7 +374,7 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>480</y>
+     <y>530</y>
      <width>211</width>
      <height>31</height>
     </rect>
@@ -387,7 +387,7 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>450</y>
+     <y>500</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -403,7 +403,7 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>510</y>
+     <y>560</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -419,7 +419,7 @@ border: 0px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>540</y>
+     <y>590</y>
      <width>211</width>
      <height>31</height>
     </rect>
@@ -444,9 +444,9 @@ QComboBox::item:selected{background-color:rgba(34,64,96,220)};</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>600</y>
+     <y>650</y>
      <width>231</width>
-     <height>301</height>
+     <height>291</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -461,7 +461,7 @@ border-radius:5px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>600</y>
+     <y>650</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -477,7 +477,7 @@ border-radius:5px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>630</y>
+     <y>680</y>
      <width>211</width>
      <height>31</height>
     </rect>
@@ -496,7 +496,7 @@ QComboBox::item:selected{background-color:rgba(34,64,96,220)};</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>690</y>
+     <y>740</y>
      <width>211</width>
      <height>111</height>
     </rect>
@@ -511,7 +511,7 @@ border-radius:5px;
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>660</y>
+     <y>710</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -527,7 +527,7 @@ border-radius:5px;
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>830</y>
+     <y>870</y>
      <width>121</width>
      <height>31</height>
     </rect>
@@ -543,7 +543,7 @@ border-radius:5px;
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>860</y>
+     <y>900</y>
      <width>211</width>
      <height>31</height>
     </rect>
@@ -558,7 +558,7 @@ border:0px;</string>
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>810</y>
+     <y>860</y>
      <width>91</width>
      <height>20</height>
     </rect>
@@ -576,7 +576,7 @@ border-radius:5px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>690</y>
+     <y>740</y>
      <width>211</width>
      <height>111</height>
     </rect>
@@ -596,7 +596,7 @@ color: rgb(255, 255, 255);</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>690</y>
+     <y>740</y>
      <width>211</width>
      <height>111</height>
     </rect>
@@ -610,6 +610,55 @@ color: rgb(0, 0, 0);</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QSlider" name="horizontalSlider_rotation_angle">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>310</y>
+     <width>181</width>
+     <height>15</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>280</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+font: 10pt &quot;微软雅黑&quot;;</string>
+   </property>
+   <property name="text">
+    <string>旋转角度：</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_rotation_angle">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>280</y>
+     <width>113</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);
+font: 10pt &quot;微软雅黑&quot;;
+background-color: rgb(40, 40, 40);
+border: 0px;</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
   <zorder>label_bg</zorder>
@@ -647,6 +696,9 @@ color: rgb(0, 0, 0);</string>
   <zorder>pushButton_selPic_style</zorder>
   <zorder>label_selPic_change</zorder>
   <zorder>label_selPic_change_name</zorder>
+  <zorder>horizontalSlider_rotation_angle</zorder>
+  <zorder>label_3</zorder>
+  <zorder>lineEdit_rotation_angle</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

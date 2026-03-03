@@ -17,10 +17,16 @@ bool ProjectDataManager::initDatabase() {
       "CREATE TABLE IF NOT EXISTS t_project_assets ("
       "id INTEGER PRIMARY KEY AUTOINCREMENT, "
       "p_name TEXT, "
-      "file_path TEXT, "
-      "lon REAL DEFAULT 0, "
+      "file_path TEXT, "  // 存放文件路径，导线可存为 "INTERNAL_LINE"
+      "lon REAL DEFAULT 0, "  // 原有字段，可保留用于兼容旧的模型点坐标
       "lat REAL DEFAULT 0, "
       "alt REAL DEFAULT 0, "
+      "start_x REAL DEFAULT 0, "  // 导线起点 X (或经度)
+      "start_y REAL DEFAULT 0, "  // 导线起点 Y (或纬度)
+      "start_z REAL DEFAULT 0, "  // 导线起点 Z (或高度)
+      "end_x REAL DEFAULT 0, "    // 导线终点 X
+      "end_y REAL DEFAULT 0, "    // 导线终点 Y
+      "end_z REAL DEFAULT 0, "    // 导线终点 Z
       "FOREIGN KEY(p_name) REFERENCES t_project(p_name) ON DELETE CASCADE)";
 
   // 3. 补充：创建剧本步骤表 (存放具体的执行逻辑顺序)
@@ -95,14 +101,24 @@ bool ProjectDataManager::saveProject(const QString& pName,
 
   // B. 批量插入新资产
   query.prepare(
-      "INSERT INTO t_project_assets (p_name, file_path, lon, lat, alt) VALUES "
-      "(?, ?, ?, ?, ?)");
+      "INSERT INTO t_project_assets (p_name, file_path, lon, lat, alt, "
+      "start_x, start_y, start_z, end_x, end_y, end_z) "
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
   for (const auto& asset : assets) {
     query.addBindValue(pName);
     query.addBindValue(asset.filePath);
     query.addBindValue(asset.lon);
     query.addBindValue(asset.lat);
     query.addBindValue(asset.alt);
+    // 新增字段绑定
+    query.addBindValue(asset.start_x);
+    query.addBindValue(asset.start_y);
+    query.addBindValue(asset.start_z);
+    query.addBindValue(asset.end_x);
+    query.addBindValue(asset.end_y);
+    query.addBindValue(asset.end_z);
+
     if (!query.exec()) {
       m_lastError = query.lastError().text();
       db.rollback();
@@ -139,8 +155,11 @@ bool ProjectDataManager::deleteProject(const QString& pName) {
 QList<AssetRecord> ProjectDataManager::getProjectAssets(const QString& pName) {
   QList<AssetRecord> list;
   QSqlQuery query;
+  // 查询字段必须与赋值时的索引对应
   query.prepare(
-      "SELECT file_path, lon, lat, alt FROM t_project_assets WHERE p_name = ?");
+      "SELECT file_path, lon, lat, alt, start_x, start_y, start_z, end_x, "
+      "end_y, end_z "
+      "FROM t_project_assets WHERE p_name = ?");
   query.addBindValue(pName);
 
   if (query.exec()) {
@@ -150,8 +169,19 @@ QList<AssetRecord> ProjectDataManager::getProjectAssets(const QString& pName) {
       rec.lon = query.value(1).toDouble();
       rec.lat = query.value(2).toDouble();
       rec.alt = query.value(3).toDouble();
+
+      // 读取新增的 6 个坐标字段
+      rec.start_x = query.value(4).toDouble();
+      rec.start_y = query.value(5).toDouble();
+      rec.start_z = query.value(6).toDouble();
+      rec.end_x = query.value(7).toDouble();
+      rec.end_y = query.value(8).toDouble();
+      rec.end_z = query.value(9).toDouble();
+
       list.append(rec);
     }
+  } else {
+    m_lastError = query.lastError().text();
   }
   return list;
 }

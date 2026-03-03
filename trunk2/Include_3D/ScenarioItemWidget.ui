@@ -92,6 +92,18 @@ QPushButton#btnPlay {
     background-color: #e6f7ff;
     border-color: #91d5ff;
 }
+QPushButton#btnPlay:hover {
+    color: #ffffff;
+    background-color: #40a9ff; /* 亮蓝色变深 */
+    border-color: #40a9ff;
+}
+
+/* 点击状态：颜色最深，且有按下感 */
+QPushButton#btnPlay:pressed {
+    color: #ffffff;
+    background-backcolor: #096dd9; /* 深蓝色 */
+    border-color: #096dd9;
+}
 
 /* 7. [彻底删除条目] 按钮 */
 QPushButton#btnDel {

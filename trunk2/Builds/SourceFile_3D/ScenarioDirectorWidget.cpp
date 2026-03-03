@@ -2,12 +2,12 @@
 
 #include <QFileDialog>
 #include <QSqlDatabase>
+#include <QSqlError>
 #include <QSqlQuery>
 #include <QUuid>
-#include <QSqlError>
-#include "NoticeToast.h"
+#include <iostream>
 
-#include<iostream>
+#include "NoticeToast.h"
 
 ScenarioDirectorWidget::ScenarioDirectorWidget(QWidget* parent)
     : m_parent(parent) {
@@ -33,7 +33,7 @@ void ScenarioDirectorWidget::on_btnAddOut_clicked() {
 void ScenarioDirectorWidget::on_btnSaveScenario_clicked() {
   QString scenarioName = ui.lineEdit->text();
   if (scenarioName.isEmpty()) {
-      return;
+    return;
   }
 
   QSqlDatabase db = QSqlDatabase::database();
@@ -160,6 +160,19 @@ void ScenarioDirectorWidget::onItemDeleteRequested(ScenarioItemWidget* ptr) {
   }
 }
 
+void ScenarioDirectorWidget::onScenarioDeleteRequested(ScenarioItemWidget* ptr)
+{
+  onItemDeleteRequested(ptr);
+  
+  //这个在UI中删除之后，数据库里面的对应条目也需要删除 需要补充代码
+  /*
+  
+  ... ...
+  
+  */
+
+}
+
 void ScenarioDirectorWidget::refreshListIndices() {
   for (int i = 0; i < ui.listScenario->count(); ++i) {
     QListWidgetItem* item = ui.listScenario->item(i);
@@ -168,5 +181,45 @@ void ScenarioDirectorWidget::refreshListIndices() {
     if (widget) {
       widget->setIndex(i + 1);
     }
+  }
+}
+
+void ScenarioDirectorWidget::on_btnLoadHistory_clicked() {
+  ui.listScenario->clear();
+
+  QSqlQuery query;
+  // 获取不重复的剧本名称
+  query.prepare("SELECT DISTINCT scenario_name FROM t_scenario_steps");
+
+  if (!query.exec()) {
+    NoticeToast::popup(this, u8"获取剧本列表失败", 2000);
+    return;
+  }
+
+  int index = 1;
+  while (query.next()) {
+    QString scenarioName = query.value(0).toString();
+
+    // 1. 创建 QListWidgetItem
+    QListWidgetItem* item = new QListWidgetItem(ui.listScenario);
+    item->setSizeHint(QSize(0, 45));  // 使用你设定的大小
+
+    // 存储剧本名到 Data，方便识别
+    item->setData(Qt::UserRole, scenarioName);
+
+    // 2. 创建自定义 Widget (使用 HISTORY 模式)
+    ScenarioItemWidget* widget = new ScenarioItemWidget(
+        index++, scenarioName,
+        ScenarioItemWidget::MODE_HISTORY,  // 你需要定义这个模式
+        this);
+
+    connect(widget, &ScenarioItemWidget::signalDelete, this,
+            &ScenarioDirectorWidget::onScenarioDeleteRequested);
+    //connect(widget, &ScenarioItemWidget::signalPlayScenario, this,
+    //        &ScenarioDirectorWidget::onPlayScenarioRequested);
+
+    // 3. 将其放入列表
+    ui.listScenario->addItem(item);
+    ui.listScenario->setItemWidget(item, widget);
   }
 }

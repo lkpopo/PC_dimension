@@ -26,8 +26,11 @@ class ScenarioDirectorWidget : public QWidget {
   void on_btnExit_clicked();
   void on_btnAddIn_clicked();
   void on_btnAddOut_clicked();
+  void on_btnLoadHistory_clicked();
   void on_btnSaveScenario_clicked();
   void onItemDeleteRequested(ScenarioItemWidget* ptr);
+  void onScenarioDeleteRequested(ScenarioItemWidget* ptr);
+  //void onPlayScenarioRequested(int idx);
 
   void handleModelAction(const ActionType& type);
   void refreshListIndices();

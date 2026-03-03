@@ -218,8 +218,8 @@ void Space_3D::loadProjectCommon(QString pName, OSGEarthApp::WorkMode mode) {
   // 使用管理器获取数据
   QList<AssetRecord> assets = ProjectDataManager::getProjectAssets(pName);
 
-  for (const auto& asset : assets) {
-    m_earthWindow->onLoadScene(asset.filePath, asset.lon, asset.lat, asset.alt);
+  for (auto& asset : assets) {
+    m_earthWindow->onLoadScene(asset.filePath, &asset);
   }
 
   m_earthWindow->updateUIByWorkMode();

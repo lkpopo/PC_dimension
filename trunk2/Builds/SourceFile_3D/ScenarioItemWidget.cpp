@@ -24,10 +24,17 @@ ScenarioItemWidget::ScenarioItemWidget(int index, QString name, Mode mode,
     case PLAY:
       ui.btnPlay->show();
       break;
+    case MODE_HISTORY:
+      // 历史记录模式，默认显示“回放”按钮
+      ui.btnPlay->show();
+      ui.btnPlay->setText(u8"查看");
+      break;
   }
 
   connect(ui.btnDel, &QPushButton::clicked, this,
           [=]() { emit signalDelete(this); });
+  connect(ui.btnPlay, &QPushButton::clicked, this,
+          [=]() { emit signalPlayScenario(index); });
 }
 void ScenarioItemWidget::setIndex(int index) {
   ui.lblIndex->setText(QString::number(index));

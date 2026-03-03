@@ -31,6 +31,7 @@ public slots:
 	void setHorValueW(int);
 	void setHorValueH(int);
 	void setHorValueHW(int);
+	void setHorValueRotation_Angle(int);
 	void setIconName();
 	void setShowTitle(int);
 
@@ -52,6 +53,7 @@ signals:
 	void sig_updateIconSet(QString);
 	void sig_setScaleX(float);
 	void sig_setScaleY(float);
+	void sig_setRotation_angle(float);
 	void sig_setIconName(QString);
 	void sig_IconNameShow(bool);
 	void sig_AddIconEnd();

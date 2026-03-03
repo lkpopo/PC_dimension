@@ -177,10 +177,7 @@
     <QtUic Include="..\..\Include_3D\ModelLibraryWidget.ui">
       <Filter>Form Files\3D</Filter>
     </QtUic>
-    <QtUic Include="..\..\Include_3D\ScenarioDirectorWidget.ui">
-      <Filter>Form Files\3D</Filter>
-    </QtUic>
-    <QtUic Include="..\..\Include_3D\ScenarioItemWidget.ui">
+    <QtUic Include="..\..\Include_3D\DirectorWidget.ui">
       <Filter>Form Files\3D</Filter>
     </QtUic>
   </ItemGroup>
@@ -380,13 +377,10 @@
     <QtMoc Include="..\..\Include_3D\ScenarioDirectorWidget.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
-    <QtMoc Include="..\..\Include_3D\ScenarioDirectorWidget.h">
-      <Filter>Header Files\3D</Filter>
-    </QtMoc>
     <QtMoc Include="..\..\Include_3D\ScenarioItemWidget.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
-    <QtMoc Include="..\..\Include_3D\ScenarioItemWidget.h">
+    <QtMoc Include="..\..\Include_3D\DirectorWidget.h">
       <Filter>Header Files\3D</Filter>
     </QtMoc>
   </ItemGroup>
@@ -600,10 +594,7 @@
     <ClCompile Include="..\SourceFile_3D\ModelLibraryWidget.cpp">
       <Filter>Source Files\3D</Filter>
     </ClCompile>
-    <ClCompile Include="..\SourceFile_3D\ScenarioDirectorWidget.cpp">
-      <Filter>Source Files\3D</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SourceFile_3D\ScenarioItemWidget.cpp">
+    <ClCompile Include="..\SourceFile_3D\DirectorWidget.cpp">
       <Filter>Source Files\3D</Filter>
     </ClCompile>
   </ItemGroup>

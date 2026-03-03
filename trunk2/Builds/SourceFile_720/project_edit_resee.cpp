@@ -214,6 +214,7 @@ project_edit_resee::project_edit_resee(QString projUUID, QStringList listPicPath
 			hp.style = query.value(4).toString();
 			hp.scale_x = query.value(6).toFloat();
 			hp.scale_y = query.value(7).toFloat();
+			hp.rotation_angle = query.value(16).toFloat();
 			hp.lock = query.value(8).toBool();
 			hp.icon_visible = query.value(9).toBool();
 			hp.title_visible = query.value(10).toBool();
@@ -626,6 +627,7 @@ void project_edit_resee::Reload()
 			hp.style = query.value(4).toString();
 			hp.scale_x = query.value(6).toFloat();
 			hp.scale_y = query.value(7).toFloat();
+			hp.rotation_angle = query.value(16).toFloat();
 			hp.lock = query.value(8).toBool();
 			hp.icon_visible = query.value(9).toBool();
 			hp.title_visible = query.value(10).toBool();
